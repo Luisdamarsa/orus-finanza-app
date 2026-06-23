@@ -1,0 +1,479 @@
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { groupByDate, fmt } from "../utils/formatters";
+import { METHOD_META } from "../constants";
+import TransactionsListService from "./TransactionsListService";
+
+/**
+ * Página de Movimientos de un pilar específico
+ * Muestra:
+ * - Total gastado en el pilar
+ * - Porcentaje del presupuesto (a favor o sobrepasado)
+ * - Desglose por categoría
+ * - Lista de movimientos (igual al Estado 2 filtrado)
+ */
+export default function MovimientosPage({
+  isDark,
+  onBack,
+  pilar,
+  transactions,
+  selectedPeriod,
+}) {
+  const t = isDark
+    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
+    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+
+  // Filtrar transacciones por pilar y período
+  const pillarTxns = transactions.filter((tx) => {
+    const matchesPillar = tx.pillar === pilar.id;
+    if (!selectedPeriod) return matchesPillar; // "Todo"
+    const [y, m, d] = tx.date.split("-").map(Number);
+    return matchesPillar && y === selectedPeriod.year && m === selectedPeriod.month;
+  });
+
+  // Calcular total gastado (sum de amounts negativos)
+  const totalSpent = Math.abs(
+    pillarTxns.reduce((sum, tx) => sum + Math.min(tx.amount, 0), 0)
+  );
+
+  // Desglose por categoría - mostrar TODAS las categorías del pilar
+  const categorySpent = {};
+  // Inicializar todas las categorías del pilar en 0
+  if (pilar.categories) {
+    pilar.categories.forEach((cat) => {
+      categorySpent[cat.name] = 0;
+    });
+  }
+  // Sumar los gastos reales
+  pillarTxns.forEach((tx) => {
+    const cat = tx.category || "Sin categoría";
+    categorySpent[cat] = (categorySpent[cat] || 0) + Math.abs(Math.min(tx.amount, 0));
+  });
+
+  // Porcentaje del presupuesto
+  const budget = pilar.budget || null;
+  const percentage = budget ? (totalSpent / budget) * 100 : null;
+  const isOverBudget = percentage && percentage > 100;
+
+  // 🆕 Obtener el color oscuro del pilar CON OPACIDAD (15%) para la barra de categorías
+  const pillarSoftColor = (pilar.darkColor || "#22C55E") + "26";
+
+  // 🆕 Obtener color suave de Deuda para cuando se pasa presupuesto
+  const debtSoftColor = "#FCA5A5";
+
+  // 🆕 Estado para filtros de categorías seleccionadas
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  // 🆕 Filtrar transacciones por categorías seleccionadas
+  const filteredTxns = selectedCategories.length > 0
+    ? pillarTxns.filter(tx => selectedCategories.includes(tx.category || "Sin categoría"))
+    : pillarTxns;
+
+  // Agrupar transacciones por fecha (usando las filtradas)
+  const groups = groupByDate(filteredTxns);
+
+  // Expandir/contraer alturas
+  const [expandedHeights, setExpandedHeights] = useState({});
+  const contentRefs = useRef({});
+
+  // 🆕 Estado para la altura dinámica de MOVIMIENTOS
+  const [movimientosHeight, setMovimientosHeight] = useState(0); // 0 inicialmente
+  const movimientosRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+
+  // 🆕 Calcular top del contenedor scrolleable (constante: 104 header + 76 presupuesto = 180px)
+  const contentTop = 180;
+
+  // 🆕 Medir altura de MOVIMIENTOS
+  useEffect(() => {
+    const measureHeight = () => {
+      if (movimientosRef.current) {
+        const height = movimientosRef.current.offsetHeight;
+        setMovimientosHeight(height);
+      }
+    };
+
+    // Medir después de montar (para tener el valor correcto)
+    setTimeout(measureHeight, 50);
+
+    // Re-medir en cambios (filtros)
+    window.addEventListener("resize", measureHeight);
+    return () => window.removeEventListener("resize", measureHeight);
+  }, [selectedCategories]);
+
+  useEffect(() => {
+    groups.forEach((group) => {
+      const ref = contentRefs.current[group.date];
+      if (ref && !expandedHeights[group.date]) {
+        setExpandedHeights((prev) => ({
+          ...prev,
+          [group.date]: ref.scrollHeight,
+        }));
+      }
+    });
+  }, [groups]);
+
+  return (
+    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
+      {/* Header fijo (top: 52, height: 52) */}
+      <div style={{
+        position: "absolute",
+        top: 52,
+        left: 0,
+        right: 0,
+        height: 52,
+        background: t.bg,
+        padding: "8px 22px",
+        boxSizing: "border-box",
+        borderBottom: `1px solid ${t.border}`,
+        zIndex: 30,
+        display: "flex",
+        alignItems: "center",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={onBack}
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              border: "none",
+              background: isDark ? "#1E1E2E" : "#EEE9FF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={isDark ? "#C4C2E0" : "#6B7280"}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>
+            Atrás
+          </span>
+        </div>
+      </div>
+
+      {/* Sección de Título - Barra del Pilar + Filtros (top: 104, height: 76px) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 104,
+          left: 0,
+          right: 0,
+          background: t.bg,
+          padding: "10px 22px",
+          boxSizing: "border-box",
+          zIndex: 25,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}>
+        {/* Barra del pilar */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}>
+          <div
+            style={{
+              flex: 1,
+              height: 32,
+              borderRadius: 8,
+              background: isDark ? "#2D2D3A" : "#E5E3F5",
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: 10,
+              position: "relative",
+              overflow: "hidden",
+            }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                height: "100%",
+                background: isOverBudget ? debtSoftColor : pillarSoftColor,
+                width: percentage ? Math.min(percentage, 100) + "%" : "100%",
+                borderRadius: 8,
+                zIndex: 1,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: t.text,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                position: "relative",
+                zIndex: 2,
+              }}>
+              {pilar.icon} {pilar.label}
+            </span>
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: isOverBudget ? "#FCA5A5" : pilar.darkColor,
+              textAlign: "right",
+              minWidth: 80,
+            }}>
+            -{fmt(totalSpent)}
+          </div>
+        </div>
+
+        {/* Porcentaje */}
+        {percentage !== null && (
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: isOverBudget ? "#FCA5A5" : pilar.darkColor,
+            }}>
+            {percentage.toFixed(0)}% del presupuesto
+          </div>
+        )}
+      </div>
+
+      {/* Contenido scrolleable (top: 184px = 104 + 60 + 20) */}
+      <div
+        ref={scrollContainerRef}
+        style={{
+          position: "absolute",
+          top: contentTop,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflowY: "auto",
+          overflowX: "hidden",
+          scrollbarWidth: "none",
+          padding: "0 22px 120px 22px",
+          boxSizing: "border-box",
+        }}>
+        <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+        {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
+        {Object.keys(categorySpent).length > 0 && (
+          <div style={{ marginBottom: 32, paddingTop: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 16 }}>
+              Categoría
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {(() => {
+                const entries = Object.entries(categorySpent).sort(([, a], [, b]) => b - a);
+                const maxSpent = Math.max(...entries.map(([, spent]) => spent), 1);
+
+                return entries.map(([category, spent]) => {
+                  // Calcular el ancho adaptativo (proporcional al máximo)
+                  const adaptiveWidth = (spent / maxSpent) * 100;
+
+                  return (
+                    <div
+                      key={category}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                      }}>
+                      {/* 🆕 Barra clickeable para filtrar por categoría */}
+                      <div
+                        onClick={() => {
+                          // Toggle: si ya está seleccionada, remover; si no, agregar
+                          setSelectedCategories(prev =>
+                            prev.includes(category)
+                              ? prev.filter(c => c !== category)
+                              : [...prev, category]
+                          );
+                        }}
+                        style={{
+                          flex: 1,
+                          height: 32,
+                          borderRadius: 8,
+                          display: "flex",
+                          alignItems: "center",
+                          paddingLeft: 10,
+                          position: "relative",
+                          overflow: "hidden",
+                          background: selectedCategories.includes(category)
+                            ? pilar.darkColor + "44"  // Más oscuro si está seleccionada
+                            : pillarSoftColor,
+                          width: adaptiveWidth + "%",
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                          border: selectedCategories.includes(category)
+                            ? `2px solid ${pilar.darkColor}`
+                            : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.opacity = "0.8";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.opacity = "1";
+                        }}>
+                        {/* Nombre dentro de la barra */}
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: t.text,
+                            position: "relative",
+                            zIndex: 2,
+                          }}>
+                          {category}
+                        </span>
+                      </div>
+
+                      {/* Valor al lado */}
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: "#EF4444",
+                          textAlign: "right",
+                          minWidth: 90,
+                        }}>
+                        -{fmt(spent)}
+                      </span>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* 🆕 MOVIMIENTOS - Sticky DENTRO del scroll */}
+        {pillarTxns.length > 0 && (
+          <div
+            ref={movimientosRef}
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 25,
+              background: t.bg,
+              padding: "0px 0",
+              marginBottom: 0,
+            }}>
+            {/* Header de Movimientos - Centrado (sin filtros) o con Filtros (con filtros) */}
+            {selectedCategories.length === 0 ? (
+              // Sin filtros: MOVIMIENTOS centrado
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: t.sub,
+                  textAlign: "center",
+                }}>
+                MOVIMIENTOS
+              </div>
+            ) : (
+              // Con filtros: MOVIMIENTOS + Tags alineados a la izquierda
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: t.sub,
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  alignItems: "center",
+                }}>
+                <span>MOVIMIENTOS</span>
+
+                {/* Tags de Filtros */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 6,
+                  }}>
+                  {selectedCategories.map((cat, idx) => {
+                    // Buscar la categoría para obtener su información
+                    const categoryInfo = pilar.categories?.find(c => c.name === cat);
+                    const catColor = categoryInfo?.color || pilar.darkColor || "#22C55E";
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          // Remover categoría del filtro (toggle off)
+                          setSelectedCategories(prev =>
+                            prev.filter(c => c !== cat)
+                          );
+                        }}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "3px 8px",
+                          borderRadius: 5,
+                          border: `1px solid ${catColor}`,
+                          background: catColor + "15",
+                          color: catColor,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = catColor + "25";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = catColor + "15";
+                        }}>
+                        {cat}
+                        <span style={{ fontSize: 9, marginLeft: 2, fontWeight: 700 }}>✕</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Grupos de transacciones por fecha */}
+        {pillarTxns.length > 0 ? (
+          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} />
+        ) : (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 0",
+              color: t.sub,
+              fontSize: 14,
+            }}>
+            Sin movimientos en este período
+          </div>
+        )}
+      </div>
+
+      {/* 🆕 Gradiente de desvanecimiento flotante (sobre el contenedor scrolleable) */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 80,
+          background: isDark
+            ? "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.9) 100%)"
+            : "linear-gradient(to bottom, transparent 0%, rgba(248, 247, 255, 0.4) 40%, rgba(248, 247, 255, 0.9) 100%)",
+          pointerEvents: "none",
+          zIndex: 20,
+        }}
+      />
+    </div>
+  );
+}
