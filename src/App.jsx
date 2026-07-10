@@ -1078,6 +1078,10 @@ function Dashboard() {
             selectedPeriod={selectedPeriod}
             categories={categories}
             categoryBudgets={categoryBudgets}
+            onEditTransaction={(tx) => {
+              setSelectedTransactionForEdit(tx);
+              setEditingTransactionId(tx.id);
+            }}
           />
         </div>
       </div>

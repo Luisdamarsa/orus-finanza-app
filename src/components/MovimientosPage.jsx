@@ -23,6 +23,7 @@ export default function MovimientosPage({
   selectedPeriod,
   categories = {},
   categoryBudgets = {},
+  onEditTransaction, // 🆕 Callback para editar transacción
 }) {
   // 🆕 Hooks para animación de press en botones
   const pressBack = usePress();
@@ -586,7 +587,7 @@ export default function MovimientosPage({
 
         {/* Grupos de transacciones por fecha */}
         {pillarTxns.length > 0 ? (
-          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} />
+          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} />
         ) : (
           <div
             style={{
