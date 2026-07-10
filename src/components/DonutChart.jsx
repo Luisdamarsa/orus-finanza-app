@@ -161,8 +161,8 @@ export default function DonutChart({
             onMouseEnter={() => setHovered(arc.id)}
             onMouseLeave={() => setHovered(null)}
           >
-            {/* Halo de selección */}
-            {isActive && (
+            {/* Halo de selección - REMOVIDO */}
+            {/* {isActive && (
               <path
                 d={arcPath(cx, cy, outerR + 2, arc.start, arc.end)}
                 fill="none"
@@ -172,7 +172,7 @@ export default function DonutChart({
                 strokeLinecap="round"
                 style={{ transition: "all 0.3s" }}
               />
-            )}
+            )} */}
 
             {/* Arco principal - con animación de trazo + cambio de color (negro → color) */}
             <style>{`

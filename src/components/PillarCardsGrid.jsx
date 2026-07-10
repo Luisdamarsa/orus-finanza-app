@@ -176,7 +176,7 @@ export default function PillarCardsGrid({
                 : saldo < 0
                   ? (isDark ? "#2a1111" : "#FEF2F2")
                   : activeId === "saldo" ? (isDark ? "#0d2118" : "#F0FDF4") : (isDark ? "#1E1E2E" : "#FFFFFF"),
-              border: `1.5px solid ${saldo < 0 ? "#EF444488" : activeId === "saldo" ? SALDO_COLOR + "88" : t.border}`,
+              border: `1.5px solid ${saldo < 0 ? "#EF444488" : t.border}`, // Sin glow en borde activo
               borderRadius: 11,
               padding: "1px 8px",
               cursor: saldo >= 0 ? "pointer" : "default",
