@@ -120,9 +120,9 @@ export default function PillarCardsGrid({
                 padding: "1px 8px",
                 cursor: "pointer",
                 outline: "none", // Quitar el outline del navegador al hacer click
-                boxShadow: isPressingThisPillar ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
-                // 🆕 Transición suave para el efecto de hundimiento
                 transform: isPressingThisPillar ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                opacity: isPressingThisPillar ? 0.7 : 1,
+                boxShadow: isPressingThisPillar ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
                 transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
@@ -178,8 +178,9 @@ export default function PillarCardsGrid({
               padding: "1px 8px",
               cursor: saldo >= 0 ? "pointer" : "default",
               outline: "none", // Quitar el outline del navegador al hacer click
-              boxShadow: pressingId === "saldo" ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
               transform: pressingId === "saldo" ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+              opacity: pressingId === "saldo" ? 0.7 : 1,
+              boxShadow: pressingId === "saldo" ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
             onClick={() => saldo >= 0 && setActiveId(activeId === "saldo" ? null : "saldo")}
