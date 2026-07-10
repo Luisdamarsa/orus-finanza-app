@@ -103,8 +103,9 @@ export default function PillarCardsGrid({
           return (
             <div
               key={p.id}
+              onClick={(e) => e.stopPropagation()} // Detener click que resetea activeId
               onPointerDown={(e) => {
-                e.stopPropagation(); // Prevenir que el click cierre el popup
+                e.stopPropagation(); // Prevenir que el pointerDown se propague
                 handlePillarPointerDown(p.id, p);
               }}
               onPointerUp={handlePillarPointerUp}
@@ -169,8 +170,9 @@ export default function PillarCardsGrid({
         {/* Tarjeta de Saldo */}
         {hasSaldo && (
           <div
+            onClick={(e) => e.stopPropagation()} // Detener click que resetea activeId
             onPointerDown={(e) => {
-              e.stopPropagation(); // Prevenir que el click cierre el popup
+              e.stopPropagation(); // Prevenir que el pointerDown se propague
               if (saldo >= 0) setPressingId("saldo");
             }}
             onPointerUp={() => setPressingId(null)}
