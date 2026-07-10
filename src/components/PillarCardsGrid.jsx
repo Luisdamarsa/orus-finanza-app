@@ -112,7 +112,9 @@ export default function PillarCardsGrid({
                   ? p.id === "ahorro"
                     ? isDark ? p.color + "33" : p.color + "22"  // Verde para Ahorro
                     : isDark ? "#EF444433" : "#FCA5A522"  // Rojo para otros
-                  : (isDark ? "#252535" : "#FFFFFF"),  // Sin overlay al presionar
+                  : isAct
+                    ? (isDark ? p.darkBg : p.bg)  // Con color cuando está activo
+                    : (isDark ? "#252535" : "#FFFFFF"),  // Gris cuando no está activo
                 border: `1.5px solid ${over ? (p.id === "ahorro" ? p.color + "88" : "#EF444488") : t.border}`, // Sin cambio de borde al estar activo
                 borderRadius: 11,
                 padding: "1px 8px",
