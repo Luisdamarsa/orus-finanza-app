@@ -79,7 +79,7 @@ export default function PillarBarsPopup({
 
   return (
     <div
-      onClick={onClose}
+      onPointerDown={onClose}
       style={{
         position: "absolute",
         inset: 0,
