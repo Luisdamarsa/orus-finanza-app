@@ -122,7 +122,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     padding: "12px 14px",
                     borderRadius: 11,
                     border: `1.5px solid ${t.border}`,
-                    background: isPressingToggleRow ? "rgba(0, 0, 0, 0.15)" : t.card,
+                    background: t.card, // Sin overlay al presionar
                     cursor: "pointer",
                     userSelect: "none",
                     transform: isPressingToggleRow ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",

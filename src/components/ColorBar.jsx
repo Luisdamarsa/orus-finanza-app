@@ -113,7 +113,7 @@ export default function ColorBar({
             onPointerLeave={() => setPressingSegmentId(null)}
             style={{
               flex: seg.pct,
-              background: isPressingThisSegment ? "rgba(0, 0, 0, 0.4)" : displayColor,
+              background: displayColor, // Sin overlay al presionar
               borderRadius: 3,
               cursor: "pointer",
               opacity: isPressingThisSegment ? 0.6 : (filteredPillar && filteredPillar !== seg.id ? 0.28 : 1),
