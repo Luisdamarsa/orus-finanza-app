@@ -745,6 +745,9 @@ function Dashboard() {
       // Si no hay nada seleccionado, no hacer nada
       if (!activeId) return;
 
+      // Si el popup está abierto, NO deseleccionar (la tarjeta debe seguir azul)
+      if (showPillarBars) return;
+
       // Si el click fue EN UN BOTÓN/TAG, no deseleccionar (ellos manejan su propio toggle)
       if (event.target.closest('button') && donutContainerRef.current?.contains(event.target)) return;
 
