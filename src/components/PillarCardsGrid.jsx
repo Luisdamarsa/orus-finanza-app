@@ -117,6 +117,7 @@ export default function PillarCardsGrid({
                 borderRadius: 11,
                 padding: "1px 8px",
                 cursor: "pointer",
+                outline: "none", // Quitar el outline del navegador al hacer click
                 // 🆕 Transición suave para el efecto de hundimiento
                 transform: isPressingThisPillar ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
                 boxShadow: isPressingThisPillar ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none",
@@ -174,6 +175,7 @@ export default function PillarCardsGrid({
               borderRadius: 11,
               padding: "1px 8px",
               cursor: saldo >= 0 ? "pointer" : "default",
+              outline: "none", // Quitar el outline del navegador al hacer click
               transform: pressingId === "saldo" ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
               boxShadow: pressingId === "saldo" ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none",
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
