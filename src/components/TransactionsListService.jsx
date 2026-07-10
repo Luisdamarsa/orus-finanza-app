@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { groupByDate, fmt } from "../utils/formatters";
 import { PILLAR_MAP, METHOD_META, ALL_CATS } from "../constants";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
@@ -11,8 +12,11 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  * - isDark: boolean (tema)
  * - transactions: array de transacciones YA FILTRADAS (no filtra internamente)
  * - stickyTop: número (opcional) - top value para las fechas sticky (default: 0)
+ * - onEditTransaction: function(transaction) - callback al hacer click en una transacción
  */
-export default function TransactionsListService({ isDark, transactions, stickyTop = 0 }) {
+export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction }) {
+  // 🆕 Estado para trackear qué transacción está siendo presionada
+  const [pressingTransactionId, setPressingTransactionId] = useState(null);
   const t = isDark
     ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" }
     : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
@@ -67,9 +71,15 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
               const pillar = PILLAR_MAP[tx.pillar] || PILLAR_MAP["varios"];
               const method = METHOD_META[tx.method] || METHOD_META["Banco"];
 
+              const isPressingThisTransaction = pressingTransactionId === tx.id;
+
               return (
                 <div
                   key={tx.id}
+                  onClick={() => onEditTransaction && onEditTransaction(tx)}
+                  onPointerDown={() => setPressingTransactionId(tx.id)}
+                  onPointerUp={() => setPressingTransactionId(null)}
+                  onPointerLeave={() => setPressingTransactionId(null)}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -79,7 +89,9 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                       i < group.items.length - 1
                         ? `1px solid ${t.divider}`
                         : "none",
-                    background: isIngreso
+                    background: isPressingThisTransaction
+                      ? "rgba(0, 0, 0, 0.1)"
+                      : isIngreso
                       ? isDark
                         ? "#0b1f14"
                         : "#f0fdf4"
@@ -88,6 +100,11 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                       : "#FFFFFF",
                     position: "relative",
                     zIndex: 0,
+                    cursor: onEditTransaction ? "pointer" : "default",
+                    transform: isPressingThisTransaction ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                    opacity: isPressingThisTransaction ? 0.7 : 1,
+                    boxShadow: isPressingThisTransaction ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+                    transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}>
                   {/* Ícono/Badge */}
                   <div
