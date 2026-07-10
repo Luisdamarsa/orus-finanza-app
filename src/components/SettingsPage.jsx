@@ -155,7 +155,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                       boxSizing: "border-box",
                       transform: pressingButton === "toggle-" + item.id ? "scale(0.92)" : "scale(1)",
                       opacity: pressingButton === "toggle-" + item.id ? 0.8 : 1,
-                      transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                      transition: item.id === "ingresos" ? "none" : "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // Inmediato para Mostrar Ingresos
                     }}>
                     <div
                       style={{
