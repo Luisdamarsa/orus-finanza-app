@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { usePress } from "../hooks/usePress";
 import { groupByDate, fmt } from "../utils/formatters";
-import { METHOD_META } from "../constants";
+import { METHOD_META, ALL_CATS } from "../constants";
 import TransactionsListService from "./TransactionsListService";
+import CategoryProgressBar from "./CategoryProgressBar";
+import { getCategoryById, getCategoryName } from "../utils/categoryUtils";
+import { getAttributeAtDate } from "../services/attributeHistoryService";
 
 /**
  * Página de Movimientos de un pilar específico
@@ -17,7 +21,15 @@ export default function MovimientosPage({
   pilar,
   transactions,
   selectedPeriod,
+  categories = {},
+  categoryBudgets = {},
 }) {
+  // 🆕 Hooks para animación de press en botones
+  const pressBack = usePress();
+  const pressClearFilter = usePress();
+  // 🆕 Estado para trackear qué tag de categoría está siendo presionado (mantener por múltiples tags)
+  const [pressingCategoryTag, setPressingCategoryTag] = useState(null);
+
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
@@ -35,18 +47,21 @@ export default function MovimientosPage({
     pillarTxns.reduce((sum, tx) => sum + Math.min(tx.amount, 0), 0)
   );
 
+  // 🆕 Obtener categorías del pilar desde el estado `categories` (ahora con IDs)
+  const pillarCategories = categories[pilar.id] || [];
+
   // Desglose por categoría - mostrar TODAS las categorías del pilar
   const categorySpent = {};
-  // Inicializar todas las categorías del pilar en 0
-  if (pilar.categories) {
-    pilar.categories.forEach((cat) => {
-      categorySpent[cat.name] = 0;
-    });
-  }
-  // Sumar los gastos reales
+  // Inicializar todas las categorías del pilar en 0 (usando IDs)
+  pillarCategories.forEach((catId) => {
+    categorySpent[catId] = 0;
+  });
+  // Sumar los gastos reales (usando IDs de categoría)
   pillarTxns.forEach((tx) => {
-    const cat = tx.category || "Sin categoría";
-    categorySpent[cat] = (categorySpent[cat] || 0) + Math.abs(Math.min(tx.amount, 0));
+    const catId = tx.category || null;
+    if (catId) {
+      categorySpent[catId] = (categorySpent[catId] || 0) + Math.abs(Math.min(tx.amount, 0));
+    }
   });
 
   // Porcentaje del presupuesto
@@ -60,12 +75,12 @@ export default function MovimientosPage({
   // 🆕 Obtener color suave de Deuda para cuando se pasa presupuesto
   const debtSoftColor = "#FCA5A5";
 
-  // 🆕 Estado para filtros de categorías seleccionadas
+  // 🆕 Estado para filtros de categorías seleccionadas (ahora con IDs)
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  // 🆕 Filtrar transacciones por categorías seleccionadas
+  // 🆕 Filtrar transacciones por categorías seleccionadas (usando IDs)
   const filteredTxns = selectedCategories.length > 0
-    ? pillarTxns.filter(tx => selectedCategories.includes(tx.category || "Sin categoría"))
+    ? pillarTxns.filter(tx => tx.category && selectedCategories.includes(tx.category))
     : pillarTxns;
 
   // Agrupar transacciones por fecha (usando las filtradas)
@@ -132,6 +147,7 @@ export default function MovimientosPage({
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             onClick={onBack}
+            {...pressBack.handlers}
             style={{
               width: 30,
               height: 30,
@@ -142,6 +158,7 @@ export default function MovimientosPage({
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              ...pressBack.getPressStyle(),
             }}>
             <svg
               width="15"
@@ -274,78 +291,37 @@ export default function MovimientosPage({
                 const entries = Object.entries(categorySpent).sort(([, a], [, b]) => b - a);
                 const maxSpent = Math.max(...entries.map(([, spent]) => spent), 1);
 
-                return entries.map(([category, spent]) => {
-                  // Calcular el ancho adaptativo (proporcional al máximo)
-                  const adaptiveWidth = (spent / maxSpent) * 100;
+                return entries.map(([categoryId, spent]) => {
+                  const categoryBudget = categoryBudgets[categoryId] || null;
+
+                  // 🆕 Obtener nombre histórico de la categoría en la fecha del período
+                  let categoryName = getCategoryName(categoryId);
+                  const category = ALL_CATS.find(cat => cat.id === categoryId);
+                  if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
+                    const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+                    categoryName = getAttributeAtDate(category, "name", queryDate);
+                  }
 
                   return (
-                    <div
-                      key={category}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                      }}>
-                      {/* 🆕 Barra clickeable para filtrar por categoría */}
-                      <div
-                        onClick={() => {
-                          // Toggle: si ya está seleccionada, remover; si no, agregar
-                          setSelectedCategories(prev =>
-                            prev.includes(category)
-                              ? prev.filter(c => c !== category)
-                              : [...prev, category]
-                          );
-                        }}
-                        style={{
-                          flex: 1,
-                          height: 32,
-                          borderRadius: 8,
-                          display: "flex",
-                          alignItems: "center",
-                          paddingLeft: 10,
-                          position: "relative",
-                          overflow: "hidden",
-                          background: selectedCategories.includes(category)
-                            ? pilar.darkColor + "44"  // Más oscuro si está seleccionada
-                            : pillarSoftColor,
-                          width: adaptiveWidth + "%",
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                          border: selectedCategories.includes(category)
-                            ? `2px solid ${pilar.darkColor}`
-                            : "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.opacity = "0.8";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.opacity = "1";
-                        }}>
-                        {/* Nombre dentro de la barra */}
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: t.text,
-                            position: "relative",
-                            zIndex: 2,
-                          }}>
-                          {category}
-                        </span>
-                      </div>
-
-                      {/* Valor al lado */}
-                      <span
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: "#EF4444",
-                          textAlign: "right",
-                          minWidth: 90,
-                        }}>
-                        -{fmt(spent)}
-                      </span>
-                    </div>
+                    <CategoryProgressBar
+                      key={categoryId}
+                      categoryId={categoryId}
+                      categoryName={categoryName}
+                      spent={spent}
+                      budget={categoryBudget}
+                      maxSpent={maxSpent}
+                      pillarColor={pilar.darkColor}
+                      isDark={isDark}
+                      onClickBar={() => {
+                        // Toggle: si ya está seleccionada, remover; si no, agregar
+                        setSelectedCategories(prev =>
+                          prev.includes(categoryId)
+                            ? prev.filter(c => c !== categoryId)
+                            : [...prev, categoryId]
+                        );
+                      }}
+                      isSelected={selectedCategories.includes(categoryId)}
+                    />
                   );
                 });
               })()}
@@ -385,59 +361,224 @@ export default function MovimientosPage({
                   fontWeight: 700,
                   color: t.sub,
                   display: "flex",
-                  flexWrap: "wrap",
+                  flexDirection: "column",
                   gap: 8,
-                  alignItems: "center",
                 }}>
-                <span>MOVIMIENTOS</span>
+                {/* 🆕 Comportamiento condicional según cantidad de filtros */}
+                {selectedCategories.length === 1 ? (
+                  // CASO 1: Solo 1 filtro → al lado de MOVIMIENTOS
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        alignItems: "center",
+                      }}>
+                      <span>MOVIMIENTOS</span>
+                      {selectedCategories.map((cat, idx) => {
+                        const catColor = pilar.darkColor || "#22C55E";
 
-                {/* Tags de Filtros */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 6,
-                  }}>
-                  {selectedCategories.map((cat, idx) => {
-                    // Buscar la categoría para obtener su información
-                    const categoryInfo = pilar.categories?.find(c => c.name === cat);
-                    const catColor = categoryInfo?.color || pilar.darkColor || "#22C55E";
+                        // 🆕 Obtener nombre histórico de la categoría filtrada
+                        let displayName = getCategoryName(cat);
+                        const category = ALL_CATS.find(c => c.id === cat);
+                        if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
+                          const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+                          displayName = getAttributeAtDate(category, "name", queryDate);
+                        }
 
-                    return (
+                        const isPressingThisTag = pressingCategoryTag === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedCategories(prev =>
+                                prev.filter(c => c !== cat)
+                              );
+                            }}
+                            onPointerDown={() => setPressingCategoryTag(idx)}
+                            onPointerUp={() => setPressingCategoryTag(null)}
+                            onPointerLeave={() => setPressingCategoryTag(null)}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                              padding: "3px 8px",
+                              borderRadius: 5,
+                              border: `1px solid ${catColor}`,
+                              background: isPressingThisTag ? catColor + "40" : (catColor + "15"),
+                              color: catColor,
+                              fontSize: 10,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              transition: "all 0.2s",
+                              transform: isPressingThisTag ? "scale(0.95)" : "scale(1)",
+                              opacity: isPressingThisTag ? 0.7 : 1,
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isPressingThisTag) {
+                                e.target.style.background = catColor + "25";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isPressingThisTag) {
+                                e.target.style.background = catColor + "15";
+                              }
+                            }}>
+                            {displayName}
+                            <span style={{ fontSize: 9, marginLeft: 2, fontWeight: 700 }}>✕</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Botón Limpiar filtro a la derecha */}
+                    {selectedCategories.length > 1 && (
                       <button
-                        key={idx}
                         onClick={() => {
-                          // Remover categoría del filtro (toggle off)
-                          setSelectedCategories(prev =>
-                            prev.filter(c => c !== cat)
-                          );
+                          console.log("✅ Limpiar filtro - onClick");
+                          setSelectedCategories([]);
                         }}
+                        {...pressClearFilter.handlers}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: 4,
-                          padding: "3px 8px",
+                          padding: "4px 8px",
                           borderRadius: 5,
-                          border: `1px solid ${catColor}`,
-                          background: catColor + "15",
-                          color: catColor,
+                          border: "1px solid #6B7280",
+                          background: "#6B728066",
+                          color: "#E5E7EB",
                           fontSize: 10,
                           fontWeight: 600,
                           cursor: "pointer",
-                          transition: "all 0.2s",
+                          whiteSpace: "nowrap",
+                          ...pressClearFilter.getPressStyle(),
                         }}
                         onMouseEnter={(e) => {
-                          e.target.style.background = catColor + "25";
+                          if (!pressClearFilter.pressing) {
+                            e.target.style.background = "#6B728099";
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          e.target.style.background = catColor + "15";
+                          if (!pressClearFilter.pressing) {
+                            e.target.style.background = "#6B728066";
+                          }
                         }}>
-                        {cat}
-                        <span style={{ fontSize: 9, marginLeft: 2, fontWeight: 700 }}>✕</span>
+                        Limpiar filtro
                       </button>
-                    );
-                  })}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  // CASO 2: 2 o más filtros → debajo de MOVIMIENTOS centrado
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        position: "relative",
+                      }}>
+                      <span>MOVIMIENTOS</span>
+
+                      {/* Botón Limpiar filtro a la derecha - posición absoluta */}
+                      {selectedCategories.length > 1 && (
+                        <button
+                          onClick={() => {
+                            console.log("✅ Limpiar filtro (2do) - onClick");
+                            setSelectedCategories([]);
+                          }}
+                          {...pressClearFilter.handlers}
+                          style={{
+                            position: "absolute",
+                            right: 0,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "4px 8px",
+                            borderRadius: 5,
+                            border: "1px solid #6B7280",
+                            background: "#6B728066",
+                            color: "#E5E7EB",
+                            fontSize: 10,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            ...pressClearFilter.getPressStyle(),
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!pressClearFilter.pressing) {
+                              e.target.style.background = "#6B728099";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!pressClearFilter.pressing) {
+                              e.target.style.background = "#6B728066";
+                            }
+                          }}>
+                          Limpiar filtro
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Tags de Filtros debajo */}
+                    {selectedCategories.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 6,
+                        }}>
+                        {selectedCategories.map((cat, idx) => {
+                          const catColor = pilar.darkColor || "#22C55E";
+
+                          // 🆕 Obtener nombre histórico de la categoría filtrada (caso múltiples filtros)
+                          let displayName = getCategoryName(cat);
+                          const category = ALL_CATS.find(c => c.id === cat);
+                          if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
+                            const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+                            displayName = getAttributeAtDate(category, "name", queryDate);
+                          }
+
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setSelectedCategories(prev =>
+                                  prev.filter(c => c !== cat)
+                                );
+                              }}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                                padding: "3px 8px",
+                                borderRadius: 5,
+                                border: `1px solid ${catColor}`,
+                                background: catColor + "15",
+                                color: catColor,
+                                fontSize: 10,
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                transition: "all 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.background = catColor + "25";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.background = catColor + "15";
+                              }}>
+                              {displayName}
+                              <span style={{ fontSize: 9, marginLeft: 2, fontWeight: 700 }}>✕</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </div>

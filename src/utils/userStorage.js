@@ -12,11 +12,22 @@
  *   email: string,            // Correo - del login (read-only)
  *   phone: string,            // Teléfono - del login (read-only)
  *   currency: string,         // "COP" | "USD" | "EUR" (editable)
- *   language: string          // "ES" | "EN" (editable)
+ *   language: string,         // "ES" | "EN" (editable)
+ *   userId: string            // ID único del usuario (10 caracteres alfanuméricos) - generado al crear
  * }
  */
 
 const STORAGE_KEY = "orus_dev_user"; // 🔄 DEV: cambios se limpian al recargar
+
+// Función para generar User ID único (10 caracteres alfanuméricos)
+const generateUserId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let userId = '';
+  for (let i = 0; i < 10; i++) {
+    userId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return userId;
+};
 
 const DEFAULT_USER = {
   displayName: "Luis Daniel",
@@ -26,6 +37,7 @@ const DEFAULT_USER = {
   phone: "+57 1111111111",
   currency: "COP",
   language: "ES",
+  userId: generateUserId(), // Genera un ID único
 };
 
 export const userStorage = {

@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { usePress } from "../hooks/usePress";
 import {
-  PILLARS, ALL_CATS, MANUAL_METHODS
+  PILLARS, MANUAL_METHODS, ALL_CATS
 } from "../constants";
+import { CheckmarkIcon } from "../icons/Icons";
+import { getCategoryName } from "../utils/categoryUtils";
 
 /**
  * Página para agregar una transacción manualmente
@@ -18,8 +21,41 @@ export default function AddTransactionPage({
   onBack,
   onDone,
   isDark,
-  customConcepts
+  customConcepts,
+  categories = {},
+  onCreateCategory
 }) {
+  /**
+   * Convierte {pillarId: [catId1, catId2, ...]} a [{id, name, pillar}, ...]
+   * Itera sobre PILLARS para garantizar orden correcto
+   */
+  const getFormattedCategories = () => {
+    const formatted = [];
+    // Iterar sobre PILLARS en lugar de Object.entries para garantizar orden
+    PILLARS.forEach(pillar => {
+      const catIdList = categories[pillar.id] || [];
+      if (Array.isArray(catIdList)) {
+        catIdList.forEach(catId => {
+          formatted.push({ id: catId, name: getCategoryName(catId), pillar: pillar.id });
+        });
+      }
+    });
+    return formatted;
+  };
+
+  // 🆕 Hook para animación de press en botón de atrás
+  const pressBack = usePress();
+  // 🆕 Hook para animación de press en botón de guardar
+  const pressSave = usePress();
+  // 🆕 Estado para trackear qué botón de método está siendo presionado
+  const [pressingMethod, setPressingMethod] = useState(null);
+  // 🆕 Estado para trackear si el dropdown de categoría está siendo presionado
+  const [pressingCategory, setPressingCategory] = useState(false);
+  // 🆕 Estado para trackear qué botón de pilar está siendo presionado
+  const [pressingPillar, setPressingPillar] = useState(null);
+  // 🆕 Estado para trackear qué opción del dropdown está siendo presionada
+  const [pressingConcept, setPressingConcept] = useState(null);
+
   // Estado del formulario
   const [desc, setDesc] = useState("");
   const [rawAmount, setRawAmount] = useState("");
@@ -29,6 +65,7 @@ export default function AddTransactionPage({
   const [pillarId, setPillarId] = useState(null);
   const [conceptOpen, setConceptOpen] = useState(false);
   const [newConceptText, setNewConceptText] = useState("");
+  const [isNewCategory, setIsNewCategory] = useState(false); // 🆕 Rastrear si es categoría nueva
 
   // Cálculos derivados
   const numericAmount = parseInt(rawAmount.replace(/\D/g, "")) || 0;
@@ -67,13 +104,14 @@ export default function AddTransactionPage({
   }
 
   /**
-   * Crea un nuevo concepto personalizado
+   * Crea una nueva categoría (temporal, se guardarán al seleccionar pilar)
    */
-  function handleCreateConcept() {
+  function handleCreateCategory() {
     const name = newConceptText.trim();
     if (!name) return;
     setConcept(name);
     setPillarId(null);
+    setIsNewCategory(true); // 🆕 Marcar como nueva
     setConceptOpen(false);
     setNewConceptText("");
   }
@@ -99,6 +137,7 @@ export default function AddTransactionPage({
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 0 }}>
         <button
           onClick={onBack}
+          {...pressBack.handlers}
           style={{
             width: 30,
             height: 30,
@@ -108,7 +147,8 @@ export default function AddTransactionPage({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            cursor: "pointer"
+            cursor: "pointer",
+            ...pressBack.getPressStyle(),
           }}>
           <svg
             width="15"
@@ -159,9 +199,17 @@ export default function AddTransactionPage({
             NUEVA TRANSACCIÓN
           </div>
 
+          <style>{`
+            .add-transaction-input::placeholder {
+              color: #9896B0;
+              opacity: 0.35;
+            }
+          `}</style>
+
           {/* Input Descripción */}
           <input
             type="text"
+            className="add-transaction-input"
             placeholder="Descripción del movimiento..."
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -192,13 +240,17 @@ export default function AddTransactionPage({
               marginBottom: 12
             }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: amountColor }}>
-                $
-              </span>
+              {/* 🆕 $ solo aparece cuando hay valor */}
+              {numericAmount > 0 && (
+                <span style={{ fontSize: 13, fontWeight: 700, color: amountColor }}>
+                  $
+                </span>
+              )}
               <input
                 type="text"
                 inputMode="numeric"
-                placeholder="0"
+                className="add-transaction-input"
+                placeholder="Monto"
                 value={
                   numericAmount > 0
                     ? numericAmount.toLocaleString("es-CO")
@@ -273,30 +325,46 @@ export default function AddTransactionPage({
           </div>
 
           {/* Método de pago */}
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+          <div style={{
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+            marginBottom: 14,
+            marginLeft: "-36px",
+            marginRight: "-36px",
+            paddingLeft: "36px",
+            paddingRight: "36px"
+          }}>
             {MANUAL_METHODS.map((m) => {
               const active = method === m.id;
               return (
                 <button
                   key={m.id}
                   onClick={() => setMethod(m.id)}
+                  onPointerDown={() => setPressingMethod(m.id)}
+                  onPointerUp={() => setPressingMethod(null)}
+                  onPointerLeave={() => setPressingMethod(null)}
                   style={{
                     padding: "4px 10px",
                     borderRadius: 20,
                     border: "none",
                     cursor: "pointer",
-                    background: active
-                      ? m.color + "22"
-                      : isDark
-                        ? "#252538"
-                        : "#F0EFF8",
+                    background: pressingMethod === m.id
+                      ? `${m.color}44`
+                      : active
+                        ? m.color + "22"
+                        : isDark
+                          ? "#252538"
+                          : "#F0EFF8",
                     color: active ? m.color : t.sub,
                     fontSize: 11,
                     fontWeight: 700,
                     outline: active
                       ? `1.5px solid ${m.color}66`
                       : "1.5px solid transparent",
-                    transition: "all 0.18s"
+                    transition: "all 0.18s",
+                    transform: pressingMethod === m.id ? "scale(0.94)" : "scale(1)",
+                    opacity: pressingMethod === m.id ? 0.7 : 1,
                   }}>
                   {m.icon} {m.id}
                 </button>
@@ -344,6 +412,9 @@ export default function AddTransactionPage({
             <div style={{ position: "relative" }}>
               <button
                 onClick={() => setConceptOpen((o) => !o)}
+                onPointerDown={() => setPressingCategory(true)}
+                onPointerUp={() => setPressingCategory(false)}
+                onPointerLeave={() => setPressingCategory(false)}
                 style={{
                   width: "100%",
                   padding: "8px 14px",
@@ -352,11 +423,13 @@ export default function AddTransactionPage({
                   border: `1.5px dashed ${
                     concept ? "#9B6DFF99" : "#9B6DFF66"
                   }`,
-                  background: "transparent",
+                  background: pressingCategory ? "#9B6DFF22" : "transparent",
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  transition: "border 0.2s"
+                  transition: "border 0.2s",
+                  transform: pressingCategory ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                  boxShadow: pressingCategory ? "inset 0 2px 4px rgba(155, 109, 255, 0.3)" : "none",
                 }}>
                 <span style={{ fontSize: 13 }}>🏷</span>
                 <span
@@ -367,7 +440,7 @@ export default function AddTransactionPage({
                     flex: 1,
                     textAlign: "left"
                   }}>
-                  {concept || "Selecciona el concepto"}
+                  {concept || "Selecciona la categoría"}
                 </span>
                 <svg
                   width="12"
@@ -421,11 +494,11 @@ export default function AddTransactionPage({
                     <span style={{ fontSize: 14 }}>✦</span>
                     <input
                       type="text"
-                      placeholder="Nuevo concepto..."
+                      placeholder="Nueva categoría..."
                       value={newConceptText}
                       onChange={(e) => setNewConceptText(e.target.value)}
                       onKeyDown={(e) =>
-                        e.key === "Enter" && handleCreateConcept()
+                        e.key === "Enter" && handleCreateCategory()
                       }
                       style={{
                         flex: 1,
@@ -441,7 +514,7 @@ export default function AddTransactionPage({
                     />
                     {newConceptText.trim() && (
                       <button
-                        onClick={handleCreateConcept}
+                        onClick={handleCreateCategory}
                         style={{
                           padding: "4px 11px",
                           borderRadius: 20,
@@ -458,19 +531,13 @@ export default function AddTransactionPage({
                     )}
                   </div>
 
-                  {/* Lista de conceptos */}
-                  {Object.entries(
-                    [...ALL_CATS, ...(customConcepts || [])].reduce(
-                      (acc, cat) => {
-                        (acc[cat.pillar] = acc[cat.pillar] || []).push(cat);
-                        return acc;
-                      },
-                      {}
-                    )
-                  ).map(([pid, cats]) => {
-                    const p = PILLARS.find((x) => x.id === pid);
+                  {/* Lista de conceptos - Iterando sobre PILLARS para mantener orden */}
+                  {PILLARS.map(p => {
+                    const allCats = [...getFormattedCategories(), ...(customConcepts || [])];
+                    const cats = allCats.filter(cat => cat.pillar === p.id);
+
                     return (
-                      <div key={pid} style={{ marginBottom: 4 }}>
+                      <div key={p.id} style={{ marginBottom: 4 }}>
                         <div
                           style={{
                             display: "inline-flex",
@@ -508,21 +575,28 @@ export default function AddTransactionPage({
                               <button
                                 key={cat.name}
                                 onClick={() => handleConceptPick(cat)}
+                                onPointerDown={() => setPressingConcept(cat.name)}
+                                onPointerUp={() => setPressingConcept(null)}
+                                onPointerLeave={() => setPressingConcept(null)}
                                 style={{
                                   width: "100%",
                                   padding: "7px 12px",
                                   border: "none",
                                   cursor: "pointer",
                                   borderRadius: 12,
-                                  background: isActive
-                                    ? isDark
-                                      ? `${p.color}30`
-                                      : `${p.color}18`
-                                    : "transparent",
+                                  background: pressingConcept === cat.name
+                                    ? `${p.color}44`
+                                    : isActive
+                                      ? isDark
+                                        ? `${p.color}30`
+                                        : `${p.color}18`
+                                      : "transparent",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "space-between",
-                                  transition: "background 0.15s"
+                                  transition: "background 0.15s",
+                                  transform: pressingConcept === cat.name ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                                  opacity: pressingConcept === cat.name ? 0.7 : 1,
                                 }}>
                                 <span
                                   style={{
@@ -533,17 +607,7 @@ export default function AddTransactionPage({
                                   {cat.name}
                                 </span>
                                 {isActive && (
-                                  <svg
-                                    width="12"
-                                    height="12"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke={p.color}
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round">
-                                    <polyline points="20 6 9 17 4 12" />
-                                  </svg>
+                                  <CheckmarkIcon width={12} height={12} color={p.color} strokeWidth={3} />
                                 )}
                               </button>
                             );
@@ -572,10 +636,10 @@ export default function AddTransactionPage({
                 }}>
                 {pillarId ? (
                   <>
-                    Categoría <span style={{ opacity: 0.6 }}>· toca para cambiar</span>
+                    Pilar <span style={{ opacity: 0.6 }}>· toca para cambiar</span>
                   </>
                 ) : (
-                  <>⚑ Elige una categoría para este concepto</>
+                  <>⚑ Elige un pilar para esta categoría</>
                 )}
               </div>
               <div style={{ display: "flex", gap: 5 }}>
@@ -584,24 +648,38 @@ export default function AddTransactionPage({
                   return (
                     <button
                       key={p.id}
-                      onClick={() => setPillarId(p.id)}
+                      onClick={() => {
+                        setPillarId(p.id);
+                        // 🆕 Si es una categoría nueva, guardarla en categories
+                        if (isNewCategory && concept && onCreateCategory) {
+                          onCreateCategory(concept, p.id);
+                          setIsNewCategory(false);
+                        }
+                      }}
+                      onPointerDown={() => setPressingPillar(p.id)}
+                      onPointerUp={() => setPressingPillar(null)}
+                      onPointerLeave={() => setPressingPillar(null)}
                       style={{
                         flex: 1,
                         padding: "7px 2px",
                         borderRadius: 12,
                         border: "none",
                         cursor: "pointer",
-                        background: active
-                          ? isDark
-                            ? p.darkBg
-                            : p.bg
-                          : isDark
-                            ? "#252538"
-                            : "#F0EFF8",
+                        background: pressingPillar === p.id
+                          ? `${p.color}44`
+                          : active
+                            ? isDark
+                              ? p.darkBg
+                              : p.bg
+                            : isDark
+                              ? "#252538"
+                              : "#F0EFF8",
                         outline: active
                           ? `2px solid ${p.color}88`
                           : "2px solid transparent",
-                        transition: "all 0.18s"
+                        transition: "all 0.18s",
+                        transform: pressingPillar === p.id ? "scale(0.94)" : "scale(1)",
+                        opacity: pressingPillar === p.id ? 0.7 : 1,
                       }}>
                       <div style={{ fontSize: 16 }}>{p.icon}</div>
                       <div
@@ -639,31 +717,24 @@ export default function AddTransactionPage({
               pillarId
             })
           }
+          onPointerDown={() => (desc || hasAmount) && pressSave.handlers.onPointerDown()}
+          onPointerUp={() => pressSave.handlers.onPointerUp()}
+          onPointerLeave={() => pressSave.handlers.onPointerLeave()}
+          disabled={!desc && !hasAmount}
           style={{
             width: 52,
             height: 52,
             borderRadius: "50%",
             border: "none",
             background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-            cursor: "pointer",
-            boxShadow: "0 6px 24px rgba(155,109,255,0.45)",
+            cursor: desc || hasAmount ? "pointer" : "not-allowed",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: desc || hasAmount ? 1 : 0.45,
-            transition: "opacity 0.2s"
+            opacity: desc || hasAmount ? (pressSave.pressing ? 0.9 : 1) : 0.45,
+            ...(desc || hasAmount ? pressSave.getPressStyle() : {}),
           }}>
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
         </button>
       </div>
     </div>

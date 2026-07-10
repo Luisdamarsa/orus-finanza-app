@@ -1,5 +1,6 @@
 import { groupByDate, fmt } from "../utils/formatters";
-import { PILLAR_MAP, METHOD_META } from "../constants";
+import { PILLAR_MAP, METHOD_META, ALL_CATS } from "../constants";
+import { getAttributeAtDate } from "../services/attributeHistoryService";
 
 /**
  * TransactionsListService
@@ -166,7 +167,12 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                           {tx.category ? (
                             <>
                               {" → "}
-                              {tx.category}
+                              {(() => {
+                                // 🆕 Obtener nombre histórico de la categoría en la fecha de la transacción
+                                const category = ALL_CATS.find(cat => cat.id === tx.category);
+                                if (!category) return tx.category;
+                                return getAttributeAtDate(category, "name", tx.date);
+                              })()}
                             </>
                           ) : null}
                         </span>

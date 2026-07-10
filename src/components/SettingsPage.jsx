@@ -1,22 +1,25 @@
 import { useState } from "react";
+import { usePress } from "../hooks/usePress";
 
-export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, showProfileSaveSuccess, showBudgetsSaveSuccess, showIncomes, setShowIncomes }) {
+export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes }) {
+  // 🆕 Hook para animación de press en botón de atrás
+  const pressBack = usePress();
+  // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
+  const [pressingButton, setPressingButton] = useState(null);
+
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
 
-  const menuItems = [
-    { id: "perfil", icon: "👤", label: "Perfil" },
-    { id: "categorias", icon: "🏷️", label: "Categorías" },
-    { id: "presupuestos", icon: "💰", label: "Presupuestos" },
-    { id: "automatizacion", icon: "⚙️", label: "Automatización" },
-    { id: "permisos", icon: "🔐", label: "Permisos" },
-    { id: "informes", icon: "📊", label: "Informes" },
-    { id: "acerca", icon: "ℹ️", label: "Acerca de ORUS Finanzas" },
-  ];
-
-  const toggleItems = [
-    { id: "ingresos", icon: "📈", label: "Mostrar Ingresos", value: showIncomes, onChange: setShowIncomes },
+  const allItems = [
+    { id: "perfil", icon: "👤", label: "Perfil", type: "menu" },
+    { id: "categorias", icon: "🏷️", label: "Categorías", type: "menu" },
+    { id: "presupuestos", icon: "💰", label: "Presupuestos", type: "menu" },
+    { id: "ingresos", icon: "📈", label: "Mostrar Ingresos", type: "toggle", value: showIncomes, onChange: setShowIncomes },
+    { id: "automatizacion", icon: "⚙️", label: "Automatización", type: "menu" },
+    { id: "permisos", icon: "🔐", label: "Permisos", type: "menu" },
+    { id: "informes", icon: "📊", label: "Informes", type: "menu" },
+    { id: "acerca", icon: "ℹ️", label: "Acerca de ORUS Finanzas", type: "menu" },
   ];
 
   return (
@@ -31,6 +34,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, sho
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             onClick={onBack}
+            {...pressBack.handlers}
             style={{
               width: 30,
               height: 30,
@@ -41,6 +45,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, sho
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              ...pressBack.getPressStyle(),
             }}>
             <svg
               width="15"
@@ -92,68 +97,122 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, sho
       }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* Menu Items */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-          {menuItems.map(item => (
-            <button key={item.id} onClick={() => {
-              if (item.id === "perfil" && onProfile) onProfile();
-              else if (item.id === "presupuestos" && onBudgets) onBudgets();
-            }} style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "12px 14px", borderRadius: 11, border: `1.5px solid ${t.border}`,
-              background: t.card, cursor: "pointer",
-              transition: "all 0.15s",
-              width: "100%",
-            }} onMouseEnter={(e) => {
-              e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-              e.target.style.borderColor = isDark ? "#3D3D4D" : "#D5D3E8";
-            }} onMouseLeave={(e) => {
-              e.target.style.background = t.card;
-              e.target.style.borderColor = t.border;
-            }}>
-              <span style={{ fontSize: 18 }}>{item.icon}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1, textAlign: "left" }}>
-                {item.label}
-              </span>
-              <span style={{ fontSize: 12, color: t.sub }}>→</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Separator */}
-        <div style={{ height: "1px", background: t.border, marginBottom: 20 }}></div>
-
-        {/* Toggle Items */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
-          {toggleItems.map(item => (
-            <div key={item.id} style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "12px 14px", borderRadius: 11, border: `1.5px solid ${t.border}`,
-              background: t.card,
-            }}>
-              <span style={{ fontSize: 18 }}>{item.icon}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1 }}>
-                {item.label}
-              </span>
-              {/* Toggle Switch */}
-              <button onClick={() => item.onChange(!item.value)} style={{
-                display: "inline-flex", alignItems: "center",
-                width: 44, height: 24, borderRadius: 12, border: "none",
-                background: item.value ? "#9B6DFF" : (isDark ? "#3D3D4D" : "#D5D3E8"),
-                cursor: "pointer",
-                padding: 2,
-                boxSizing: "border-box",
-                transition: "all 0.3s",
-              }}>
-                <div style={{
-                  width: 20, height: 20, borderRadius: "50%",
-                  background: "#FFFFFF",
-                  transition: "all 0.3s",
-                  transform: item.value ? "translateX(20px)" : "translateX(0)",
-                }}></div>
+        {/* Menu Items + Toggles */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
+          {allItems.map((item, idx) => {
+            // Si es un toggle, renderizar con switch clickeable
+            if (item.type === "toggle") {
+              const isPressingToggleRow = pressingButton === "toggle-row-" + item.id;
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    // Si es el item de ingresos, navegar a la página
+                    if (item.id === "ingresos" && onShowIncomes) {
+                      onShowIncomes();
+                    }
+                  }}
+                  onPointerDown={() => setPressingButton("toggle-row-" + item.id)}
+                  onPointerUp={() => setPressingButton(null)}
+                  onPointerLeave={() => setPressingButton(null)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 14px",
+                    borderRadius: 11,
+                    border: `1.5px solid ${t.border}`,
+                    background: isPressingToggleRow ? "rgba(0, 0, 0, 0.15)" : t.card,
+                    cursor: "pointer",
+                    userSelect: "none",
+                    transform: isPressingToggleRow ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                    boxShadow: isPressingToggleRow ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+                    transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}>
+                  <span style={{ fontSize: 18 }}>{item.icon}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1, textAlign: "left" }}>
+                    {item.label}
+                  </span>
+                  {/* Toggle Switch */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevenir que el click en toggle navegue
+                      item.onChange(!item.value);
+                    }}
+                    onPointerDown={() => setPressingButton("toggle-" + item.id)}
+                    onPointerUp={() => setPressingButton(null)}
+                    onPointerLeave={() => setPressingButton(null)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      width: 44,
+                      height: 24,
+                      borderRadius: 12,
+                      border: "none",
+                      background: item.value ? "#9B6DFF" : isDark ? "#3D3D4D" : "#D5D3E8",
+                      cursor: "pointer",
+                      padding: 2,
+                      boxSizing: "border-box",
+                      transform: pressingButton === "toggle-" + item.id ? "scale(0.92)" : "scale(1)",
+                      opacity: pressingButton === "toggle-" + item.id ? 0.8 : 1,
+                      transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}>
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        background: "#FFFFFF",
+                        transform: item.value ? "translateX(20px)" : "translateX(0)",
+                      }}
+                    />
+                  </button>
+                </div>
+              );
+            }
+            // Si es un menu item, renderizar como botón
+            const isPressingThisButton = pressingButton === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === "perfil" && onProfile) onProfile();
+                  else if (item.id === "presupuestos" && onBudgets) onBudgets();
+                  else if (item.id === "categorias" && onCategories) onCategories();
+                }}
+                onPointerDown={() => setPressingButton(item.id)}
+                onPointerUp={() => setPressingButton(null)}
+                onPointerLeave={() => setPressingButton(null)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "12px 14px", borderRadius: 11, border: `1.5px solid ${t.border}`,
+                  background: isPressingThisButton ? "rgba(0, 0, 0, 0.15)" : t.card,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  width: "100%",
+                  transform: isPressingThisButton ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                  boxShadow: isPressingThisButton ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+                }}
+                onMouseEnter={(e) => {
+                  if (pressingButton !== item.id) {
+                    e.target.style.background = isDark ? "#252535" : "#F5F3FF";
+                    e.target.style.borderColor = isDark ? "#3D3D4D" : "#D5D3E8";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (pressingButton !== item.id) {
+                    e.target.style.background = t.card;
+                    e.target.style.borderColor = t.border;
+                  }
+                }}>
+                <span style={{ fontSize: 18 }}>{item.icon}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1, textAlign: "left" }}>
+                  {item.label}
+                </span>
+                <span style={{ fontSize: 12, color: t.sub }}>→</span>
               </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Footer Info */}
@@ -163,83 +222,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, sho
         </div>
       </div>
 
-      {/* 🆕 Gradiente de desvanecimiento flotante */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 80,
-          background: isDark
-            ? "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.9) 100%)"
-            : "linear-gradient(to bottom, transparent 0%, rgba(248, 247, 255, 0.4) 40%, rgba(248, 247, 255, 0.9) 100%)",
-          pointerEvents: "none",
-          zIndex: 20,
-        }}
-      />
 
-      {/* 🆕 Popup flotante de Perfil guardado */}
-      {showProfileSaveSuccess && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 32,
-            left: 22,
-            right: 22,
-            maxWidth: "calc(100% - 44px)",
-            padding: "14px 16px",
-            borderRadius: 12,
-            background: "#22C55E33", // Verde transparente
-            border: `1px solid #22C55E66`,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            animation: "slideInUp 0.3s ease",
-            zIndex: 999,
-          }}>
-          <span style={{ fontSize: 18 }}>✓</span>
-          <span
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: "#16A34A",
-            }}>
-            Cambios en el Perfil guardados
-          </span>
-        </div>
-      )}
-
-      {/* 🆕 Popup flotante de Presupuestos guardados */}
-      {showBudgetsSaveSuccess && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 32,
-            left: 22,
-            right: 22,
-            maxWidth: "calc(100% - 44px)",
-            padding: "14px 16px",
-            borderRadius: 12,
-            background: "#22C55E33", // Verde transparente
-            border: `1px solid #22C55E66`,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            animation: "slideInUp 0.3s ease",
-            zIndex: 999,
-          }}>
-          <span style={{ fontSize: 18 }}>✓</span>
-          <span
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: "#16A34A",
-            }}>
-            Cambios en Presupuestos guardados
-          </span>
-        </div>
-      )}
     </div>
   );
 }

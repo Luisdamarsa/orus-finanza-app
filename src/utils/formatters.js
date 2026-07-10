@@ -30,11 +30,17 @@ export const fmtDate = (dateStr) => {
 };
 
 /**
- * Obtiene la etiqueta del período (mes o "Todo")
+ * Obtiene la etiqueta del período (mes, año o "Todo")
  * @param {object} period - Objeto con year y month
  * @returns {string} Etiqueta del período
  */
-export const getPeriodLabel = (period) => !period ? "Todo" : MONTHS_SHORT[period.month - 1];
+export const getPeriodLabel = (period) => {
+  if (!period) return "Todo";
+  // ✅ Si month es null, mostrar el año
+  if (period.month === null) return period.year.toString();
+  // Si month existe, mostrar el mes
+  return MONTHS_SHORT[period.month - 1];
+};
 
 /**
  * Agrupa transacciones por fecha

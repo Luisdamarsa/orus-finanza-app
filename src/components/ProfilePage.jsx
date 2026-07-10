@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { userStorage } from "../utils/userStorage";
+import { usePopup } from "../services/PopupService";
+import { usePress } from "../hooks/usePress";
+import DeleteAccountModal from "./DeleteAccountModal";
+import { CheckmarkIcon, TrashIcon, CopyIcon } from "../icons/Icons";
 
 /**
  * Página de Perfil del usuario
@@ -11,8 +15,10 @@ import { userStorage } from "../utils/userStorage";
 export default function ProfilePage({
   isDark,
   onBack,
-  onSaveSuccess, // 🆕 Callback cuando se guardan cambios
+  onSaveSuccess, // Callback para navegar de vuelta a Settings
 }) {
+  // 🆕 Usar el servicio de popups
+  const popup = usePopup();
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99", inputBg: "#2D2D3A", inputText: "#F0EEFF", disabled: "#9B99B3", disabledBg: "#3D3D4D" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0", inputBg: "#F1F0FF", inputText: "#1A1830", disabled: "#7B7A99", disabledBg: "#F5F3FF" };
@@ -26,11 +32,32 @@ export default function ProfilePage({
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
 
+  // Modal de eliminación de cuenta
+  const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
+
   // Datos del usuario (read-only)
   const [user, setUser] = useState(null);
 
   // Estados para detección de cambios
   const [hasChanged, setHasChanged] = useState(false);
+  // Estado para mostrar que se copió el User ID
+  const [copiedUserId, setCopiedUserId] = useState(false);
+
+  // 🆕 Usar hook de press effect para todos los botones
+  const pressBack = usePress();
+  const pressDelete = usePress();
+  const pressGuardar = usePress();
+  const pressLogout = usePress();
+
+  // Función para generar User ID único (10 caracteres alfanuméricos)
+  const generateUserId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let userId = '';
+    for (let i = 0; i < 10; i++) {
+      userId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return userId;
+  };
 
   // Cargar datos del usuario al montar
   useEffect(() => {
@@ -74,6 +101,20 @@ export default function ProfilePage({
     setLanguageOpen(false);
   };
 
+  // 🆕 Función para copiar User ID al portapapeles
+  const handleCopyUserId = async () => {
+    if (!user || !user.userId) return;
+
+    try {
+      await navigator.clipboard.writeText(user.userId);
+      setCopiedUserId(true);
+      // Mostrar "Copiado" por 2 segundos
+      setTimeout(() => setCopiedUserId(false), 2000);
+    } catch (err) {
+      console.error("Error al copiar:", err);
+    }
+  };
+
   // 🆕 Guardar cambios
   const handleSave = () => {
     if (!hasChanged) return; // No hacer nada si no hay cambios
@@ -86,7 +127,10 @@ export default function ProfilePage({
 
     setHasChanged(false);
 
-    // 🆕 Llamar a callback y regresa a Settings (el popup se muestra en Settings)
+    // 🆕 Mostrar popup de éxito usando el servicio
+    popup.showEditPopup('Perfil');
+
+    // Llamar a callback y regresa a Settings
     if (onSaveSuccess) {
       onSaveSuccess();
     } else {
@@ -134,6 +178,7 @@ export default function ProfilePage({
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button
             onClick={onBack}
+            {...pressBack.handlers}
             style={{
               width: 30,
               height: 30,
@@ -144,6 +189,7 @@ export default function ProfilePage({
               alignItems: "center",
               justifyContent: "center",
               cursor: "pointer",
+              ...pressBack.getPressStyle({ scale: 0.92 }),
             }}>
             <svg
               width="15"
@@ -161,7 +207,7 @@ export default function ProfilePage({
         </div>
       </div>
 
-      {/* Sección de Título + Botón Guardar */}
+      {/* Sección de Título */}
       <div
         style={{
           position: "absolute",
@@ -182,47 +228,45 @@ export default function ProfilePage({
             fontSize: 20,
             fontWeight: 700,
             color: t.text,
-            flex: 1,
-            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
           }}>
+          <span style={{ fontSize: 22 }}>👤</span>
           Perfil
         </div>
 
-        {/* Botón Guardar */}
-        <div style={{ position: "absolute", right: 22 }}>
-          <button
-            onClick={handleSave}
-            disabled={!hasChanged}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "none",
-              cursor: hasChanged ? "pointer" : "not-allowed",
-              background: hasChanged ? "#22C55E" : "#22C55E80",
-              fontSize: 13,
-              fontWeight: 700,
-              color: "#FFFFFF",
-              transition: "all 0.15s",
-              boxShadow: hasChanged ? "0 2px 8px rgba(34, 197, 94, 0.3)" : "none",
-              opacity: hasChanged ? 1 : 0.5,
-            }}
-            onMouseEnter={(e) => {
-              if (hasChanged) {
-                e.target.style.background = "#16A34A";
-                e.target.style.boxShadow = "0 4px 12px rgba(34, 197, 94, 0.4)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (hasChanged) {
-                e.target.style.background = "#22C55E";
-                e.target.style.boxShadow = "0 2px 8px rgba(34, 197, 94, 0.3)";
-              }
-            }}>
-            Guardar
-          </button>
-        </div>
+        {/* Botón Cerrar Sesión - Posicionado a la derecha */}
+        <button
+          onClick={onBack}
+          {...pressLogout.handlers}
+          style={{
+            position: "absolute",
+            right: 22,
+            padding: "8px 14px",
+            borderRadius: 6,
+            border: `1px solid ${t.border}`,
+            background: isDark ? "#252535" : "#F5F3FF",
+            color: t.text,
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: "pointer",
+            outline: "none",
+            ...pressLogout.getPressStyle({ scale: 0.95 }),
+          }}
+          onMouseEnter={(e) => {
+            if (!pressLogout.pressing) {
+              e.target.style.background = isDark ? "#2D2D3A" : "#F0EFF8";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!pressLogout.pressing) {
+              e.target.style.background = isDark ? "#252535" : "#F5F3FF";
+            }
+          }}>
+          Cerrar Sesión
+        </button>
       </div>
 
       {/* Contenido scrolleable */}
@@ -242,49 +286,84 @@ export default function ProfilePage({
         }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* SECCIÓN 1: Nombre de Visualización (SIEMPRE Editable) */}
-        <div style={{ marginBottom: 28 }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: 12,
-              fontWeight: 700,
-              color: t.sub,
-              marginBottom: 8,
-              textTransform: "uppercase",
-            }}>
-            Cómo quieres que te llamemos?
-          </label>
-          <input
-            type="text"
-            value={displayName}
-            onChange={(e) => handleDisplayNameChange(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: 8,
-              border: `1px solid ${t.border}`,
-              background: t.inputBg,
-              color: t.inputText,
-              fontSize: 14,
-              fontWeight: 600,
-              boxSizing: "border-box",
-              outline: "none",
-              transition: "all 0.2s",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "#7C3AED";
-              e.target.style.boxShadow = "0 0 0 3px rgba(124, 58, 237, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = t.border;
-              e.target.style.boxShadow = "none";
-            }}
-          />
+        {/* SECCIÓN 1: Nombre de Usuario (SIEMPRE Editable) */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8 }}>
+            <label
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: t.sub,
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto",
+              }}>
+              Nombre de usuario
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => handleDisplayNameChange(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "6px 14px",
+                borderRadius: 8,
+                border: `1px solid ${t.border}`,
+                background: t.inputBg,
+                color: t.inputText,
+                fontSize: 14,
+                fontWeight: 600,
+                boxSizing: "border-box",
+                outline: "none",
+                transition: "all 0.2s",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#7C3AED";
+                e.target.style.boxShadow = "0 0 0 3px rgba(124, 58, 237, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = t.border;
+                e.target.style.boxShadow = "none";
+              }}
+            />
+          </div>
+
+          {/* User ID - Alineado a la derecha debajo del input */}
+          {user && user.userId && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginLeft: 0 }}>
+              <span style={{ fontSize: 11, color: t.sub, fontWeight: 500 }}>
+                User ID: <strong style={{ color: t.text, fontFamily: "monospace" }}>{user.userId}</strong>
+              </span>
+              <button
+                onClick={handleCopyUserId}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "0",
+                  display: "flex",
+                  alignItems: "center",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.opacity = "0.7";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.opacity = "1";
+                }}
+                title={copiedUserId ? "¡Copiado!" : "Copiar User ID"}>
+                <CopyIcon width={14} height={14} color={copiedUserId ? "#22C55E" : t.sub} strokeWidth={2} />
+              </button>
+              {copiedUserId && (
+                <span style={{ fontSize: 10, color: "#22C55E", fontWeight: 600 }}>Copiado</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* SECCIÓN 2: Datos Personales (Read-only) */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginTop: 4, paddingTop: 28, borderTop: `1px solid ${t.border}`, marginBottom: 28 }}>
           <div
             style={{
               fontSize: 12,
@@ -292,20 +371,21 @@ export default function ProfilePage({
               color: t.sub,
               marginBottom: 12,
               textTransform: "uppercase",
+              textAlign: "left",
             }}>
             Información Personal
           </div>
 
           {/* Nombre(s) */}
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
             <label
               style={{
-                display: "block",
                 fontSize: 11,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto",
               }}>
               Nombre(s)
             </label>
@@ -314,8 +394,8 @@ export default function ProfilePage({
               value={user.firstName}
               disabled
               style={{
-                width: "100%",
-                padding: "12px 14px",
+                flex: 1,
+                padding: "6px 14px",
                 borderRadius: 8,
                 border: `1px solid ${t.border}`,
                 background: t.disabledBg,
@@ -329,15 +409,15 @@ export default function ProfilePage({
           </div>
 
           {/* Apellido(s) */}
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
             <label
               style={{
-                display: "block",
                 fontSize: 11,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto",
               }}>
               Apellido(s)
             </label>
@@ -346,8 +426,8 @@ export default function ProfilePage({
               value={user.lastName}
               disabled
               style={{
-                width: "100%",
-                padding: "12px 14px",
+                flex: 1,
+                padding: "6px 14px",
                 borderRadius: 8,
                 border: `1px solid ${t.border}`,
                 background: t.disabledBg,
@@ -361,15 +441,15 @@ export default function ProfilePage({
           </div>
 
           {/* Correo */}
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
             <label
               style={{
-                display: "block",
                 fontSize: 11,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto",
               }}>
               Correo Electrónico
             </label>
@@ -378,8 +458,8 @@ export default function ProfilePage({
               value={user.email}
               disabled
               style={{
-                width: "100%",
-                padding: "12px 14px",
+                flex: 1,
+                padding: "6px 14px",
                 borderRadius: 8,
                 border: `1px solid ${t.border}`,
                 background: t.disabledBg,
@@ -393,15 +473,15 @@ export default function ProfilePage({
           </div>
 
           {/* Teléfono */}
-          <div>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <label
               style={{
-                display: "block",
                 fontSize: 11,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto",
               }}>
               Teléfono
             </label>
@@ -410,8 +490,8 @@ export default function ProfilePage({
               value={user.phone}
               disabled
               style={{
-                width: "100%",
-                padding: "12px 14px",
+                flex: 1,
+                padding: "6px 14px",
                 borderRadius: 8,
                 border: `1px solid ${t.border}`,
                 background: t.disabledBg,
@@ -426,7 +506,7 @@ export default function ProfilePage({
         </div>
 
         {/* SECCIÓN 3: Preferencias (SIEMPRE Editable) */}
-        <div style={{ marginBottom: 28 }}>
+        <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${t.border}`, marginBottom: 28 }}>
           <div
             style={{
               fontSize: 12,
@@ -434,67 +514,71 @@ export default function ProfilePage({
               color: t.sub,
               marginBottom: 12,
               textTransform: "uppercase",
+              textAlign: "left",
             }}>
             Preferencias
           </div>
 
           {/* Moneda - Popup */}
           <div style={{ marginBottom: 12 }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                marginBottom: 6,
-                textTransform: "uppercase",
-              }}>
-              Moneda
-            </label>
-            <button
-              onClick={() => setCurrencyOpen(!currencyOpen)}
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.inputBg,
-                color: t.inputText,
-                fontSize: 14,
-                fontWeight: 600,
-                boxSizing: "border-box",
-                cursor: "pointer",
-                outline: "none",
-                transition: "all 0.2s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                textAlign: "left",
-              }}>
-              {getCurrencyLabel()}
-              <span style={{ transform: currencyOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                ▼
-              </span>
-            </button>
-
-            {/* Popup de opciones de moneda */}
-            {currencyOpen && (
-              <div
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <label
                 style={{
-                  marginTop: 8,
-                  borderRadius: 12,
-                  border: `1px solid ${t.border}`,
-                  background: t.card,
-                  overflow: "hidden",
-                  animation: "fadeInUp 0.2s ease",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: t.sub,
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  flex: "0 0 auto",
+                  paddingTop: 6,
                 }}>
+                Moneda
+              </label>
+              <div style={{ flex: 1 }}>
+                <button
+                  onClick={() => setCurrencyOpen(!currencyOpen)}
+                  style={{
+                    width: "100%",
+                    padding: "6px 14px",
+                    borderRadius: 8,
+                    border: `1px solid ${t.border}`,
+                    background: t.inputBg,
+                    color: t.inputText,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    boxSizing: "border-box",
+                    cursor: "pointer",
+                    outline: "none",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    textAlign: "left",
+                  }}>
+                  {getCurrencyLabel()}
+                  <span style={{ transform: currencyOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* Popup de opciones de moneda */}
+                {currencyOpen && (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      borderRadius: 12,
+                      border: `1px solid ${t.border}`,
+                      background: t.card,
+                      overflow: "hidden",
+                      animation: "fadeInUp 0.2s ease",
+                    }}>
                 {currencyOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleCurrencyChange(option.value)}
                     style={{
                       width: "100%",
-                      padding: "12px 14px",
+                      padding: "6px 14px",
                       border: "none",
                       borderBottom: option !== currencyOptions[currencyOptions.length - 1] ? `1px solid ${t.border}` : "none",
                       background: currency === option.value ? (isDark ? "#2D2D3A" : "#F0EFF8") : "transparent",
@@ -521,67 +605,72 @@ export default function ProfilePage({
                     )}
                   </button>
                 ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Idioma - Popup */}
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                marginBottom: 6,
-                textTransform: "uppercase",
-              }}>
-              Idioma
-            </label>
-            <button
-              onClick={() => setLanguageOpen(!languageOpen)}
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.inputBg,
-                color: t.inputText,
-                fontSize: 14,
-                fontWeight: 600,
-                boxSizing: "border-box",
-                cursor: "pointer",
-                outline: "none",
-                transition: "all 0.2s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                textAlign: "left",
-              }}>
-              {getLanguageLabel()}
-              <span style={{ transform: languageOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                ▼
-              </span>
-            </button>
-
-            {/* Popup de opciones de idioma */}
-            {languageOpen && (
-              <div
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <label
                 style={{
-                  marginTop: 8,
-                  borderRadius: 12,
-                  border: `1px solid ${t.border}`,
-                  background: t.card,
-                  overflow: "hidden",
-                  animation: "fadeInUp 0.2s ease",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: t.sub,
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  flex: "0 0 auto",
+                  paddingTop: 6,
                 }}>
+                Idioma
+              </label>
+              <div style={{ flex: 1 }}>
+                <button
+                  onClick={() => setLanguageOpen(!languageOpen)}
+                  style={{
+                    width: "100%",
+                    padding: "6px 14px",
+                    borderRadius: 8,
+                    border: `1px solid ${t.border}`,
+                    background: t.inputBg,
+                    color: t.inputText,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    boxSizing: "border-box",
+                    cursor: "pointer",
+                    outline: "none",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    textAlign: "left",
+                  }}>
+                  {getLanguageLabel()}
+                  <span style={{ transform: languageOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* Popup de opciones de idioma */}
+                {languageOpen && (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      borderRadius: 12,
+                      border: `1px solid ${t.border}`,
+                      background: t.card,
+                      overflow: "hidden",
+                      animation: "fadeInUp 0.2s ease",
+                    }}>
                 {languageOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => handleLanguageChange(option.value)}
                     style={{
                       width: "100%",
-                      padding: "12px 14px",
+                      padding: "6px 14px",
                       border: "none",
                       borderBottom: option !== languageOptions[languageOptions.length - 1] ? `1px solid ${t.border}` : "none",
                       background: language === option.value ? (isDark ? "#2D2D3A" : "#F0EFF8") : "transparent",
@@ -608,27 +697,104 @@ export default function ProfilePage({
                     )}
                   </button>
                 ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
+        </div>
+
+        {/* SECCIÓN 4: Zona de Peligro - Eliminar Cuenta */}
+        <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${t.border}` }}>
+          <button
+            onClick={() => setDeleteAccountModalOpen(true)}
+            {...pressDelete.handlers}
+            style={{
+              width: "100%",
+              padding: "6px 14px",
+              borderRadius: 8,
+              border: "none",
+              background: "#EF4444",
+              fontSize: 14,
+              fontWeight: 700,
+              boxSizing: "border-box",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              ...pressDelete.getPressStyle(),
+            }}
+            onMouseEnter={(e) => {
+              if (!pressDelete.pressing) {
+                e.target.style.background = "#DC2626";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!pressDelete.pressing) {
+                e.target.style.background = "#EF4444";
+              }
+            }}
+          >
+            {/* Icono de papelera centralizado */}
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                background: "rgba(255, 255, 255, 0.2)",
+                flexShrink: 0,
+              }}>
+              <TrashIcon width={14} height={14} color="#FFFFFF" strokeWidth={2.5} />
+            </div>
+            <span style={{ color: "#FFFFFF" }}>Eliminar Cuenta</span>
+          </button>
         </div>
       </div>
 
-      {/* 🆕 Gradiente de desvanecimiento flotante */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 80,
-          background: isDark
-            ? "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 40%, rgba(0, 0, 0, 0.9) 100%)"
-            : "linear-gradient(to bottom, transparent 0%, rgba(248, 247, 255, 0.4) 40%, rgba(248, 247, 255, 0.9) 100%)",
-          pointerEvents: "none",
-          zIndex: 20,
+      {/* Modal de Eliminación de Cuenta */}
+      <DeleteAccountModal
+        isDark={isDark}
+        isOpen={deleteAccountModalOpen}
+        onCancel={() => setDeleteAccountModalOpen(false)}
+        onConfirm={() => {
+          // 🆕 Aquí iría la lógica para eliminar la cuenta
+          // Por ahora es un placeholder - en futuro se conectará al backend
+          popup.showDeletePopup('cuenta');
+          setDeleteAccountModalOpen(false);
+          // Luego navegar a login o mostrar pantalla de confirmación
         }}
       />
+
+      {/* 🆕 Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
+      <div style={{ position: "absolute", bottom: 24, right: 22 }}>
+        <button
+          onClick={handleSave}
+          onPointerDown={() => hasChanged && pressGuardar.handlers.onPointerDown()}
+          onPointerUp={() => pressGuardar.handlers.onPointerUp()}
+          onPointerLeave={() => pressGuardar.handlers.onPointerLeave()}
+          disabled={!hasChanged}
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: "50%",
+            border: "none",
+            background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+            cursor: hasChanged ? "pointer" : "not-allowed",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: hasChanged ? (pressGuardar.pressing ? 0.9 : 1) : 0.45,
+            ...(hasChanged ? pressGuardar.getPressStyle({ scale: 0.93 }) : {}),
+          }}
+        >
+          <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
+        </button>
+      </div>
+
     </div>
   );
 }

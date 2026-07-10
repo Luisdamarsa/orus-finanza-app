@@ -1,0 +1,30 @@
+/**
+ * buttonPress.css
+ * Elimina efectos de iluminación y solo deja el efecto de hundimiento
+ */
+
+/* 🔴 ELIMINAR ILUMINACION: Deshabilitar todos los efectos por defecto */
+button {
+  position: relative !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  /* Eliminar efectos nativos del navegador */
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+button:active {
+  box-shadow: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+button:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+button:focus-visible {
+  box-shadow: none !important;
+  outline: none !important;
+}
