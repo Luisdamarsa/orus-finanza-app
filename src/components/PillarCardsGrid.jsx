@@ -108,13 +108,11 @@ export default function PillarCardsGrid({
               onPointerLeave={handlePillarPointerLeave}
               style={{
                 // 🎨 CAMBIO: Resalta en verde (Ahorro) o rojo (otros) si pasa presupuesto
-                background: isPressingThisPillar
-                  ? "rgba(0, 0, 0, 0.3)"  // 🆕 Oscuro mientras presionas
-                  : over
-                    ? p.id === "ahorro"
-                      ? isDark ? p.color + "33" : p.color + "22"  // Verde para Ahorro
-                      : isDark ? "#EF444433" : "#FCA5A522"  // Rojo para otros
-                    : (isDark ? "#252535" : "#FFFFFF"),  // Sin cambio de color al estar activo
+                background: over
+                  ? p.id === "ahorro"
+                    ? isDark ? p.color + "33" : p.color + "22"  // Verde para Ahorro
+                    : isDark ? "#EF444433" : "#FCA5A522"  // Rojo para otros
+                  : (isDark ? "#252535" : "#FFFFFF"),  // Sin overlay al presionar
                 border: `1.5px solid ${isAct ? p.color + "88" : over ? (p.id === "ahorro" ? p.color + "88" : "#EF444488") : t.border}`,
                 borderRadius: 11,
                 padding: "1px 8px",
@@ -169,11 +167,9 @@ export default function PillarCardsGrid({
             onPointerUp={() => setPressingId(null)}
             onPointerLeave={() => setPressingId(null)}
             style={{
-              background: pressingId === "saldo"
-                ? "rgba(0, 0, 0, 0.3)"
-                : saldo < 0
-                  ? (isDark ? "#2a1111" : "#FEF2F2")
-                  : (isDark ? "#1E1E2E" : "#FFFFFF"), // Sin cambio de color al estar activo
+              background: saldo < 0
+                ? (isDark ? "#2a1111" : "#FEF2F2")
+                : (isDark ? "#1E1E2E" : "#FFFFFF"), // Sin overlay al presionar
               border: `1.5px solid ${saldo < 0 ? "#EF444488" : t.border}`, // Sin glow en borde activo
               borderRadius: 11,
               padding: "1px 8px",
