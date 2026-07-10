@@ -1424,6 +1424,7 @@ function Dashboard() {
             onClose={() => { setShowPillarBars(false); setActiveId(null); }}
             onViewMovements={() => {
               setShowPillarBars(false);
+              setActiveId(null); // Resetear la tarjeta seleccionada al abrir movimientos
               setSelectedPillarForMovements(selectedPillarDetail);
               setScreen("movimientos");
             }}
