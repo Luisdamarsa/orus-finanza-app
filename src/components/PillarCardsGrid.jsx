@@ -103,7 +103,10 @@ export default function PillarCardsGrid({
           return (
             <div
               key={p.id}
-              onPointerDown={() => handlePillarPointerDown(p.id, p)}
+              onPointerDown={(e) => {
+                e.stopPropagation(); // Prevenir que el click cierre el popup
+                handlePillarPointerDown(p.id, p);
+              }}
               onPointerUp={handlePillarPointerUp}
               onPointerLeave={handlePillarPointerLeave}
               style={{
@@ -166,7 +169,10 @@ export default function PillarCardsGrid({
         {/* Tarjeta de Saldo */}
         {hasSaldo && (
           <div
-            onPointerDown={() => saldo >= 0 && setPressingId("saldo")}
+            onPointerDown={(e) => {
+              e.stopPropagation(); // Prevenir que el click cierre el popup
+              if (saldo >= 0) setPressingId("saldo");
+            }}
             onPointerUp={() => setPressingId(null)}
             onPointerLeave={() => setPressingId(null)}
             style={{
