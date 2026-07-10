@@ -96,6 +96,7 @@ export default function PillarBarsPopup({
 
       <div
         onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 300,
