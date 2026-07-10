@@ -34,6 +34,7 @@ import HeaderService from "./components/HeaderService";
 import PeriodSelector from "./components/PeriodSelectorService";
 import ProfilePage from "./components/ProfilePage";
 import AddTransactionPage from "./components/AddTransactionPage";
+import EditTransactionPage from "./components/EditTransactionPage";
 import PillarCardsGrid from "./components/PillarCardsGrid";
 import PillarTagsBar from "./components/PillarTagsBar";
 import DonutChartComponent from "./components/DonutChart";
@@ -507,6 +508,10 @@ function Dashboard() {
   const [editingCategoryName, setEditingCategoryName] = useState(null);
   const [editingPillarId, setEditingPillarId] = useState(null);
 
+  // 🆕 Estados para editar transacción
+  const [editingTransactionId, setEditingTransactionId] = useState(null);
+  const [selectedTransactionForEdit, setSelectedTransactionForEdit] = useState(null);
+
   // 🆕 Listener global para efecto de hundimiento en botones
   useEffect(() => {
     const handleButtonClick = (e) => {
@@ -647,6 +652,38 @@ function Dashboard() {
     }
 
     console.log("✅ Presupuesto de pilar actualizado:", pillarId, newBudget);
+  };
+
+  // 🆕 FUNCIONES CRUD PARA TRANSACCIONES
+  const editTransaction = (transactionId, updatedData) => {
+    // Buscar y actualizar transacción (sobrescribe datos pero mantiene id, date, time)
+    const txIndex = transactions.findIndex(tx => tx.id === transactionId);
+    if (txIndex === -1) return;
+
+    const updatedTransactions = [...transactions];
+    updatedTransactions[txIndex] = {
+      ...transactions[txIndex],
+      ...updatedData,
+      id: transactions[txIndex].id, // Mantener ID
+      date: transactions[txIndex].date, // Mantener fecha
+      time: transactions[txIndex].time, // Mantener hora
+    };
+
+    setTransactions(updatedTransactions);
+    setEditingTransactionId(null);
+    setSelectedTransactionForEdit(null);
+
+    console.log("✅ Transacción editada:", transactionId);
+  };
+
+  const deleteTransaction = (transactionId) => {
+    // Eliminar transacción
+    const updatedTransactions = transactions.filter(tx => tx.id !== transactionId);
+    setTransactions(updatedTransactions);
+    setEditingTransactionId(null);
+    setSelectedTransactionForEdit(null);
+
+    console.log("✅ Transacción eliminada:", transactionId);
   };
 
   // 🆕 Refs para medir alturas dinámicamente
@@ -900,6 +937,43 @@ function Dashboard() {
               // 🆕 Usar hook para agregar categoría
               addCategoryToHook(pillarId, categoryName);
             }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // 🆕 Pantalla de Editar Transacción
+  if (editingTransactionId && selectedTransactionForEdit) {
+    return (
+      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
+        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+          <EditTransactionPage
+            transaction={selectedTransactionForEdit}
+            onBack={() => {
+              setEditingTransactionId(null);
+              setSelectedTransactionForEdit(null);
+            }}
+            onSave={(transactionId, updatedData) => {
+              editTransaction(transactionId, updatedData);
+              // Volver a la pantalla anterior (dashboard o movimientos)
+              if (screen === "movimientos") {
+                setScreen("movimientos");
+              } else {
+                setScreen("dashboard");
+              }
+            }}
+            onDelete={(transactionId) => {
+              deleteTransaction(transactionId);
+              // Volver a la pantalla anterior
+              if (screen === "movimientos") {
+                setScreen("movimientos");
+              } else {
+                setScreen("dashboard");
+              }
+            }}
+            isDark={isDark}
+            categories={categories}
           />
         </div>
       </div>
