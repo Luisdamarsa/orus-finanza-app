@@ -127,7 +127,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     userSelect: "none",
                     transform: isPressingToggleRow ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
                     boxShadow: isPressingToggleRow ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
-                    transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transition: item.id === "ingresos" ? "none" : "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // Inmediato para Mostrar Ingresos
                   }}>
                   <span style={{ fontSize: 18 }}>{item.icon}</span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1, textAlign: "left" }}>
