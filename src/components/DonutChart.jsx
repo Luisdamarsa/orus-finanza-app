@@ -145,7 +145,7 @@ export default function DonutChart({
       key={`donut-${selectedPeriod?.year}-${selectedPeriod?.month}`}
       width={cx * 2}
       height={cy * 2}
-      style={{ overflow: "visible" }}>
+      style={{ overflow: "visible", outline: "none" }}>
       {/* Segmentos del donut */}
       {arcs.map((arc) => {
         const isActive = activeId === arc.id;
