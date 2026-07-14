@@ -41,10 +41,15 @@ export default function PillarCardsGrid({
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 
-  // 🆕 Handlers mejorados usando state en lugar de classList
-  const handlePillarPointerDown = (pillarId, pillar) => {
-    console.log("🔻 POINTER DOWN - Presionando:", pillarId, "setPressingId:", pillarId);
+  // 🆕 Handler para visual press (solo setPressingId, sin acción)
+  const handlePillarPress = (pillarId) => {
+    console.log("🔻 POINTER DOWN - Presionando visualmente:", pillarId);
     setPressingId(pillarId);
+  };
+
+  // 🆕 Handler para acción real (se ejecuta al SOLTAR / onClick)
+  const handlePillarSelect = (pillarId, pillar) => {
+    console.log("✅ CLICK - Seleccionando pilar:", pillarId);
     setActiveId(pillarId);
     setSelectedPillarDetail(pillar);
     setShowPillarBars(true);
@@ -103,10 +108,13 @@ export default function PillarCardsGrid({
           return (
             <div
               key={p.id}
-              onClick={(e) => e.stopPropagation()} // Detener click que resetea activeId
+              onClick={(e) => {
+                e.stopPropagation(); // Detener click que resetea activeId
+                handlePillarSelect(p.id, p); // 🆕 Ejecutar acción al hacer click (soltar)
+              }}
               onPointerDown={(e) => {
                 e.stopPropagation(); // Prevenir que el pointerDown se propague
-                handlePillarPointerDown(p.id, p);
+                handlePillarPress(p.id); // 🆕 Solo efecto visual, sin acción
               }}
               onPointerUp={handlePillarPointerUp}
               onPointerLeave={handlePillarPointerLeave}
