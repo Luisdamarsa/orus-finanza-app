@@ -214,9 +214,7 @@ export default function TransactionPage({
    * Eliminar transacción
    */
   function handleDelete() {
-    if (window.confirm(`¿Eliminar transacción de $${Math.abs(editingTransaction.amount)}?`)) {
-      onDelete(editingTransaction.id);
-    }
+    onDelete(editingTransaction.id);
   }
 
   return (
