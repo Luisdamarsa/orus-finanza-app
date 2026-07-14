@@ -299,7 +299,7 @@ export default function TransactionPage({
               letterSpacing: 1,
               marginBottom: 12
             }}>
-            {isEditing ? "EDITAR TRANSACCIÓN" : "NUEVA TRANSACCIÓN"}
+            {isEditing ? "TRANSACCIÓN" : "NUEVA TRANSACCIÓN"}
           </div>
 
           <style>{`
