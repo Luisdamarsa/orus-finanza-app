@@ -39,16 +39,16 @@ export default function PillarTagsBar({
         return (
           <button
             key={p.id}
-            onPointerDown={() => {
+            onMouseDown={() => {
               console.log("🔻 TAG PRESS DOWN:", p.id);
               setPressingId(p.id);
             }} // 🆕 Al presionar
-            onPointerUp={() => {
+            onMouseUp={() => {
               console.log("🔺 TAG PRESS UP:", p.id);
               setPressingId(null);
             }} // 🆕 Al soltar
-            onPointerLeave={() => {
-              console.log("🚫 TAG POINTER LEAVE:", p.id);
+            onMouseLeave={() => {
+              console.log("🚫 TAG MOUSE LEAVE:", p.id);
               setPressingId(null);
             }} // 🆕 Si el mouse deja el elemento
             onClick={() => {
