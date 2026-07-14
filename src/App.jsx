@@ -1234,12 +1234,22 @@ function Dashboard() {
                       const isClickable = !isSaldo || !isMovementOpen;
 
                       const isPressing = pressingSegmentId === seg.id; // 🆕 Verificar si este tag está siendo presionado
+                      if (isPressing) console.log("🎯 RENDERING DONUT TAG PRESSED:", seg.id, "pressingSegmentId:", pressingSegmentId);
                       return (
                       <button
                         key={seg.id}
-                        onMouseDown={() => isClickable && setPressingSegmentId(seg.id)} // 🆕 Al presionar
-                        onMouseUp={() => setPressingSegmentId(null)} // 🆕 Al soltar
-                        onMouseLeave={() => setPressingSegmentId(null)} // 🆕 Si el mouse deja el elemento
+                        onMouseDown={() => {
+                          console.log("🔻 DONUT TAG MOUSE DOWN:", seg.id);
+                          isClickable && setPressingSegmentId(seg.id);
+                        }} // 🆕 Al presionar
+                        onMouseUp={() => {
+                          console.log("🔺 DONUT TAG MOUSE UP:", seg.id);
+                          setPressingSegmentId(null);
+                        }} // 🆕 Al soltar
+                        onMouseLeave={() => {
+                          console.log("🚫 DONUT TAG MOUSE LEAVE:", seg.id);
+                          setPressingSegmentId(null);
+                        }} // 🆕 Si el mouse deja el elemento
                         onClick={() => isClickable && setActiveId(activeId === seg.id ? null : seg.id)}
                         disabled={!isClickable}
                         style={{
