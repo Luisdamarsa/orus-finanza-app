@@ -5,6 +5,8 @@ import {
 } from "../constants";
 import { CheckmarkIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
+import LoadingWrapper from "./LoadingWrapper";
+import { FormSkeleton } from "./LoadingSkeleton";
 
 /**
  * Página para agregar una transacción manualmente
@@ -55,6 +57,9 @@ export default function AddTransactionPage({
   const [pressingPillar, setPressingPillar] = useState(null);
   // 🆕 Estado para trackear qué opción del dropdown está siendo presionada
   const [pressingConcept, setPressingConcept] = useState(null);
+
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(false);
 
   // Estado del formulario
   const [desc, setDesc] = useState("");
@@ -205,6 +210,14 @@ export default function AddTransactionPage({
               opacity: 0.35;
             }
           `}</style>
+
+          {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+          <LoadingWrapper
+            isLoading={isLoading}
+            skeleton={<FormSkeleton isDark={isDark} fieldCount={6} />}
+            isDark={isDark}
+          >
+            <>
 
           {/* Input Descripción */}
           <input
@@ -701,10 +714,7 @@ export default function AddTransactionPage({
               </div>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Botón flotante de confirmación */}
+            </>
       <div style={{ position: "absolute", bottom: 24, right: 22 }}>
         <button
           onClick={() =>

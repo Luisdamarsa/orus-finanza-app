@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
 import { getCategoryName } from "../utils/categoryUtils";
+import LoadingWrapper from "./LoadingWrapper";
+import { MenuListSkeleton } from "./LoadingSkeleton";
 
 /**
  * CategoriesPage.jsx
@@ -36,6 +38,9 @@ export default function CategoriesPage({
   const pressAdd = usePress();
   // 🆕 Estado para rastrear qué categoría está siendo presionada
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
+
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(false);
 
   // 🆕 Medir altura dinámicamente de la descripción
   useEffect(() => {
@@ -161,8 +166,16 @@ export default function CategoriesPage({
         padding: "6px 22px 20px 22px", boxSizing: "border-box"
       }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
-        {/* Pilares y sus categorías */}
-        {PILLARS.map((pillar) => {
+
+        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+        <LoadingWrapper
+          isLoading={isLoading}
+          skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
+          isDark={isDark}
+        >
+          <>
+            {/* Pilares y sus categorías */}
+            {PILLARS.map((pillar) => {
           const pillarCategories = categories[pillar.id] || [];
 
           return (
@@ -302,9 +315,11 @@ export default function CategoriesPage({
             }
           }}
         >
-          <span style={{ fontSize: 18 }}>+</span>
-          <span>Añadir categoría</span>
-        </button>
+              <span style={{ fontSize: 18 }}>+</span>
+              <span>Añadir categoría</span>
+            </button>
+          </>
+        </LoadingWrapper>
       </div>
 
     </div>

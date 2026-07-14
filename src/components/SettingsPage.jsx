@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { usePress } from "../hooks/usePress";
+import LoadingWrapper from "./LoadingWrapper";
+import { MenuListSkeleton } from "./LoadingSkeleton";
 
 export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
   const [pressingButton, setPressingButton] = useState(null);
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(false);
 
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
@@ -97,8 +101,15 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
       }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* Menu Items + Toggles */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
+        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+        <LoadingWrapper
+          isLoading={isLoading}
+          skeleton={<MenuListSkeleton isDark={isDark} itemCount={8} />}
+          isDark={isDark}
+        >
+          <>
+            {/* Menu Items + Toggles */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
           {allItems.map((item, idx) => {
             // Si es un toggle, renderizar con switch clickeable
             if (item.type === "toggle") {
@@ -212,14 +223,16 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                 <span style={{ fontSize: 12, color: t.sub }}>→</span>
               </button>
             );
-          })}
-        </div>
+            })}
+            </div>
 
-        {/* Footer Info */}
-        <div style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20 }}>
-          <div>ORUS Finanzas v1.0.0</div>
-          <div style={{ marginTop: 4 }}>© 2026 ORUS. Todos los derechos reservados.</div>
-        </div>
+            {/* Footer Info */}
+            <div style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20 }}>
+              <div>ORUS Finanzas v1.0.0</div>
+              <div style={{ marginTop: 4 }}>© 2026 ORUS. Todos los derechos reservados.</div>
+            </div>
+          </>
+        </LoadingWrapper>
       </div>
 
 

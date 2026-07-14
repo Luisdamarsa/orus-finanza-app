@@ -7,6 +7,8 @@ import { useBudgets } from "../hooks/useBudgets";
 import { CheckmarkIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
+import LoadingWrapper from "./LoadingWrapper";
+import { MenuListSkeleton } from "./LoadingSkeleton";
 
 export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, onSaveSuccess, categories: categoriesFromProps, editPillarBudget, editCategoryBudget }) {
   // 🆕 Usar servicios/hooks independientes
@@ -26,6 +28,8 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   const [hasChanged, setHasChanged] = useState(false);
   // 🆕 Estado para pilares expandidos
   const [expandedPillars, setExpandedPillars] = useState({});
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(false);
   // 🆕 Usar ref para guardar valores iniciales solo una vez
   const initialCategoryBudgetsRef = useRef(null);
   // 🆕 Ref para medir altura de descripción dinámicamente
@@ -322,9 +326,16 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
           }
         `}</style>
 
-        {/* Lista de pilares */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
-          {PILLARS.map(pillar => {
+        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+        <LoadingWrapper
+          isLoading={isLoading}
+          skeleton={<MenuListSkeleton isDark={isDark} itemCount={10} />}
+          isDark={isDark}
+        >
+          <>
+            {/* Lista de pilares */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
+              {PILLARS.map(pillar => {
             // 🆕 Traer categorías del pilar
             const pillarCategories = categories[pillar.id] || [];
             const isExpanded = expandedPillars[pillar.id] || false;
@@ -524,8 +535,10 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
                 )}
               </div>
             );
-          })}
-        </div>
+              })}
+            </div>
+          </>
+        </LoadingWrapper>
       </div>
 
       {/* 🆕 Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}

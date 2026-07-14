@@ -4,6 +4,8 @@ import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import DeleteAccountModal from "./DeleteAccountModal";
 import { CheckmarkIcon, TrashIcon, CopyIcon } from "../icons/Icons";
+import LoadingWrapper from "./LoadingWrapper";
+import { FormSkeleton } from "./LoadingSkeleton";
 
 /**
  * Página de Perfil del usuario
@@ -43,6 +45,9 @@ export default function ProfilePage({
   // Estado para mostrar que se copió el User ID
   const [copiedUserId, setCopiedUserId] = useState(false);
 
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(true);
+
   // 🆕 Usar hook de press effect para todos los botones
   const pressBack = usePress();
   const pressDelete = usePress();
@@ -67,6 +72,7 @@ export default function ProfilePage({
     setCurrency(userData.currency);
     setLanguage(userData.language);
     setHasChanged(false); // Reset cambios al montar
+    setIsLoading(false); // 🆕 Terminar loading
   }, []);
 
   // 🆕 Detectar cambios en tiempo real
@@ -286,7 +292,14 @@ export default function ProfilePage({
         }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* SECCIÓN 1: Nombre de Usuario (SIEMPRE Editable) */}
+        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+        <LoadingWrapper
+          isLoading={isLoading}
+          skeleton={<FormSkeleton isDark={isDark} fieldCount={4} />}
+          isDark={isDark}
+        >
+          <>
+            {/* SECCIÓN 1: Nombre de Usuario (SIEMPRE Editable) */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8 }}>
             <label
@@ -753,6 +766,8 @@ export default function ProfilePage({
             <span style={{ color: "#FFFFFF" }}>Eliminar Cuenta</span>
           </button>
         </div>
+          </>
+        </LoadingWrapper>
       </div>
 
       {/* Modal de Eliminación de Cuenta */}
