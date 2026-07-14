@@ -54,10 +54,10 @@ export default function CategoryProgressBar({
   if (hasBudget && isOverHalfBudget) {
     // Modo presupuesto: mostrar progreso vs presupuesto (para el indicador)
     percentage = budgetPercentage;  // Puede ser > 100%
-    // Relleno: relativo a maxSpent (proporcional), limitado al presupuesto y máximo 90%
-    barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax, 90);
-    // Línea punteada: hasta el presupuesto relativo a maxSpent, máximo 90%
-    budgetLinePercentage = Math.min(budgetPercentageOfMax, 90);
+    // Relleno: relativo a maxSpent (proporcional), pero limitado al presupuesto
+    barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax);
+    // Línea punteada: hasta el presupuesto relativo a maxSpent
+    budgetLinePercentage = budgetPercentageOfMax;
   } else {
     // Modo sin presupuesto: mostrar progreso relativo a maxSpent
     percentage = (spent / maxSpent) * 100;
