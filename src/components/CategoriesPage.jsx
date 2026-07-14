@@ -54,6 +54,7 @@ export default function CategoriesPage({
   }, []);
 
   return (
+    <>
     <PageLayout
       isDark={isDark}
       onBack={onBack}
@@ -241,5 +242,6 @@ export default function CategoriesPage({
         <span>Añadir categoría</span>
       </button>
     </div>
+    </>
   );
 }

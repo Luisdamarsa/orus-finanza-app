@@ -199,6 +199,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   };
 
   return (
+    <>
     <PageLayout
       isDark={isDark}
       onBack={onBack}
@@ -493,5 +494,6 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
           <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
         </button>
       </div>
+    </>
   );
 }

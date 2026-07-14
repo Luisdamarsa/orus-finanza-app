@@ -197,6 +197,7 @@ export default function ProfilePage({
   );
 
   return (
+    <>
     <PageLayout
       isDark={isDark}
       onBack={onBack}
@@ -728,5 +729,6 @@ export default function ProfilePage({
         <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
       </button>
     </div>
+    </>
   );
 }
