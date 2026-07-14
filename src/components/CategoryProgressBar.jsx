@@ -32,6 +32,9 @@ export default function CategoryProgressBar({
   // Determinar si tiene presupuesto
   const hasBudget = budget && budget > 0;
 
+  // 🆕 Determinar si la categoría está deshabilitada (sin gasto)
+  const isDisabled = spent === 0;
+
   // 🆕 Calcular porcentaje del presupuesto (vs presupuesto)
   const budgetPercentage = hasBudget ? (spent / budget) * 100 : 0;
 
@@ -84,7 +87,7 @@ export default function CategoryProgressBar({
       >
         {/* Barra de Progreso */}
         <div
-          onClick={onClickBar}
+          onClick={isDisabled ? undefined : onClickBar}
           style={{
             width: "100%",
             height: 32,
@@ -96,20 +99,16 @@ export default function CategoryProgressBar({
             top: 0,
             left: 0,
             overflow: "hidden",
-            cursor: "pointer",
+            cursor: isDisabled ? "not-allowed" : "pointer",
             transition: "all 0.2s",
             background: isDark ? "#000000" : "#1A1830",
-            backgroundColor: isSelected
-              ? pillarColor + "22"
-              : isDark
-                ? "#000000"
-                : "#1A1830",
+            opacity: isDisabled ? 0.5 : 1,
           }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.opacity = "0.8";
+          if (!isDisabled) e.currentTarget.style.opacity = "0.8";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.opacity = "1";
+          if (!isDisabled) e.currentTarget.style.opacity = "1";
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
@@ -122,8 +121,8 @@ export default function CategoryProgressBar({
             width: showDashedBorder ? `calc(${barFillPercentage}% + 4px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
-            opacity: 0.6,
-            transition: "width 0.2s",
+            opacity: isSelected ? 1 : 0.6,
+            transition: "width 0.2s, opacity 0.2s",
           }}
         />
 
