@@ -63,9 +63,9 @@ export default function DonutChart({
 
   // 🆕 Orden de animación (mismo que en la barra del Estado 2)
   const ANIMATION_ORDER = ["fijos", "deuda", "ahorro", "ocio", "varios", "saldo"];
-  const SEGMENT_DELAY = 70; // 70ms entre cada segmento (distribuido en 0.5s total)
-  const ANIMATION_DURATION = 150; // 150ms por segmento
-  // Total: 5 * 70 + 150 = 500ms (0.5s)
+  const SEGMENT_DELAY = 20; // 20ms entre cada segmento
+  const ANIMATION_DURATION = 100; // 100ms por segmento
+  // Total: 5 * 20 + 100 = 200ms (0.2s)
 
   // 🆕 Detectar cambio de período e iniciar animación
   useEffect(() => {
@@ -195,8 +195,8 @@ export default function DonutChart({
               strokeDasharray="600"
               opacity={op}
               style={{
-                // 🆕 Animación combinada: se dibuja el arco EN NEGRO y luego cambia a color (0.15s cada una, 0.5s total)
-                animation: `drawArc_${arc.id} 0.15s ease-out ${getSegmentIndex(arc.id) * SEGMENT_DELAY}ms forwards`,
+                // 🆕 Animación combinada: se dibuja el arco EN NEGRO y luego cambia a color
+                animation: `drawArc_${arc.id} ${ANIMATION_DURATION}ms ease-out ${getSegmentIndex(arc.id) * SEGMENT_DELAY}ms forwards`,
                 transformOrigin: `${cx}px ${cy}px`,
                 transition: "all 0.25s cubic-bezier(.4,0,.2,1)",
                 transform: `scale(${scale})`,
