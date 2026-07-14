@@ -512,6 +512,9 @@ function Dashboard() {
   const [editingTransactionId, setEditingTransactionId] = useState(null);
   const [selectedTransactionForEdit, setSelectedTransactionForEdit] = useState(null);
 
+  // 🆕 Estado para trackear qué tag del donut está siendo presionado
+  const [pressingSegmentId, setPressingSegmentId] = useState(null);
+
   // 🆕 Listener global para efecto de hundimiento en botones
   useEffect(() => {
     const handleButtonClick = (e) => {
@@ -1230,9 +1233,13 @@ function Dashboard() {
                       const isSaldo = seg.id === "saldo";
                       const isClickable = !isSaldo || !isMovementOpen;
 
+                      const isPressing = pressingSegmentId === seg.id; // 🆕 Verificar si este tag está siendo presionado
                       return (
                       <button
                         key={seg.id}
+                        onMouseDown={() => isClickable && setPressingSegmentId(seg.id)} // 🆕 Al presionar
+                        onMouseUp={() => setPressingSegmentId(null)} // 🆕 Al soltar
+                        onMouseLeave={() => setPressingSegmentId(null)} // 🆕 Si el mouse deja el elemento
                         onClick={() => isClickable && setActiveId(activeId === seg.id ? null : seg.id)}
                         disabled={!isClickable}
                         style={{
@@ -1242,7 +1249,9 @@ function Dashboard() {
                           color: activeId === seg.id ? seg.color : t.sub, fontSize: 9.5, fontWeight: 700,
                           cursor: isClickable ? "pointer" : "default",
                           whiteSpace: "nowrap",
-                          opacity: isClickable ? 1 : 0.6,
+                          opacity: isPressing ? 0.6 : (isClickable ? 1 : 0.6), // 🆕 Reducir opacidad al presionar
+                          transform: isPressing ? "scale(0.95)" : "scale(1)", // 🆕 Empequeñecer al presionar
+                          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
                         }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: seg.color, display: "inline-block" }} />
                         {seg.label}
