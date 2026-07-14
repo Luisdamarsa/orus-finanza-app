@@ -34,13 +34,23 @@ export default function PillarTagsBar({
       {PILLARS.map((p, i) => {
         const isFiltered = filteredPillar === p.id;
         const isPressing = pressingId === p.id; // 🆕 Verificar si este tag está siendo presionado
+        if (isPressing) console.log("🎯 RENDERING TAG PRESSED:", p.id, "isPressing:", isPressing);
 
         return (
           <button
             key={p.id}
-            onPointerDown={() => setPressingId(p.id)} // 🆕 Al presionar
-            onPointerUp={() => setPressingId(null)} // 🆕 Al soltar
-            onPointerLeave={() => setPressingId(null)} // 🆕 Si el mouse deja el elemento
+            onPointerDown={() => {
+              console.log("🔻 TAG PRESS DOWN:", p.id);
+              setPressingId(p.id);
+            }} // 🆕 Al presionar
+            onPointerUp={() => {
+              console.log("🔺 TAG PRESS UP:", p.id);
+              setPressingId(null);
+            }} // 🆕 Al soltar
+            onPointerLeave={() => {
+              console.log("🚫 TAG POINTER LEAVE:", p.id);
+              setPressingId(null);
+            }} // 🆕 Si el mouse deja el elemento
             onClick={() => {
               // Filtros mutuamente excluyentes: limpiar filterType
               if (!isFiltered) {
