@@ -753,14 +753,14 @@ export default function TransactionPage({
                         flex: 1,
                         padding: "7px 2px",
                         borderRadius: 12,
-                        border: `1.5px solid ${p.color}44`,
+                        border: active ? `2px solid ${p.color}` : "2px solid transparent",
                         cursor: "pointer",
                         background: pressingPillar === p.id
                           ? `${p.color}44`
                           : active
                             ? isDark ? p.darkBg : p.bg
                             : isDark ? "#252538" : "#F0EFF8",
-                        outline: active ? `2px solid ${p.color}88` : "2px solid transparent",
+                        outline: "none",
                         transition: "all 0.18s",
                         transform: pressingPillar === p.id ? "scale(0.94)" : "scale(1)",
                         opacity: pressingPillar === p.id ? 0.7 : 1,
