@@ -278,8 +278,10 @@ export default function CategoriesPage({
               </div>
             </div>
           );
-        })}
-
+            })}
+            </div>
+          </>
+        </LoadingWrapper>
       </div>
 
       {/* Botón Flotante Añadir Categoría */}
@@ -315,11 +317,9 @@ export default function CategoriesPage({
             }
           }}
         >
-              <span style={{ fontSize: 18 }}>+</span>
-              <span>Añadir categoría</span>
-            </button>
-          </>
-        </LoadingWrapper>
+          <span style={{ fontSize: 18 }}>+</span>
+          <span>Añadir categoría</span>
+        </button>
       </div>
 
     </div>
