@@ -753,7 +753,7 @@ export default function TransactionPage({
                         flex: 1,
                         padding: "7px 2px",
                         borderRadius: 12,
-                        border: "none",
+                        border: `1.5px solid ${p.color}44`,
                         cursor: "pointer",
                         background: pressingPillar === p.id
                           ? `${p.color}44`
