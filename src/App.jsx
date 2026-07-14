@@ -33,8 +33,7 @@ import MovimientosPage from "./components/MovimientosPage";
 import HeaderService from "./components/HeaderService";
 import PeriodSelector from "./components/PeriodSelectorService";
 import ProfilePage from "./components/ProfilePage";
-import AddTransactionPage from "./components/AddTransactionPage";
-import EditTransactionPage from "./components/EditTransactionPage";
+import TransactionPage from "./components/TransactionPage";
 import PillarCardsGrid from "./components/PillarCardsGrid";
 import PillarTagsBar from "./components/PillarTagsBar";
 import DonutTagsBar from "./components/DonutTagsBar";
@@ -899,7 +898,8 @@ function Dashboard() {
     return (
       <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
         <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
-          <AddTransactionPage
+          <TransactionPage
+            isEditing={false}
             onBack={() => setScreen("dashboard")}
             onDone={({ desc, rawAmount, isIncome, method, concept, pillarId }) => {
               const absAmount = parseInt((rawAmount || "").replace(/\D/g, "")) || 0;
@@ -952,8 +952,9 @@ function Dashboard() {
     return (
       <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
         <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
-          <EditTransactionPage
-            transaction={selectedTransactionForEdit}
+          <TransactionPage
+            isEditing={true}
+            editingTransaction={selectedTransactionForEdit}
             onBack={() => {
               setEditingTransactionId(null);
               setSelectedTransactionForEdit(null);
