@@ -450,9 +450,9 @@ export default function TransactionPage({
                     border: "none",
                     cursor: "pointer",
                     background: pressingMethod === m.id
-                      ? `${m.color}44`
+                      ? `${m.color}88`
                       : active
-                        ? m.color + "44"
+                        ? m.color + "88"
                         : isDark
                           ? "#252538"
                           : "#F0EFF8",
