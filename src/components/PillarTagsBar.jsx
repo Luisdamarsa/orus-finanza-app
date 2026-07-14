@@ -42,15 +42,27 @@ export default function PillarTagsBar({
             onMouseDown={() => {
               console.log("🔻 TAG PRESS DOWN:", p.id);
               setPressingId(p.id);
-            }} // 🆕 Al presionar
+            }} // 🆕 Al presionar (desktop)
             onMouseUp={() => {
               console.log("🔺 TAG PRESS UP:", p.id);
               setPressingId(null);
-            }} // 🆕 Al soltar
+            }} // 🆕 Al soltar (desktop)
             onMouseLeave={() => {
               console.log("🚫 TAG MOUSE LEAVE:", p.id);
               setPressingId(null);
-            }} // 🆕 Si el mouse deja el elemento
+            }} // 🆕 Si el mouse deja el elemento (desktop)
+            onTouchStart={() => {
+              console.log("👆 TAG TOUCH START:", p.id);
+              setPressingId(p.id);
+            }} // 🆕 Al presionar (móvil)
+            onTouchEnd={() => {
+              console.log("👆 TAG TOUCH END:", p.id);
+              setPressingId(null);
+            }} // 🆕 Al soltar (móvil)
+            onTouchCancel={() => {
+              console.log("👆 TAG TOUCH CANCEL:", p.id);
+              setPressingId(null);
+            }} // 🆕 Si se cancela el touch (móvil)
             onClick={() => {
               // Filtros mutuamente excluyentes: limpiar filterType
               if (!isFiltered) {

@@ -1241,15 +1241,27 @@ function Dashboard() {
                         onMouseDown={() => {
                           console.log("🔻 DONUT TAG MOUSE DOWN:", seg.id);
                           isClickable && setPressingSegmentId(seg.id);
-                        }} // 🆕 Al presionar
+                        }} // 🆕 Al presionar (desktop)
                         onMouseUp={() => {
                           console.log("🔺 DONUT TAG MOUSE UP:", seg.id);
                           setPressingSegmentId(null);
-                        }} // 🆕 Al soltar
+                        }} // 🆕 Al soltar (desktop)
                         onMouseLeave={() => {
                           console.log("🚫 DONUT TAG MOUSE LEAVE:", seg.id);
                           setPressingSegmentId(null);
-                        }} // 🆕 Si el mouse deja el elemento
+                        }} // 🆕 Si el mouse deja el elemento (desktop)
+                        onTouchStart={() => {
+                          console.log("👆 DONUT TAG TOUCH START:", seg.id);
+                          isClickable && setPressingSegmentId(seg.id);
+                        }} // 🆕 Al presionar (móvil)
+                        onTouchEnd={() => {
+                          console.log("👆 DONUT TAG TOUCH END:", seg.id);
+                          setPressingSegmentId(null);
+                        }} // 🆕 Al soltar (móvil)
+                        onTouchCancel={() => {
+                          console.log("👆 DONUT TAG TOUCH CANCEL:", seg.id);
+                          setPressingSegmentId(null);
+                        }} // 🆕 Si se cancela el touch (móvil)
                         onClick={() => isClickable && setActiveId(activeId === seg.id ? null : seg.id)}
                         disabled={!isClickable}
                         style={{
