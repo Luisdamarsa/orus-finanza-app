@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 /**
  * PillarTagsBar.jsx
  *
@@ -23,14 +25,22 @@ export default function PillarTagsBar({
   isDark,
   t,
 }) {
+  // 🆕 Estado para trackear qué tag está siendo presionado
+  const [pressingId, setPressingId] = useState(null);
+
   return (
     <div style={{ display: "flex", gap: 4 }}>
       {/* Tags de pilares */}
       {PILLARS.map((p, i) => {
         const isFiltered = filteredPillar === p.id;
+        const isPressing = pressingId === p.id; // 🆕 Verificar si este tag está siendo presionado
+
         return (
           <button
             key={p.id}
+            onPointerDown={() => setPressingId(p.id)} // 🆕 Al presionar
+            onPointerUp={() => setPressingId(null)} // 🆕 Al soltar
+            onPointerLeave={() => setPressingId(null)} // 🆕 Si el mouse deja el elemento
             onClick={() => {
               // Filtros mutuamente excluyentes: limpiar filterType
               if (!isFiltered) {
@@ -50,6 +60,10 @@ export default function PillarTagsBar({
               cursor: "pointer",
               background: isFiltered ? p.color + "33" : p.color + "1A",
               outline: isFiltered ? `1.5px solid ${p.color}BB` : `1px solid ${p.color}44`,
+              transform: isPressing ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)", // 🆕 Se empequeñece al presionar
+              opacity: isPressing ? 0.7 : 1, // 🆕 Opacidad al presionar
+              boxShadow: isPressing ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Sombra inset al presionar
+              transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
             }}
           >
             <div style={{ fontSize: 10, fontWeight: 800, color: p.color }}>{p.label}</div>
