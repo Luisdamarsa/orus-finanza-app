@@ -38,7 +38,8 @@ export default function AddCategoryPage({
 }) {
   // 🆕 Usar el servicio de popups
   const popup = usePopup();
-  // 🆕 Hooks para animación de press en botones de guardar y eliminar
+  // 🆕 Hooks para animación de press en botones
+  const pressBack = usePress();
   const pressSave = usePress();
   const pressDelete = usePress();
   const [description, setDescription] = useState("");
@@ -158,6 +159,7 @@ export default function AddCategoryPage({
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 0 }}>
         <button
           onClick={onBack}
+          {...pressBack.handlers}
           style={{
             width: 30,
             height: 30,
@@ -167,7 +169,8 @@ export default function AddCategoryPage({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            cursor: "pointer"
+            cursor: "pointer",
+            ...pressBack.getPressStyle(),
           }}
         >
           <svg

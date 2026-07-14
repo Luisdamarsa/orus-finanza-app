@@ -116,6 +116,15 @@ export default function TransactionPage({
     return formatted;
   };
 
+  // 🆕 Obtener nombre de categoría por ID
+  const getCategoryDisplayName = (categoryId) => {
+    if (!categoryId) return null;
+    // Buscar en las categorías formateadas
+    const formatted = getFormattedCategories();
+    const found = formatted.find(cat => cat.id === categoryId);
+    return found ? found.name : null;
+  };
+
   // Cálculos derivados
   const numericAmount = parseInt(rawAmount.replace(/\D/g, "")) || 0;
   const hasAmount = numericAmount > 0;
@@ -529,7 +538,7 @@ export default function TransactionPage({
                     flex: 1,
                     textAlign: "left"
                   }}>
-                  {concept || "Selecciona la categoría"}
+                  {getCategoryDisplayName(concept) || "Selecciona la categoría"}
                 </span>
                 <svg
                   width="12"
