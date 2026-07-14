@@ -149,7 +149,7 @@ export default function CategoryProgressBar({
               left: 0,
               width: `${budgetLinePercentage}%`,
               height: 32,
-              border: `1.7px dashed #FFFFFF`,
+              border: `2px dashed #FFFFFF`,
               borderRadius: 8,
               boxSizing: "border-box",
               pointerEvents: "none",
