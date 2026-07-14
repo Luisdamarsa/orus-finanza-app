@@ -119,14 +119,28 @@ export default function PillarCardsGrid({
                   : isAct
                     ? (isDark ? p.darkBg : p.bg)  // Con color cuando está activo
                     : (isDark ? "#252535" : "#FFFFFF"),  // Gris cuando no está activo
-                border: `1.5px solid ${over ? (p.id === "ahorro" ? p.color + "88" : "#EF444488") : t.border}`, // Sin cambio de borde al estar activo
+                border: `1.5px solid ${
+                  over
+                    ? (p.id === "ahorro" ? p.color + "88" : "#EF444488")  // Rojo/Verde si pasa presupuesto
+                    : isAct
+                    ? p.color  // 🆕 Color del pilar cuando está seleccionado
+                    : t.border  // Gris cuando no está activo
+                }`,
                 borderRadius: 11,
                 padding: "1px 8px",
                 cursor: "pointer",
                 outline: "none", // Quitar el outline del navegador al hacer click
-                transform: isPressingThisPillar ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+                transform: isPressingThisPillar
+                  ? "scale(0.98) translateY(1px)"  // Empequeñece al presionar
+                  : isAct
+                  ? "scale(1.10) translateY(-2px)"  // 🆕 Crece cuando está seleccionado
+                  : "scale(1) translateY(0)",
                 opacity: isPressingThisPillar ? 0.7 : 1,
-                boxShadow: isPressingThisPillar ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
+                boxShadow: isPressingThisPillar
+                  ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)"  // Hundida al presionar
+                  : isAct
+                  ? `0 8px 16px ${isDark ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0.15)"}`  // 🆕 Sombra exterior para profundidad cuando está seleccionado
+                  : "none !important",  // Sin shadow cuando no está seleccionado
                 transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
@@ -180,15 +194,29 @@ export default function PillarCardsGrid({
             style={{
               background: saldo < 0
                 ? (isDark ? "#2a1111" : "#FEF2F2")
-                : (isDark ? "#1E1E2E" : "#FFFFFF"), // Sin overlay al presionar
-              border: `1.5px solid ${saldo < 0 ? "#EF444488" : t.border}`, // Sin glow en borde activo
+                : (isDark ? "#1E1E2E" : "#FFFFFF"),
+              border: `1.5px solid ${
+                saldo < 0
+                  ? "#EF444488"  // Rojo si saldo es negativo
+                  : activeId === "saldo"
+                  ? "#64748B"  // 🆕 Color gris/plata cuando está seleccionado
+                  : t.border  // Gris normal cuando no está seleccionado
+              }`,
               borderRadius: 11,
               padding: "1px 8px",
               cursor: saldo >= 0 ? "pointer" : "default",
-              outline: "none", // Quitar el outline del navegador al hacer click
-              transform: pressingId === "saldo" ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
+              outline: "none",
+              transform: pressingId === "saldo"
+                ? "scale(0.98) translateY(1px)"  // Empequeñece al presionar
+                : activeId === "saldo"
+                ? "scale(1.10) translateY(-2px)"  // 🆕 Crece cuando está seleccionado
+                : "scale(1) translateY(0)",
               opacity: pressingId === "saldo" ? 0.7 : 1,
-              boxShadow: pressingId === "saldo" ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none !important", // Forzar sin box-shadow del navegador
+              boxShadow: pressingId === "saldo"
+                ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)"  // Hundida al presionar
+                : activeId === "saldo"
+                ? `0 8px 16px ${isDark ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0.15)"}`  // 🆕 Sombra exterior cuando está seleccionado
+                : "none !important",
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
             onClick={() => saldo >= 0 && setActiveId(activeId === "saldo" ? null : "saldo")}
