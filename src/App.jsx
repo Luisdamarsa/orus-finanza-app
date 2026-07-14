@@ -1259,8 +1259,9 @@ function Dashboard() {
                           color: activeId === seg.id ? seg.color : t.sub, fontSize: 9.5, fontWeight: 700,
                           cursor: isClickable ? "pointer" : "default",
                           whiteSpace: "nowrap",
-                          opacity: isPressing ? 0.6 : (isClickable ? 1 : 0.6), // 🆕 Reducir opacidad al presionar
-                          transform: isPressing ? "scale(0.95)" : "scale(1)", // 🆕 Empequeñecer al presionar
+                          opacity: isPressing ? 0.5 : (isClickable ? 1 : 0.6), // 🆕 Más oscuro al presionar
+                          transform: isPressing ? "scale(0.88) translateY(0.5px)" : "scale(1) translateY(0)", // 🆕 Empequeñecer más al presionar
+                          boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Efecto hundido
                           transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
                         }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: seg.color, display: "inline-block" }} />

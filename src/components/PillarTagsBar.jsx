@@ -70,9 +70,9 @@ export default function PillarTagsBar({
               cursor: "pointer",
               background: isFiltered ? p.color + "33" : p.color + "1A",
               outline: isFiltered ? `1.5px solid ${p.color}BB` : `1px solid ${p.color}44`,
-              transform: isPressing ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)", // 🆕 Se empequeñece al presionar
-              opacity: isPressing ? 0.7 : 1, // 🆕 Opacidad al presionar
-              boxShadow: isPressing ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Sombra inset al presionar
+              transform: isPressing ? "scale(0.88) translateY(0.5px)" : "scale(1) translateY(0)", // 🆕 Se empequeñece más al presionar
+              opacity: isPressing ? 0.5 : 1, // 🆕 Opacidad más baja al presionar
+              boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Sombra inset al presionar
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
             }}
           >
