@@ -212,6 +212,141 @@ export function TagsBarSkeleton({ isDark }) {
 }
 
 /**
+ * Skeleton para formularios (ProfilePage, AddTransactionPage, EditTransactionPage)
+ */
+export function FormSkeleton({ isDark, fieldCount = 5 }) {
+  const bgColor = isDark ? "#1E1E2E" : "#F8F7FF";
+  const shimmerColor = isDark ? "#252535" : "#E5E3F5";
+
+  return (
+    <div style={{ padding: "20px 22px" }}>
+      {[...Array(fieldCount)].map((_, i) => (
+        <div key={i} style={{ marginBottom: 20 }}>
+          {/* Label */}
+          <div
+            style={{
+              width: "30%",
+              height: 12,
+              borderRadius: 4,
+              background: shimmerColor,
+              opacity: 0.5,
+              marginBottom: 8,
+            }}
+          />
+          {/* Input */}
+          <div
+            style={{
+              width: "100%",
+              height: 40,
+              borderRadius: 8,
+              background: bgColor,
+              border: `1.5px solid ${shimmerColor}`,
+              opacity: 0.6,
+              animation: `pulse 2s ease-in-out infinite`,
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Botón */}
+      <div
+        style={{
+          width: "100%",
+          height: 44,
+          borderRadius: 10,
+          background: shimmerColor,
+          opacity: 0.5,
+          marginTop: 30,
+          animation: `pulse 2s ease-in-out infinite`,
+        }}
+      />
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/**
+ * Skeleton para lista de items/settings (SettingsPage, CategoriesPage, BudgetsPage)
+ */
+export function MenuListSkeleton({ isDark, itemCount = 6 }) {
+  const bgColor = isDark ? "#1E1E2E" : "#FFFFFF";
+  const shimmerColor = isDark ? "#252535" : "#E5E3F5";
+
+  return (
+    <div style={{ padding: "20px 22px" }}>
+      {[...Array(itemCount)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 14px",
+            borderRadius: 11,
+            border: `1.5px solid ${shimmerColor}`,
+            background: bgColor,
+            marginBottom: 8,
+            opacity: 0.6,
+            animation: `pulse 2s ease-in-out infinite`,
+            animationDelay: `${i * 0.05}s`,
+          }}
+        >
+          {/* Icono + Texto */}
+          <div style={{ display: "flex", gap: 12, flex: 1 }}>
+            <div
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: 4,
+                background: shimmerColor,
+                opacity: 0.5,
+                flexShrink: 0,
+              }}
+            />
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  width: "60%",
+                  height: 12,
+                  borderRadius: 4,
+                  background: shimmerColor,
+                  opacity: 0.5,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Flecha */}
+          <div
+            style={{
+              width: 12,
+              height: 12,
+                borderRadius: 2,
+              background: shimmerColor,
+              opacity: 0.5,
+              flexShrink: 0,
+            }}
+          />
+        </div>
+      ))}
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/**
  * Skeleton para una lista de transacciones
  */
 export function TransactionListSkeleton({ isDark, count = 5 }) {
