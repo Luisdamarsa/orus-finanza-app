@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { usePress } from "../hooks/usePress";
+import SimplePageLayout from "./SimplePageLayout";
 import { PILLARS, MANUAL_METHODS, ALL_CATS } from "../constants";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
@@ -108,62 +109,17 @@ export default function EditTransactionPage({
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
-      {/* Header */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 52,
-        background: t.bg, padding: "8px 22px", boxSizing: "border-box",
-        borderBottom: `1px solid ${t.border}`, zIndex: 30,
-        display: "flex", alignItems: "center", justifyContent: "space-between"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30, height: 30, borderRadius: 9, border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", ...pressBack.getPressStyle(),
-            }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"} strokeWidth="2.5"
-              strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>Atrás</span>
-        </div>
-      </div>
-
-      {/* Título */}
-      <div style={{
-        position: "absolute", top: 52, left: 0, right: 0, height: 60,
-        background: t.bg, padding: "0 22px", boxSizing: "border-box",
-        zIndex: 25, display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <div style={{
-          fontSize: 20, fontWeight: 700, color: t.text,
-          textAlign: "center",
-        }}>
-          Editar Transacción
-        </div>
-      </div>
-
-      {/* Contenido scrolleable */}
-      <div style={{
-        position: "absolute", top: 112, left: 0, right: 0, bottom: 0,
-        overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none",
-        padding: "20px 22px", boxSizing: "border-box"
-      }}>
-        <style>{`::-webkit-scrollbar { display: none; }`}</style>
-
-        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
-        <LoadingWrapper
-          isLoading={isLoading}
-          skeleton={<FormSkeleton isDark={isDark} fieldCount={6} />}
-          isDark={isDark}
-        >
+    <SimplePageLayout
+      isDark={isDark}
+      onBack={onBack}
+      pressBack={pressBack}
+    >
+      {/* LoadingWrapper para mostrar skeleton mientras carga */}
+      <LoadingWrapper
+        isLoading={isLoading}
+        skeleton={<FormSkeleton isDark={isDark} fieldCount={6} />}
+        isDark={isDark}
+      >
           <>
             {/* Descripción */}
         <div style={{ marginBottom: 20 }}>
@@ -366,9 +322,8 @@ export default function EditTransactionPage({
               🗑️ Eliminar
             </button>
           </div>
-          </>
-        </LoadingWrapper>
-      </div>
-    </div>
+        </>
+      </LoadingWrapper>
+    </SimplePageLayout>
   );
 }

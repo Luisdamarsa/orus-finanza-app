@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { userStorage } from "../utils/userStorage";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
+import PageLayout from "./PageLayout";
 import DeleteAccountModal from "./DeleteAccountModal";
 import { CheckmarkIcon, TrashIcon, CopyIcon } from "../icons/Icons";
 import LoadingWrapper from "./LoadingWrapper";
@@ -162,143 +163,64 @@ export default function ProfilePage({
 
   if (!user) return null; // Esperar a que carguen los datos
 
-  return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
-      {/* Header fijo */}
-      <div
-        style={{
-          position: "absolute",
-          top: 52,
-          left: 0,
-          right: 0,
-          height: 52,
-          background: t.bg,
-          padding: "8px 22px",
-          boxSizing: "border-box",
-          borderBottom: `1px solid ${t.border}`,
-          zIndex: 30,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              ...pressBack.getPressStyle({ scale: 0.92 }),
-            }}>
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>Atrás</span>
-        </div>
-      </div>
+  // Componente para el botón Cerrar Sesión en el título
+  const logoutButtonInTitle = (
+    <button
+      onClick={onBack}
+      {...pressLogout.handlers}
+      style={{
+        position: "absolute",
+        right: 22,
+        padding: "8px 14px",
+        borderRadius: 6,
+        border: `1px solid ${t.border}`,
+        background: isDark ? "#252535" : "#F5F3FF",
+        color: t.text,
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: "pointer",
+        outline: "none",
+        ...pressLogout.getPressStyle({ scale: 0.95 }),
+      }}
+      onMouseEnter={(e) => {
+        if (!pressLogout.pressing) {
+          e.target.style.background = isDark ? "#2D2D3A" : "#F0EFF8";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!pressLogout.pressing) {
+          e.target.style.background = isDark ? "#252535" : "#F5F3FF";
+        }
+      }}>
+      Cerrar Sesión
+    </button>
+  );
 
-      {/* Sección de Título */}
-      <div
-        style={{
-          position: "absolute",
-          top: 104,
-          left: 0,
-          right: 0,
-          height: 60,
-          background: t.bg,
-          padding: "0 22px",
-          boxSizing: "border-box",
-          zIndex: 25,
+  return (
+    <PageLayout
+      isDark={isDark}
+      onBack={onBack}
+      title={
+        <div style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: 8,
         }}>
-        <div
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: t.text,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-          }}>
           <span style={{ fontSize: 22 }}>👤</span>
           Perfil
         </div>
-
-        {/* Botón Cerrar Sesión - Posicionado a la derecha */}
-        <button
-          onClick={onBack}
-          {...pressLogout.handlers}
-          style={{
-            position: "absolute",
-            right: 22,
-            padding: "8px 14px",
-            borderRadius: 6,
-            border: `1px solid ${t.border}`,
-            background: isDark ? "#252535" : "#F5F3FF",
-            color: t.text,
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: "pointer",
-            outline: "none",
-            ...pressLogout.getPressStyle({ scale: 0.95 }),
-          }}
-          onMouseEnter={(e) => {
-            if (!pressLogout.pressing) {
-              e.target.style.background = isDark ? "#2D2D3A" : "#F0EFF8";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!pressLogout.pressing) {
-              e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-            }
-          }}>
-          Cerrar Sesión
-        </button>
-      </div>
-
-      {/* Contenido scrolleable */}
-      <div
-        style={{
-          position: "absolute",
-          top: 164,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          scrollbarWidth: "none",
-          padding: "20px 22px",
-          paddingBottom: 100,
-          boxSizing: "border-box",
-        }}>
-        <style>{`::-webkit-scrollbar { display: none; }`}</style>
-
-        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
-        <LoadingWrapper
-          isLoading={isLoading}
-          skeleton={<FormSkeleton isDark={isDark} fieldCount={4} />}
-          isDark={isDark}
-        >
-          <>
+      }
+      pressBack={pressBack}
+      titleExtra={logoutButtonInTitle}
+    >
+      {/* LoadingWrapper para mostrar skeleton mientras carga */}
+      <LoadingWrapper
+        isLoading={isLoading}
+        skeleton={<FormSkeleton isDark={isDark} fieldCount={4} />}
+        isDark={isDark}
+      >
+        <>
             {/* SECCIÓN 1: Nombre de Usuario (SIEMPRE Editable) */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8 }}>
@@ -766,50 +688,45 @@ export default function ProfilePage({
             <span style={{ color: "#FFFFFF" }}>Eliminar Cuenta</span>
           </button>
         </div>
-          </>
-        </LoadingWrapper>
-      </div>
+        </>
+      </LoadingWrapper>
+    </PageLayout>
 
-      {/* Modal de Eliminación de Cuenta */}
-      <DeleteAccountModal
-        isDark={isDark}
-        isOpen={deleteAccountModalOpen}
-        onCancel={() => setDeleteAccountModalOpen(false)}
-        onConfirm={() => {
-          // 🆕 Aquí iría la lógica para eliminar la cuenta
-          // Por ahora es un placeholder - en futuro se conectará al backend
-          popup.showDeletePopup('cuenta');
-          setDeleteAccountModalOpen(false);
-          // Luego navegar a login o mostrar pantalla de confirmación
+    {/* Modal de Eliminación de Cuenta */}
+    <DeleteAccountModal
+      isDark={isDark}
+      isOpen={deleteAccountModalOpen}
+      onCancel={() => setDeleteAccountModalOpen(false)}
+      onConfirm={() => {
+        popup.showDeletePopup('cuenta');
+        setDeleteAccountModalOpen(false);
+      }}
+    />
+
+    {/* Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
+    <div style={{ position: "fixed", bottom: 24, right: 22 }}>
+      <button
+        onClick={handleSave}
+        onPointerDown={() => hasChanged && pressGuardar.handlers.onPointerDown()}
+        onPointerUp={() => pressGuardar.handlers.onPointerUp()}
+        onPointerLeave={() => pressGuardar.handlers.onPointerLeave()}
+        disabled={!hasChanged}
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: "50%",
+          border: "none",
+          background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+          cursor: hasChanged ? "pointer" : "not-allowed",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: hasChanged ? (pressGuardar.pressing ? 0.9 : 1) : 0.45,
+          ...(hasChanged ? pressGuardar.getPressStyle({ scale: 0.93 }) : {}),
         }}
-      />
-
-      {/* 🆕 Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
-      <div style={{ position: "absolute", bottom: 24, right: 22 }}>
-        <button
-          onClick={handleSave}
-          onPointerDown={() => hasChanged && pressGuardar.handlers.onPointerDown()}
-          onPointerUp={() => pressGuardar.handlers.onPointerUp()}
-          onPointerLeave={() => pressGuardar.handlers.onPointerLeave()}
-          disabled={!hasChanged}
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            border: "none",
-            background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-            cursor: hasChanged ? "pointer" : "not-allowed",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: hasChanged ? (pressGuardar.pressing ? 0.9 : 1) : 0.45,
-            ...(hasChanged ? pressGuardar.getPressStyle({ scale: 0.93 }) : {}),
-          }}
-        >
-          <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
-        </button>
-      </div>
-
+      >
+        <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
+      </button>
     </div>
   );
 }

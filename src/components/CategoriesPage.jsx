@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
+import PageLayout from "./PageLayout";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
@@ -53,126 +54,46 @@ export default function CategoriesPage({
   }, []);
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
-      {/* Header fijo (top: 52, height: 52) */}
-      <div style={{
-        position: "absolute", top: 52, left: 0, right: 0, height: 52,
-        background: t.bg, padding: "8px 22px", boxSizing: "border-box",
-        borderBottom: `1px solid ${t.border}`, zIndex: 30,
-        display: "flex", alignItems: "center", justifyContent: "space-between"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              ...pressBack.getPressStyle(),
-            }}>
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>Atrás</span>
-        </div>
-      </div>
+    <PageLayout
+      isDark={isDark}
+      onBack={onBack}
+      title="🏷️ Categorías"
+      pressBack={pressBack}
+      description={
+        <>
+          {/* Descripción 1 */}
+          <div style={{
+            fontSize: 13,
+            color: t.sub,
+            marginBottom: 4,
+            lineHeight: 1.4,
+            fontWeight: 400,
+            textAlign: "left",
+          }}>
+            Organiza tus gastos en categorías personalizadas dentro de cada pilar financiero.
+          </div>
 
-      {/* Sección de Título Centrado (top: 104, height: 60) */}
-      <div style={{
-        position: "absolute",
-        top: 104,
-        left: 0,
-        right: 0,
-        height: 60,
-        background: t.bg,
-        padding: "0 22px",
-        paddingBottom: "3px",
-        boxSizing: "border-box",
-        zIndex: 25,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
-        <div style={{
-          fontSize: 20,
-          fontWeight: 700,
-          color: t.text,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}>
-          🏷️ Categorías
-        </div>
-      </div>
-
-      {/* Sección de Descripción (Componente Aparte) */}
-      <div
-        ref={descriptionRef}
-        style={{
-          position: "absolute",
-          top: 164,
-          left: 0,
-          right: 0,
-          background: t.bg,
-          padding: "3px 22px",
-          paddingBottom: "6px",
-          boxSizing: "border-box",
-          zIndex: 25,
-        }}>
-        {/* Descripción 1 */}
-        <div style={{
-          fontSize: 13,
-          color: t.sub,
-          marginBottom: 4,
-          lineHeight: 1.4,
-          fontWeight: 400,
-          textAlign: "left",
-        }}>
-          Organiza tus gastos en categorías personalizadas dentro de cada pilar financiero.
-        </div>
-
-        {/* Descripción 2 (Ejemplos) */}
-        <div style={{
-          fontSize: 12,
-          color: t.sub,
-          opacity: 0.75,
-          fontStyle: "italic",
-          textAlign: "left",
-        }}>
-          Ejemplos: Edita "Arriendo" en Fijos o Cine en Ocio
-        </div>
-      </div>
-
-      {/* Contenido scrolleable - después del contenedor de descripción */}
-      <div style={{
-        position: "absolute", top: contentTop, left: 0, right: 0, bottom: 0,
-        overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none",
-        padding: "6px 22px 20px 22px", boxSizing: "border-box"
-      }}>
-        <style>{`::-webkit-scrollbar { display: none; }`}</style>
-
-        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
-        <LoadingWrapper
-          isLoading={isLoading}
-          skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
-          isDark={isDark}
-        >
+          {/* Descripción 2 (Ejemplos) */}
+          <div style={{
+            fontSize: 12,
+            color: t.sub,
+            opacity: 0.75,
+            fontStyle: "italic",
+            textAlign: "left",
+          }}>
+            Ejemplos: Edita "Arriendo" en Fijos o Cine en Ocio
+          </div>
+        </>
+      }
+      descriptionRef={descriptionRef}
+      contentTopOffset={contentTop}
+    >
+      {/* LoadingWrapper para mostrar skeleton mientras carga */}
+      <LoadingWrapper
+        isLoading={isLoading}
+        skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
+        isDark={isDark}
+      >
           <>
             {/* Pilares y sus categorías */}
             {PILLARS.map((pillar) => {
@@ -279,48 +200,46 @@ export default function CategoriesPage({
             </div>
           );
             })}
-          </>
-        </LoadingWrapper>
-      </div>
+        </>
+      </LoadingWrapper>
+    </PageLayout>
 
-      {/* Botón Flotante Añadir Categoría */}
-      <div style={{ position: "absolute", bottom: 24, right: 22 }}>
-        <button
-          onClick={onAddCategory}
-          {...pressAdd.handlers}
-          style={{
-            padding: "12px 18px",
-            borderRadius: 20,
-            border: "none",
-            background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            opacity: pressAdd.pressing ? 0.9 : 1,
-            fontSize: 14,
-            color: "white",
-            fontWeight: 700,
-            whiteSpace: "nowrap",
-            ...pressAdd.getPressStyle(),
-          }}
-          onMouseEnter={(e) => {
-            if (!pressAdd.pressing) {
-              e.currentTarget.style.transform = "scale(1.05)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!pressAdd.pressing) {
-              e.currentTarget.style.transform = "scale(1)";
-            }
-          }}
-        >
-          <span style={{ fontSize: 18 }}>+</span>
-          <span>Añadir categoría</span>
-        </button>
-      </div>
-
+    {/* Botón Flotante Añadir Categoría */}
+    <div style={{ position: "fixed", bottom: 24, right: 22 }}>
+      <button
+        onClick={onAddCategory}
+        {...pressAdd.handlers}
+        style={{
+          padding: "12px 18px",
+          borderRadius: 20,
+          border: "none",
+          background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          opacity: pressAdd.pressing ? 0.9 : 1,
+          fontSize: 14,
+          color: "white",
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+          ...pressAdd.getPressStyle(),
+        }}
+        onMouseEnter={(e) => {
+          if (!pressAdd.pressing) {
+            e.currentTarget.style.transform = "scale(1.05)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!pressAdd.pressing) {
+            e.currentTarget.style.transform = "scale(1)";
+          }
+        }}
+      >
+        <span style={{ fontSize: 18 }}>+</span>
+        <span>Añadir categoría</span>
+      </button>
     </div>
   );
 }

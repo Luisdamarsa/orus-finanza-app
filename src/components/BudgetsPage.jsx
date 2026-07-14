@@ -4,6 +4,7 @@ import { usePress } from "../hooks/usePress";
 import { usePopup } from "../services/PopupService";
 import { useCategories } from "../hooks/useCategories";
 import { useBudgets } from "../hooks/useBudgets";
+import PageLayout from "./PageLayout";
 import { CheckmarkIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
@@ -198,94 +199,24 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
-      {/* Header fijo (top: 52, height: 52) */}
-      <div style={{
-        position: "absolute", top: 52, left: 0, right: 0, height: 52,
-        background: t.bg, padding: "8px 22px", boxSizing: "border-box",
-        borderBottom: `1px solid ${t.border}`, zIndex: 30,
-        display: "flex", alignItems: "center", justifyContent: "space-between"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              ...pressBack.getPressStyle(),
-            }}>
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>Atrás</span>
-        </div>
-      </div>
-
-      {/* Sección de Título Centrado (top: 104, height: 60) */}
-      <div
-        style={{
-          position: "absolute",
-          top: 104,
-          left: 0,
-          right: 0,
-          height: 60,
-          background: t.bg,
-          padding: "0 22px",
-          paddingBottom: "3px",
-          boxSizing: "border-box",
-          zIndex: 25,
+    <PageLayout
+      isDark={isDark}
+      onBack={onBack}
+      title={
+        <div style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          gap: 8,
         }}>
-        <div
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: t.text,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}>
           <span style={{ fontSize: 22 }}>💰</span>
           Presupuestos
         </div>
-      </div>
-
-      {/* Sección de Descripción (Componente Aparte) */}
-      <div
-        ref={descriptionRef}
-        style={{
-          position: "absolute",
-          top: 164,
-          left: 0,
-          right: 0,
-          background: t.bg,
-          padding: "3px 22px",
-          paddingBottom: "6px",
-          boxSizing: "border-box",
-          zIndex: 25,
-        }}>
-        {/* Descripción 1 */}
-        <div
-          style={{
+      }
+      pressBack={pressBack}
+      description={
+        <>
+          {/* Descripción 1 */}
+          <div style={{
             fontSize: 13,
             color: t.sub,
             marginBottom: 4,
@@ -293,45 +224,41 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
             fontWeight: 400,
             textAlign: "left",
           }}>
-          Define cuánto quieres gastar en cada categoría y pilar. Los cambios se guardan automáticamente.
-        </div>
+            Define cuánto quieres gastar en cada categoría y pilar. Los cambios se guardan automáticamente.
+          </div>
 
-        {/* Descripción 2 (Ayuda) */}
-        <div
-          style={{
+          {/* Descripción 2 (Ayuda) */}
+          <div style={{
             fontSize: 12,
             color: t.sub,
             opacity: 0.75,
             fontStyle: "italic",
             textAlign: "left",
           }}>
-          Expande el Pilar para ver presupuestos de cada categoría
-        </div>
-      </div>
+            Expande el Pilar para ver presupuestos de cada categoría
+          </div>
+        </>
+      }
+      descriptionRef={descriptionRef}
+      contentTopOffset={contentTop}
+    >
+      <style>{`
+        ::-webkit-scrollbar { display: none; }
+        [data-pillar-card] {
+          -webkit-tap-highlight-color: transparent;
+        }
+        [data-pillar-card]:active {
+          background: inherit !important;
+          box-shadow: none !important;
+        }
+      `}</style>
 
-      {/* Contenido scrolleable - después del contenedor de descripción */}
-      <div style={{
-        position: "absolute", top: contentTop, left: 0, right: 0, bottom: 0,
-        overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none",
-        padding: "6px 22px 40px 22px", boxSizing: "border-box"
-      }}>
-        <style>{`
-          ::-webkit-scrollbar { display: none; }
-          [data-pillar-card] {
-            -webkit-tap-highlight-color: transparent;
-          }
-          [data-pillar-card]:active {
-            background: inherit !important;
-            box-shadow: none !important;
-          }
-        `}</style>
-
-        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
-        <LoadingWrapper
-          isLoading={isLoading}
-          skeleton={<MenuListSkeleton isDark={isDark} itemCount={10} />}
-          isDark={isDark}
-        >
+      {/* LoadingWrapper para mostrar skeleton mientras carga */}
+      <LoadingWrapper
+        isLoading={isLoading}
+        skeleton={<MenuListSkeleton isDark={isDark} itemCount={10} />}
+        isDark={isDark}
+      >
           <>
             {/* Lista de pilares */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
@@ -539,10 +466,10 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
             </div>
           </>
         </LoadingWrapper>
-      </div>
+    </PageLayout>
 
-      {/* 🆕 Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
-      <div style={{ position: "absolute", bottom: 24, right: 22 }}>
+    {/* Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
+    <div style={{ position: "fixed", bottom: 24, right: 22 }}>
         <button
           onClick={handleSave}
           disabled={!hasChanged}
@@ -566,7 +493,5 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
           <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
         </button>
       </div>
-
-    </div>
   );
 }
