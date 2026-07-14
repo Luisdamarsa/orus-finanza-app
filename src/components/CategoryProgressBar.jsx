@@ -70,7 +70,7 @@ export default function CategoryProgressBar({
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 10,
       }}
     >
       {/* Contenedor de la Barra (para posicionar el borde punteado) */}
