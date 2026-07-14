@@ -2,6 +2,8 @@ import { useState } from "react";
 import { usePress } from "../hooks/usePress";
 import { PILLARS, MANUAL_METHODS, ALL_CATS } from "../constants";
 import { getCategoryName } from "../utils/categoryUtils";
+import LoadingWrapper from "./LoadingWrapper";
+import { FormSkeleton } from "./LoadingSkeleton";
 
 /**
  * EditTransactionPage.jsx
@@ -37,6 +39,9 @@ export default function EditTransactionPage({
   const [concept, setConcept] = useState(transaction?.category || null);
   const [pillarId, setPillarId] = useState(transaction?.pillar || null);
   const [conceptOpen, setConceptOpen] = useState(false);
+
+  // 🆕 Estado de loading para skeleton
+  const [isLoading, setIsLoading] = useState(false);
 
   // Cálculos
   const numericAmount = parseInt(rawAmount.replace(/\D/g, "")) || 0;
@@ -153,7 +158,14 @@ export default function EditTransactionPage({
       }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        {/* Descripción */}
+        {/* 🆕 LoadingWrapper para mostrar skeleton mientras carga */}
+        <LoadingWrapper
+          isLoading={isLoading}
+          skeleton={<FormSkeleton isDark={isDark} fieldCount={6} />}
+          isDark={isDark}
+        >
+          <>
+            {/* Descripción */}
         <div style={{ marginBottom: 20 }}>
           <label style={{ fontSize: 12, color: t.sub, fontWeight: 600, display: "block", marginBottom: 6 }}>
             Descripción
@@ -351,9 +363,11 @@ export default function EditTransactionPage({
               transition: "all 0.1s",
             }}
           >
-            🗑️ Eliminar
-          </button>
-        </div>
+              🗑️ Eliminar
+            </button>
+          </div>
+          </>
+        </LoadingWrapper>
       </div>
     </div>
   );

@@ -715,6 +715,11 @@ export default function AddTransactionPage({
             </div>
           )}
             </>
+          </LoadingWrapper>
+        </div>
+      </div>
+
+      {/* Botón flotante de confirmación */}
       <div style={{ position: "absolute", bottom: 24, right: 22 }}>
         <button
           onClick={() =>
