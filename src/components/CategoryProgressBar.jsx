@@ -116,10 +116,10 @@ export default function CategoryProgressBar({
         <div
           style={{
             position: "absolute",
-            left: 0,
+            left: showDashedBorder ? "1px" : 0,
             top: 0,
             height: "100%",
-            width: `${barFillPercentage}%`,
+            width: showDashedBorder ? `calc(${barFillPercentage}% + 4px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 6,
             opacity: 0.6,
