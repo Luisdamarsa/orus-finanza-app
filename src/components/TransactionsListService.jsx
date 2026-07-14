@@ -138,7 +138,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}>
-                      {tx.desc}
+                      {tx.description}
                     </div>
                     <div
                       style={{

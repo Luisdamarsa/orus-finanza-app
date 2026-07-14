@@ -909,18 +909,18 @@ function Dashboard() {
               const timeStr = now.toTimeString().slice(0, 5);
 
               // Crear nueva transacción
-              // 🔄 Obtener ID de la categoría
-              const categoryId = ALL_CATS.find(cat => cat.name === concept)?.id || null;
+              // 🔄 concept es el ID de la categoría (viene desde TransactionPage)
+              const categoryId = concept || null;
 
               const newTx = {
                 id: Math.max(...transactions.map(t => t.id || 0), 0) + 1,
                 date: dateStr,
                 time: timeStr,
-                desc: desc || concept,
+                description: desc,  // ✅ Usar "description" para consistencia
                 method: method || "Banco",
                 amount: isIncome ? absAmount : -absAmount,
-                pillar: isIncome ? "ingreso" : (pillarId || concept),
-                category: categoryId,  // ✅ Guardar ID, no nombre
+                pillar: isIncome ? "ingreso" : pillarId,
+                category: categoryId,  // ✅ Ya es ID desde TransactionPage
               };
 
               // Guardar en estado (useEffect automaticamente guarda en localStorage)
