@@ -79,6 +79,7 @@ export default function CategoryProgressBar({
           flex: 1,
           position: "relative",
           height: 32,
+          maxWidth: "calc(100% - 10px)",
         }}
       >
         {/* Barra de Progreso */}
