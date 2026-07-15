@@ -269,7 +269,7 @@ export default function MovimientosPage({
         {Object.keys(categorySpent).length > 0 && (
           <div style={{ marginBottom: 32, paddingTop: 0 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: t.sub, marginBottom: 16, textAlign: "left" }}>
-              Categoría
+              Categorías
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {(() => {
