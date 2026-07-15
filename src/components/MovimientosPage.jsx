@@ -212,6 +212,7 @@ export default function MovimientosPage({
             categoryName={pilar.label}
             icon={pilar.icon}
             onClickBar={undefined}
+            alwaysShowDashedBorder={true}
           />
           <div
             style={{

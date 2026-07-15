@@ -16,6 +16,7 @@
  *   onClickBar - Callback cuando se hace click
  *   categoryName - Nombre de la categoría a mostrar (opcional)
  *   icon - Ícono a mostrar junto al nombre (opcional, puede ser emoji o componente)
+ *   alwaysShowDashedBorder - Si true, muestra borde punteado siempre (para pilares)
  */
 export default function ProgressBar({
   spent,
@@ -27,6 +28,7 @@ export default function ProgressBar({
   onClickBar,
   categoryName = null,
   icon = null,
+  alwaysShowDashedBorder = false,
 }) {
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
   const borderWidth = 2; // px
@@ -50,8 +52,9 @@ export default function ProgressBar({
   const isOverHalfBudget = budgetPercentage > 50;
 
   // 🆕 Determinar si mostrar borde punteado
-  // Solo mostrar si: tiene presupuesto Y está sobre 50%
-  const showDashedBorder = hasBudget && isOverHalfBudget;
+  // Si alwaysShowDashedBorder: mostrar si tiene presupuesto (sin límite de %)
+  // Si no: mostrar si tiene presupuesto Y está sobre 50%
+  const showDashedBorder = alwaysShowDashedBorder ? hasBudget : (hasBudget && isOverHalfBudget);
 
   // 🆕 Calcular porcentajes relativos a maxSpent (para proporcionalidad)
   const spentPercentageOfMax = (spent / maxSpent) * 100;
