@@ -115,14 +115,14 @@ export default function CategoryProgressBar({
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: resta el doble del grosor del border para alineación perfecta */}
+        {/* 🆕 Cuando showDashedBorder: resta borderWidth * 3 para estar exactamente 1px dentro del borde */}
         <div
           style={{
             position: "absolute",
             left: showDashedBorder ? "1px" : 0,
             top: showDashedBorder ? "1px" : 0,
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 4}px)` : `${barFillPercentage}%`,
+            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 3}px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
