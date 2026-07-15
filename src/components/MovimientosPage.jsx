@@ -205,7 +205,7 @@ export default function MovimientosPage({
           <ProgressBar
             spent={totalSpent}
             budget={budget}
-            maxSpent={totalSpent}
+            maxSpent={Math.max(totalSpent, budget || 0)}
             pillarColor={isOverBudget ? "#FCA5A5" : pilar.darkColor}
             isDark={isDark}
             isSelected={false}
