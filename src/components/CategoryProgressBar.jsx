@@ -32,6 +32,12 @@ export default function CategoryProgressBar({
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
   const borderWidth = 2; // px
 
+  // 🆕 Factores de compensación para alineación visual de la barra azul
+  // Primera categoría (100%): resta borderWidth * 5.5 = 11px
+  // Otras categorías: resta borderWidth * 3.5 = 7px
+  const FIRST_CATEGORY_REDUCTION_FACTOR = 5.5;
+  const OTHER_CATEGORIES_REDUCTION_FACTOR = 3.5;
+
   // Determinar si tiene presupuesto
   const hasBudget = budget && budget > 0;
 
@@ -124,8 +130,8 @@ export default function CategoryProgressBar({
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
             width: showDashedBorder
               ? barFillPercentage === 100
-                ? `calc(${barFillPercentage}% - ${borderWidth * 5.5}px)`
-                : `calc(${barFillPercentage}% - ${borderWidth * 3.5}px)`
+                ? `calc(${barFillPercentage}% - ${borderWidth * FIRST_CATEGORY_REDUCTION_FACTOR}px)`
+                : `calc(${barFillPercentage}% - ${borderWidth * OTHER_CATEGORIES_REDUCTION_FACTOR}px)`
               : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
