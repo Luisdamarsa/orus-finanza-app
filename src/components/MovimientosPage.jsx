@@ -290,7 +290,19 @@ export default function MovimientosPage({
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {(() => {
                 const entries = Object.entries(categorySpent).sort(([, a], [, b]) => b - a);
-                const maxSpent = Math.max(...entries.map(([, spent]) => spent), 1);
+
+                // 🆕 Calcular maxSpent basado en la categoría con más gasto
+                // Si esa categoría tiene borde punteado (gasto > 50% presupuesto), usar presupuesto
+                // Si no, usar gasto
+                let maxSpent = 1;
+                if (entries.length > 0) {
+                  const [maxCategoryId, maxCategorySpent] = entries[0];
+                  const maxCategoryBudget = categoryBudgets[maxCategoryId] || null;
+                  const budgetPercentage = maxCategoryBudget ? (maxCategorySpent / maxCategoryBudget) * 100 : 0;
+                  const hasVisibleBorder = maxCategoryBudget && budgetPercentage > 50;
+
+                  maxSpent = hasVisibleBorder ? maxCategoryBudget : maxCategorySpent;
+                }
 
                 return entries.map(([categoryId, spent]) => {
                   const categoryBudget = categoryBudgets[categoryId] || null;
