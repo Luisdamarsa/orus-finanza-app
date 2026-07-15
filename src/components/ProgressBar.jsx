@@ -174,7 +174,7 @@ export default function ProgressBar({
             position: "absolute",
             top: 0,
             left: 0,
-            width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)) - ${borderWidth * 2}px)`,
+            width: `calc(${budgetLinePercentage}% - ${borderWidth * 2}px)`,
             height: 28,
             border: `${borderWidth}px dashed #FFFFFF`,
             borderRadius: 8,
