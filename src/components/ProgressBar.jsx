@@ -68,8 +68,15 @@ export default function ProgressBar({
   if (hasBudget && isOverHalfBudget) {
     // Modo presupuesto: mostrar progreso vs presupuesto (para el indicador)
     percentage = budgetPercentage; // Puede ser > 100%
-    // Relleno: relativo a maxSpent (proporcional), pero limitado al presupuesto
-    barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax);
+
+    // 🆕 Si sobrepasó presupuesto: barra crece libremente
+    // Si está dentro del presupuesto: barra limitada al presupuesto
+    if (percentage > 100) {
+      barFillPercentage = spentPercentageOfMax; // Crece proporcional al gasto real
+    } else {
+      barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax);
+    }
+
     // Línea punteada: hasta el presupuesto relativo a maxSpent
     budgetLinePercentage = budgetPercentageOfMax;
   } else {
@@ -123,11 +130,13 @@ export default function ProgressBar({
             top: showDashedBorder ? "1px" : 0,
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
             width: showDashedBorder
-              ? barFillPercentage === 100
+              ? barFillPercentage > 100
+                ? `calc(${barFillPercentage}% - ${borderWidth * 1.5}px)`  // Sobrepasa: factor menor (3px)
+                : barFillPercentage === 100
                 ? `calc(${barFillPercentage}% - ${borderWidth * FIRST_CATEGORY_REDUCTION_FACTOR}px)`
                 : `calc(${barFillPercentage}% - ${borderWidth * OTHER_CATEGORIES_REDUCTION_FACTOR}px)`
               : `${barFillPercentage}%`,
-            background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
+            background: pillarColor,
             borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
             transition: "width 0.2s, opacity 0.2s",
