@@ -147,13 +147,14 @@ export default function CategoryProgressBar({
         {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
         {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
         {/* borderWidth está sincronizado con la barra azul para compensar visualmente */}
+        {/* 🆕 Removido + 6px temporalmente para diagnosticar diferencia de alineación */}
         {showDashedBorder && (
           <div
             style={{
               position: "absolute",
               top: 0,
               left: 0,
-              width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}% + 6px, 100%)))`,
+              width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)))`,
               height: 28,
               border: `${borderWidth}px dashed #FFFFFF`,
               borderRadius: 8,
