@@ -143,6 +143,7 @@ export default function CategoryProgressBar({
 
         {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
         {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
+        {/* box-sizing: border-box asegura que el border cuente hacia adentro, no hacia afuera */}
         {showDashedBorder && (
           <div
             style={{
@@ -153,6 +154,7 @@ export default function CategoryProgressBar({
               height: 28,
               border: `2px dashed #FFFFFF`,
               borderRadius: 8,
+              boxSizing: "border-box",
               pointerEvents: "none",
               zIndex: 3,
               transition: "width 0.2s",
