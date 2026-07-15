@@ -211,6 +211,7 @@ export default function MovimientosPage({
             isSelected={false}
             categoryName={pilar.label}
             icon={pilar.icon}
+            onClickBar={undefined}
           />
           <div
             style={{
