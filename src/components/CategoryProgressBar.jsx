@@ -94,7 +94,7 @@ export default function CategoryProgressBar({
           style={{
             width: "100%",
             height: 32,
-            borderRadius: 0,
+            borderRadius: 8,
             display: "flex",
             alignItems: "center",
             paddingLeft: 10,
@@ -124,7 +124,7 @@ export default function CategoryProgressBar({
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
             width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 4}px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
-            borderRadius: 0,
+            borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
             transition: "width 0.2s, opacity 0.2s",
           }}
@@ -157,7 +157,7 @@ export default function CategoryProgressBar({
               width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)) - ${borderWidth * 2}px)`,
               height: 28,
               border: `${borderWidth}px dashed #FFFFFF`,
-              borderRadius: 0,
+              borderRadius: 8,
               pointerEvents: "none",
               zIndex: 3,
               transition: "width 0.2s",
