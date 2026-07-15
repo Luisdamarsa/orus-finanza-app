@@ -27,7 +27,9 @@ export default function CategoryProgressBar({
   budget = null,
   maxSpent = 1,
   pillarColor = "#22C55E",
+  pillarId = null,
   isDark = true,
+  textColor = "#F0EEFF",
   onClickBar,
   isSelected = false,
 }) {
@@ -55,6 +57,16 @@ export default function CategoryProgressBar({
   // 🆕 Determinar si mostrar borde punteado
   // Solo mostrar si: tiene presupuesto Y está sobre 50%
   const showDashedBorder = hasBudget && isOverHalfBudget;
+
+  // 🆕 Determinar color del % según pilar
+  // Si es Ahorro: verde si se pasa, gris si no
+  // Si no es Ahorro: rojo si se pasa, gris si no
+  const isAhorrosPillar = pillarId === "ahorro";
+  const getPercentageColor = () => {
+    if (!showDashedBorder) return textColor; // Gris si no mostrar borde (< 50%)
+    if (percentage <= 100) return textColor; // Gris si está dentro del presupuesto
+    return isAhorrosPillar ? "#22C55E" : "#FCA5A5"; // Verde (Ahorros) o Rojo (otros)
+  };
 
   // 🆕 Calcular porcentajes relativos a maxSpent (para proporcionalidad)
   const spentPercentageOfMax = (spent / maxSpent) * 100;
@@ -131,7 +143,7 @@ export default function CategoryProgressBar({
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: percentage > 100 ? "#EF4444" : pillarColor,
+              color: getPercentageColor(),
             }}
           >
             {Math.round(percentage)}%

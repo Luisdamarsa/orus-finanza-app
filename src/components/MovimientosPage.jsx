@@ -71,6 +71,15 @@ export default function MovimientosPage({
   const percentage = budget ? (totalSpent / budget) * 100 : null;
   const isOverBudget = percentage && percentage > 100;
 
+  // 🆕 Determinar color según pilar y estado de presupuesto
+  // Si es Ahorro: verde si se pasa, gris si no
+  // Si no es Ahorro: rojo si se pasa, gris si no
+  const isAhorrosPillar = pilar.id === "ahorro";
+  const getOverBudgetColor = () => {
+    if (!isOverBudget) return t.sub; // Gris por defecto
+    return isAhorrosPillar ? "#22C55E" : "#FCA5A5"; // Verde (Ahorros) o Rojo (otros)
+  };
+
   // 🆕 Obtener el color oscuro del pilar CON OPACIDAD (15%) para la barra de categorías
   const pillarSoftColor = (pilar.darkColor || "#22C55E") + "26";
 
@@ -218,11 +227,11 @@ export default function MovimientosPage({
             style={{
               fontSize: 12,
               fontWeight: 800,
-              color: isOverBudget ? "#FCA5A5" : pilar.darkColor,
+              color: getOverBudgetColor(),
               textAlign: "right",
               minWidth: 80,
             }}>
-            -{fmt(totalSpent)}
+            ${fmt(totalSpent)}
           </div>
         </div>
 
@@ -232,7 +241,7 @@ export default function MovimientosPage({
             style={{
               fontSize: 11,
               fontWeight: 700,
-              color: isOverBudget ? "#FCA5A5" : pilar.darkColor,
+              color: getOverBudgetColor(),
             }}>
             {percentage.toFixed(0)}% del presupuesto
           </div>
@@ -259,7 +268,7 @@ export default function MovimientosPage({
         {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
         {Object.keys(categorySpent).length > 0 && (
           <div style={{ marginBottom: 32, paddingTop: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: t.sub, marginBottom: 16, textAlign: "left" }}>
               Categoría
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -291,7 +300,9 @@ export default function MovimientosPage({
                       budget={categoryBudget}
                       maxSpent={maxSpent}
                       pillarColor={pilar.darkColor}
+                      pillarId={pilar.id}
                       isDark={isDark}
+                      textColor={t.sub}
                       onClickBar={() => {
                         // Toggle: si ya está seleccionada, remover; si no, agregar
                         setSelectedCategories(prev =>
