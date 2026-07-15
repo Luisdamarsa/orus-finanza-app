@@ -4,6 +4,7 @@ import { groupByDate, fmt } from "../utils/formatters";
 import { METHOD_META, ALL_CATS } from "../constants";
 import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
+import ProgressBar from "./ProgressBar";
 import { getCategoryById, getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 
@@ -194,51 +195,23 @@ export default function MovimientosPage({
           flexDirection: "column",
           gap: 8,
         }}>
-        {/* Barra del pilar */}
+        {/* 🆕 Barra del pilar usando ProgressBar */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 12,
           }}>
-          <div
-            style={{
-              flex: 1,
-              height: 32,
-              borderRadius: 8,
-              background: isDark ? "#2D2D3A" : "#E5E3F5",
-              display: "flex",
-              alignItems: "center",
-              paddingLeft: 10,
-              position: "relative",
-              overflow: "hidden",
-            }}>
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 0,
-                height: "100%",
-                background: isOverBudget ? debtSoftColor : pillarSoftColor,
-                width: percentage ? Math.min(percentage, 100) + "%" : "100%",
-                borderRadius: 8,
-                zIndex: 1,
-              }}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: t.text,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                position: "relative",
-                zIndex: 2,
-              }}>
-              {pilar.icon} {pilar.label}
-            </span>
-          </div>
+          <ProgressBar
+            spent={totalSpent}
+            budget={budget}
+            maxSpent={totalSpent}
+            pillarColor={isOverBudget ? debtSoftColor : pillarSoftColor}
+            isDark={isDark}
+            isSelected={false}
+            categoryName={pilar.label}
+            icon={pilar.icon}
+          />
           <div
             style={{
               fontSize: 12,

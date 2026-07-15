@@ -15,6 +15,7 @@
  *   isSelected - Si está seleccionada (afecta opacidad)
  *   onClickBar - Callback cuando se hace click
  *   categoryName - Nombre de la categoría a mostrar (opcional)
+ *   icon - Ícono a mostrar junto al nombre (opcional, puede ser emoji o componente)
  */
 export default function ProgressBar({
   spent,
@@ -25,6 +26,7 @@ export default function ProgressBar({
   isSelected = false,
   onClickBar,
   categoryName = null,
+  icon = null,
 }) {
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
   const borderWidth = 2; // px
@@ -139,8 +141,12 @@ export default function ProgressBar({
               position: "relative",
               zIndex: 2,
               pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
             }}
           >
+            {icon && <span>{icon}</span>}
             {categoryName}
           </span>
         )}
