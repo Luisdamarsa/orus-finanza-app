@@ -2,7 +2,8 @@
  * ProgressBar.jsx
  *
  * Componente reutilizable de barra de progreso
- * Renderiza solo las barras (azul de relleno + borde punteado de presupuesto)
+ * Renderiza las barras (azul de relleno + borde punteado de presupuesto)
+ * Puede incluir el nombre de la categoría opcionalmente
  * Incluye toda la lógica de cálculos y alineación
  *
  * Props:
@@ -13,6 +14,7 @@
  *   isDark - Tema oscuro
  *   isSelected - Si está seleccionada (afecta opacidad)
  *   onClickBar - Callback cuando se hace click
+ *   categoryName - Nombre de la categoría a mostrar (opcional)
  */
 export default function ProgressBar({
   spent,
@@ -22,6 +24,7 @@ export default function ProgressBar({
   isDark = true,
   isSelected = false,
   onClickBar,
+  categoryName = null,
 }) {
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
   const borderWidth = 2; // px
@@ -125,6 +128,22 @@ export default function ProgressBar({
             transition: "width 0.2s, opacity 0.2s",
           }}
         />
+
+        {/* 🆕 Nombre de la categoría - Si se proporciona */}
+        {categoryName && (
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: isDark ? "#F0EEFF" : "#FFFFFF",
+              position: "relative",
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          >
+            {categoryName}
+          </span>
+        )}
       </div>
 
       {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}

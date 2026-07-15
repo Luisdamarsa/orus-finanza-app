@@ -87,7 +87,7 @@ export default function CategoryProgressBar({
         gap: 10,
       }}
     >
-      {/* 🆕 Componente ProgressBar - Renderiza las barras (azul + punteada) */}
+      {/* 🆕 Componente ProgressBar - Renderiza las barras (azul + punteada) + nombre */}
       <ProgressBar
         spent={spent}
         budget={budget}
@@ -96,33 +96,8 @@ export default function CategoryProgressBar({
         isDark={isDark}
         isSelected={isSelected}
         onClickBar={onClickBar}
+        categoryName={categoryName}
       />
-
-      {/* Nombre de la categoría - Sobre la barra */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 32,
-          display: "flex",
-          alignItems: "center",
-          paddingLeft: 10,
-          pointerEvents: "none",
-          zIndex: 2,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: isDark ? "#F0EEFF" : "#FFFFFF",
-          }}
-        >
-          {categoryName}
-        </span>
-      </div>
 
       {/* Info: gasto y presupuesto */}
       <div
