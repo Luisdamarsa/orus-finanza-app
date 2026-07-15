@@ -141,7 +141,7 @@ export default function CategoryProgressBar({
         {showDashedBorder && (
           <span
             style={{
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: 600,
               color: getPercentageColor(),
             }}
