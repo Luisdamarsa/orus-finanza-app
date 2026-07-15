@@ -125,7 +125,7 @@ export default function CategoryProgressBar({
             width: showDashedBorder
               ? barFillPercentage === 100
                 ? `calc(${barFillPercentage}% - ${borderWidth * 4}px)`
-                : `calc(${barFillPercentage}% - ${borderWidth * 4}px - 1px)`
+                : `calc(${barFillPercentage}% - ${borderWidth * 4}px)`
               : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
