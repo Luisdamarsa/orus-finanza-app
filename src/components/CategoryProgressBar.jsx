@@ -115,14 +115,14 @@ export default function CategoryProgressBar({
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: resta el doble del grosor del border para alineación perfecta */}
+        {/* 🆕 Cuando showDashedBorder: resta borderWidth * 4 + 1px del left */}
         <div
           style={{
             position: "absolute",
             left: showDashedBorder ? "1px" : 0,
             top: showDashedBorder ? "1px" : 0,
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 4}px)` : `${barFillPercentage}%`,
+            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 4}px - 1px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
@@ -147,14 +147,14 @@ export default function CategoryProgressBar({
         {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
         {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
         {/* borderWidth está sincronizado con la barra azul para compensar visualmente */}
-        {/* 🆕 Resta borderWidth * 1.5 para alineación visual correcta */}
+        {/* 🆕 Resta borderWidth * 2 para que el border no se sobrepase del contenedor */}
         {showDashedBorder && (
           <div
             style={{
               position: "absolute",
               top: 0,
               left: 0,
-              width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)) - ${borderWidth * 1.5}px)`,
+              width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)) - ${borderWidth * 2}px)`,
               height: 28,
               border: `${borderWidth}px dashed #FFFFFF`,
               borderRadius: 8,
