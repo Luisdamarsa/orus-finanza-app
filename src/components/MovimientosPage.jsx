@@ -206,7 +206,7 @@ export default function MovimientosPage({
             spent={totalSpent}
             budget={budget}
             maxSpent={totalSpent}
-            pillarColor={isOverBudget ? debtSoftColor : pillarSoftColor}
+            pillarColor={isOverBudget ? "#FCA5A5" : pilar.darkColor}
             isDark={isDark}
             isSelected={false}
             categoryName={pilar.label}
