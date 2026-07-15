@@ -132,7 +132,7 @@ export default function CategoryProgressBar({
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: "#FFFFFF",
+            color: isDisabled ? textColor : "#FFFFFF",
           }}
         >
           ${spent.toLocaleString("es-CO")}
