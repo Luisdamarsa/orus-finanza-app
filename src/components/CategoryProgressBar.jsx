@@ -29,6 +29,9 @@ export default function CategoryProgressBar({
   onClickBar,
   isSelected = false,
 }) {
+  // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
+  const borderWidth = 2; // px
+
   // Determinar si tiene presupuesto
   const hasBudget = budget && budget > 0;
 
@@ -112,14 +115,14 @@ export default function CategoryProgressBar({
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: ancho resta 1px para compensar left:1px, termina exactamente en 100% */}
+        {/* 🆕 Cuando showDashedBorder: resta el grosor del border (borderWidth * 2) para compensar */}
         <div
           style={{
             position: "absolute",
             left: showDashedBorder ? "1px" : 0,
             top: showDashedBorder ? "1px" : 0,
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder ? `calc(${barFillPercentage}% - 1px)` : `${barFillPercentage}%`,
+            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 2}px)` : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
@@ -143,7 +146,7 @@ export default function CategoryProgressBar({
 
         {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
         {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
-        {/* box-sizing: border-box asegura que el border cuente hacia adentro, no hacia afuera */}
+        {/* borderWidth está sincronizado con la barra azul para compensar visualmente */}
         {showDashedBorder && (
           <div
             style={{
@@ -152,9 +155,8 @@ export default function CategoryProgressBar({
               left: 0,
               width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}% + 6px, 100%)))`,
               height: 28,
-              border: `2px dashed #FFFFFF`,
+              border: `${borderWidth}px dashed #FFFFFF`,
               borderRadius: 8,
-              boxSizing: "border-box",
               pointerEvents: "none",
               zIndex: 3,
               transition: "width 0.2s",
