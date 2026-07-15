@@ -115,14 +115,18 @@ export default function CategoryProgressBar({
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: resta borderWidth * 4 + 1px del left */}
+        {/* 🆕 Cuando showDashedBorder: resta diferente si es primera categoría o no */}
         <div
           style={{
             position: "absolute",
             left: showDashedBorder ? "1px" : 0,
             top: showDashedBorder ? "1px" : 0,
             height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder ? `calc(${barFillPercentage}% - ${borderWidth * 4}px - 1px)` : `${barFillPercentage}%`,
+            width: showDashedBorder
+              ? barFillPercentage === 100
+                ? `calc(${barFillPercentage}% - ${borderWidth * 4}px)`
+                : `calc(${barFillPercentage}% - ${borderWidth * 4}px - 1px)`
+              : `${barFillPercentage}%`,
             background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
             borderRadius: 8,
             opacity: isSelected ? 1 : 0.6,
