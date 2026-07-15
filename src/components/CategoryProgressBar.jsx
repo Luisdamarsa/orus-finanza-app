@@ -124,7 +124,7 @@ export default function CategoryProgressBar({
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-end",
-          gap: -2,
+          gap: 0,
           minWidth: 80,
         }}
       >
