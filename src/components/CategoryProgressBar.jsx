@@ -1,3 +1,5 @@
+import ProgressBar from "./ProgressBar";
+
 /**
  * CategoryProgressBar.jsx
  *
@@ -85,95 +87,41 @@ export default function CategoryProgressBar({
         gap: 10,
       }}
     >
-      {/* Contenedor de la Barra (para posicionar el borde punteado) */}
+      {/* 🆕 Componente ProgressBar - Renderiza las barras (azul + punteada) */}
+      <ProgressBar
+        spent={spent}
+        budget={budget}
+        maxSpent={maxSpent}
+        pillarColor={pillarColor}
+        isDark={isDark}
+        isSelected={isSelected}
+        onClickBar={onClickBar}
+      />
+
+      {/* Nombre de la categoría - Sobre la barra */}
       <div
         style={{
-          flex: 1,
-          position: "relative",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
           height: 32,
-          maxWidth: "calc(100% - 10px)",
+          display: "flex",
+          alignItems: "center",
+          paddingLeft: 10,
+          pointerEvents: "none",
+          zIndex: 2,
         }}
       >
-        {/* Barra de Progreso */}
-        <div
-          onClick={isDisabled ? undefined : onClickBar}
+        <span
           style={{
-            width: "100%",
-            height: 32,
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: 10,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            overflow: "hidden",
-            cursor: isDisabled ? "not-allowed" : "pointer",
-            transition: "all 0.2s",
-            background: isDark ? "#000000" : "#1A1830",
-            opacity: isDisabled ? 0.5 : 1,
+            fontSize: 13,
+            fontWeight: 600,
+            color: isDark ? "#F0EEFF" : "#FFFFFF",
           }}
-        onMouseEnter={(e) => {
-          if (!isDisabled) e.currentTarget.style.opacity = "0.8";
-        }}
-        onMouseLeave={(e) => {
-          if (!isDisabled) e.currentTarget.style.opacity = "1";
-        }}
-      >
-        {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: resta diferente si es primera categoría o no */}
-        <div
-          style={{
-            position: "absolute",
-            left: showDashedBorder ? "1px" : 0,
-            top: showDashedBorder ? "1px" : 0,
-            height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder
-              ? barFillPercentage === 100
-                ? `calc(${barFillPercentage}% - ${borderWidth * FIRST_CATEGORY_REDUCTION_FACTOR}px)`
-                : `calc(${barFillPercentage}% - ${borderWidth * OTHER_CATEGORIES_REDUCTION_FACTOR}px)`
-              : `${barFillPercentage}%`,
-            background: showDashedBorder && percentage > 100 ? "#EF4444" : pillarColor,
-            borderRadius: 8,
-            opacity: isSelected ? 1 : 0.6,
-            transition: "width 0.2s, opacity 0.2s",
-          }}
-        />
-
-          {/* Nombre de la categoría */}
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: isDark ? "#F0EEFF" : "#FFFFFF",
-              position: "relative",
-              zIndex: 2,
-            }}
-          >
-            {categoryName}
-          </span>
-        </div>
-
-        {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
-        {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
-        {/* borderWidth está sincronizado con la barra azul para compensar visualmente */}
-        {/* 🆕 Resta borderWidth * 2 para que el border no se sobrepase del contenedor */}
-        {showDashedBorder && (
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: `calc(max(${barFillPercentage}%, min(${budgetLinePercentage}%, 100%)) - ${borderWidth * 2}px)`,
-              height: 28,
-              border: `${borderWidth}px dashed #FFFFFF`,
-              borderRadius: 8,
-              pointerEvents: "none",
-              zIndex: 3,
-              transition: "width 0.2s",
-            }}
-          />
-        )}
+        >
+          {categoryName}
+        </span>
       </div>
 
       {/* Info: gasto y presupuesto */}
