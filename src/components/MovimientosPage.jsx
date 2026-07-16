@@ -280,15 +280,19 @@ export default function MovimientosPage({
                 const maxSpent = entries.length > 0 ? entries[0][1] : 1;
 
                 return entries.map(([categoryId, spent]) => {
-                  const categoryBudget = categoryBudgets[categoryId] || null;
-
-                  // 🆕 Obtener nombre histórico de la categoría en la fecha del período
+                  // 🆕 Nombre y presupuesto históricos (según el período visto)
                   let categoryName = getCategoryName(categoryId);
                   const category = ALL_CATS.find(cat => cat.id === categoryId);
-                  if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
-                    const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+                  const queryDate = selectedPeriod && selectedPeriod.month && selectedPeriod.year
+                    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`
+                    : null;
+                  if (category && queryDate) {
                     categoryName = getAttributeAtDate(category, "name", queryDate);
                   }
+                  // 🆕 Presupuesto: fuente única = ALL_CATS con historial (por período)
+                  const categoryBudget = category
+                    ? (queryDate ? getAttributeAtDate(category, "budget", queryDate) : category.budget) || null
+                    : (categoryBudgets[categoryId] || null);
 
                   return (
                     <CategoryProgressBar
