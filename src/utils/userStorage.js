@@ -31,7 +31,7 @@ const generateUserId = () => {
 };
 
 // Detecta el idioma soportado (ES/EN) desde el dispositivo. Fallback: ES.
-function detectLanguage() {
+export function detectLanguage() {
   if (typeof navigator === "undefined") return "ES";
   const lang = (navigator.language || "es").split("-")[0].toLowerCase();
   const supported = { es: "ES", en: "EN", fr: "FR", it: "IT", pt: "PT" };
@@ -62,7 +62,7 @@ function detectRegion() {
 }
 
 // Deriva la moneda soportada (COP/USD/EUR) desde la región. Fallback: COP.
-function detectCurrency() {
+export function detectCurrency() {
   const region = detectRegion();
   const byRegion = {
     CO: "COP",
@@ -83,8 +83,8 @@ const DEFAULT_USER = {
   email: "test@test.com",
   phone: "+57 1111111111",
   authProvider: "google", // "google" | "apple" | null (registro normal)
-  currency: detectCurrency(), // default segun region del dispositivo
-  language: detectLanguage(), // default segun idioma del dispositivo
+  currency: "COP", // demo colombiano fijo; detectCurrency() se usa en el onboarding real
+  language: "ES",  // demo fijo; detectLanguage() se usa en el onboarding real
   userId: generateUserId(), // Genera un ID único
 };
 
