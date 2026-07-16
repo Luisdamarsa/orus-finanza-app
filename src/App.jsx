@@ -497,12 +497,16 @@ function Dashboard() {
     const newId = count === 0 ? `cat_${baseName}` : `cat_${baseName}_${count}`;
 
     // Crear nueva categoría
+    const now = new Date().toISOString();
     const newCategory = {
       id: newId,
       name: categoryName,
       pillar: pillarId,
       spent: 0,
-      budget: null
+      budget: null,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null
     };
 
     // 1. Agregar directamente a ALL_CATS
@@ -539,6 +543,7 @@ function Dashboard() {
       editCategoryInHook(categoryId, updates.pillar);
     }
 
+    category.updatedAt = new Date().toISOString();
     console.log("✅ Categoría editada:", category);
   };
 
@@ -549,10 +554,10 @@ function Dashboard() {
 
     const pillarId = category.pillar;
 
-    // Encontrar índice y remover de ALL_CATS
+    // 🆕 Soft delete: marcar como borrada (conservar para históricos), NO destruir
     const idx = ALL_CATS.findIndex(cat => cat.id === categoryId);
     if (idx !== -1) {
-      ALL_CATS.splice(idx, 1);
+      ALL_CATS[idx].deletedAt = new Date().toISOString();
     }
 
     // Actualizar estado React del hook
