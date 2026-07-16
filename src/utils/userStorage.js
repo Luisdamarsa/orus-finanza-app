@@ -11,6 +11,7 @@
  *   lastName: string,         // Apellido(s) - del login (read-only)
  *   email: string,            // Correo - del login (read-only)
  *   phone: string,            // Teléfono - del login (read-only)
+ *   authProvider: string|null,// "google" | "apple" | null (registro normal) - del login
  *   currency: string,         // "COP" | "USD" | "EUR" (editable)
  *   language: string,         // "ES" | "EN" (editable)
  *   userId: string            // ID único del usuario (10 caracteres alfanuméricos) - generado al crear
@@ -35,6 +36,7 @@ const DEFAULT_USER = {
   lastName: "TEST",
   email: "test@test.com",
   phone: "+57 1111111111",
+  authProvider: "google", // "google" | "apple" | null (registro normal)
   currency: "COP",
   language: "ES",
   userId: generateUserId(), // Genera un ID único

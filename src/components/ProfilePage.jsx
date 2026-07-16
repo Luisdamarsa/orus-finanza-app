@@ -4,7 +4,7 @@ import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
 import DeleteAccountModal from "./DeleteAccountModal";
-import { CheckmarkIcon, TrashIcon, CopyIcon } from "../icons/Icons";
+import { CheckmarkIcon, TrashIcon, CopyIcon, GoogleIcon, AppleIcon } from "../icons/Icons";
 import LoadingWrapper from "./LoadingWrapper";
 import { FormSkeleton } from "./LoadingSkeleton";
 
@@ -389,23 +389,35 @@ export default function ProfilePage({
               }}>
               Correo Electrónico
             </label>
-            <input
-              type="email"
-              value={user.email}
-              disabled
-              style={{
-                flex: 1,
-                padding: "6px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.disabledBg,
-                color: t.disabled,
-                fontSize: 14,
-                fontWeight: 600,
-                boxSizing: "border-box",
-                cursor: "not-allowed",
-              }}
-            />
+            <div style={{ flex: 1, position: "relative" }}>
+              <input
+                type="email"
+                value={user.email}
+                disabled
+                style={{
+                  width: "100%",
+                  padding: "6px 34px 6px 14px",
+                  borderRadius: 8,
+                  border: `1px solid ${t.border}`,
+                  background: t.disabledBg,
+                  color: t.disabled,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  boxSizing: "border-box",
+                  cursor: "not-allowed",
+                }}
+              />
+              {user.authProvider === "google" && (
+                <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                  <GoogleIcon size={16} />
+                </span>
+              )}
+              {user.authProvider === "apple" && (
+                <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                  <AppleIcon size={16} color={isDark ? "#F0EEFF" : "#1A1830"} />
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Teléfono */}
