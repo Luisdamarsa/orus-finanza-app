@@ -50,8 +50,19 @@ export default function MovimientosPage({
     pillarTxns.reduce((sum, tx) => sum + Math.min(tx.amount, 0), 0)
   );
 
-  // 🆕 Obtener categorías del pilar desde el estado `categories` (ahora con IDs)
-  const pillarCategories = categories[pilar.id] || [];
+  // 🆕 Categorías del pilar que EXISTÍAN en el período visto (historización: createdAt/deletedAt)
+  const periodKey = selectedPeriod && selectedPeriod.month && selectedPeriod.year
+    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`
+    : null;
+  const pillarCategories = ALL_CATS
+    .filter((cat) => cat.pillar === pilar.id)
+    .filter((cat) => {
+      if (!periodKey) return !cat.deletedAt; // "Todo": excluir borradas
+      const createdOk = !cat.createdAt || cat.createdAt.slice(0, 7) <= periodKey;
+      const notDeleted = !cat.deletedAt || cat.deletedAt.slice(0, 7) > periodKey;
+      return createdOk && notDeleted;
+    })
+    .map((cat) => cat.id);
 
   // Desglose por categoría - mostrar TODAS las categorías del pilar
   const categorySpent = {};
