@@ -445,21 +445,21 @@ export default function TransactionPage({
                   style={{
                     padding: "4px 10px",
                     borderRadius: 20,
-                    border: "none",
+                    border: active
+                      ? `1.5px solid ${m.color}`
+                      : "1.5px solid transparent",
                     cursor: "pointer",
                     background: pressingMethod === m.id
-                      ? `${m.color}88`
+                      ? `${m.color}33`
                       : active
-                        ? m.color + "88"
+                        ? `${m.color}22`
                         : isDark
                           ? "#252538"
                           : "#F0EFF8",
                     color: active ? m.color : t.sub,
                     fontSize: 11,
                     fontWeight: 700,
-                    outline: active
-                      ? `1.5px solid ${m.color}66`
-                      : "1.5px solid transparent",
+                    outline: "none",
                     transition: "all 0.18s",
                     transform: pressingMethod === m.id ? "scale(0.94)" : "scale(1)",
                     opacity: pressingMethod === m.id ? 0.7 : 1,
