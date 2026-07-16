@@ -300,9 +300,13 @@ export default function MovimientosPage({
                   if (category && queryDate) {
                     categoryName = getAttributeAtDate(category, "name", queryDate);
                   }
-                  // 🆕 Presupuesto: fuente única = ALL_CATS con historial (por período)
+                  // 🆕 Presupuesto: fuente única = ALL_CATS con historial.
+                  // Consultar al FIN del mes para incluir cambios del período en curso.
+                  const budgetQueryDate = selectedPeriod && selectedPeriod.month && selectedPeriod.year
+                    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-${String(new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate()).padStart(2, '0')}`
+                    : null;
                   const categoryBudget = category
-                    ? (queryDate ? getAttributeAtDate(category, "budget", queryDate) : category.budget) || null
+                    ? (budgetQueryDate ? getAttributeAtDate(category, "budget", budgetQueryDate) : category.budget) || null
                     : (categoryBudgets[categoryId] || null);
 
                   return (
