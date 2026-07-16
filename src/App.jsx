@@ -6,6 +6,7 @@ import { PopupProvider } from "./services/PopupService";
 
 // 🆕 Importar hooks
 import { useCategories } from "./hooks/useCategories";
+import { useCategoryEditing } from "./hooks/useCategoryEditing";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
@@ -468,9 +469,10 @@ function Dashboard() {
   const [showIncomes, setShowIncomes] = useState(false);
 
   // 🆕 Estados para editar categoría
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [editingCategoryName, setEditingCategoryName] = useState(null);
-  const [editingPillarId, setEditingPillarId] = useState(null);
+  const {
+    editingCategoryId, editingCategoryName, editingPillarId,
+    startEditing: startCategoryEditing, resetEditing: resetCategoryEditing,
+  } = useCategoryEditing();
 
   // 🆕 Estados para editar transacción
   const [editingTransactionId, setEditingTransactionId] = useState(null);
@@ -1066,16 +1068,12 @@ function Dashboard() {
             isDark={isDark}
             onBack={() => setScreen("settings")}
             onAddCategory={() => {
-              setEditingCategoryId(null);
-              setEditingCategoryName(null);
-              setEditingPillarId(null);
+              resetCategoryEditing();
               setScreen("add-category");
             }}
             onEditCategory={(categoryId, pillarId) => {
               // ✅ Guardar ID y convertir ID a nombre para pasar a AddCategoryPage
-              setEditingCategoryId(categoryId);
-              setEditingCategoryName(getCategoryName(categoryId));
-              setEditingPillarId(pillarId);
+              startCategoryEditing(categoryId, getCategoryName(categoryId), pillarId);
               setScreen("add-category");
             }}
             categories={categories}
@@ -1107,9 +1105,7 @@ function Dashboard() {
               }
 
               setScreen("categories");
-              setEditingCategoryId(null);
-              setEditingCategoryName(null);
-              setEditingPillarId(null);
+              resetCategoryEditing();
             }}
             onDelete={() => {
               // 🆕 Eliminar categoría por ID
@@ -1117,9 +1113,7 @@ function Dashboard() {
                 deleteCategory(editingCategoryId);
               }
               setScreen("categories");
-              setEditingCategoryId(null);
-              setEditingCategoryName(null);
-              setEditingPillarId(null);
+              resetCategoryEditing();
             }}
           />
         </div>
