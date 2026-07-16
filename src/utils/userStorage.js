@@ -30,6 +30,49 @@ const generateUserId = () => {
   return userId;
 };
 
+// Detecta el idioma soportado (ES/EN) desde el dispositivo. Fallback: ES.
+function detectLanguage() {
+  if (typeof navigator === "undefined") return "ES";
+  const lang = (navigator.language || "es").split("-")[0].toLowerCase();
+  return lang === "en" ? "EN" : "ES"; // hoy solo soportamos ES/EN
+}
+
+// Detecta la región (país) del dispositivo/sesión: locale -> zona horaria. Fallback: null.
+function detectRegion() {
+  if (typeof navigator === "undefined") return null;
+  try {
+    const r = new Intl.Locale(navigator.language).region;
+    if (r) return r.toUpperCase(); // ej "es-CO" -> "CO"
+  } catch (e) { /* noop */ }
+  const part = (navigator.language || "").split("-")[1];
+  if (part && part.length === 2) return part.toUpperCase();
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const tzToRegion = {
+      "America/Bogota": "CO", "America/Guayaquil": "EC", "America/Panama": "PA",
+      "America/New_York": "US", "America/Chicago": "US", "America/Los_Angeles": "US",
+      "America/Mexico_City": "MX", "America/Lima": "PE", "America/Santiago": "CL",
+      "America/Argentina/Buenos_Aires": "AR", "Europe/Madrid": "ES",
+      "Europe/Paris": "FR", "Europe/Berlin": "DE",
+    };
+    if (tzToRegion[tz]) return tzToRegion[tz];
+  } catch (e) { /* noop */ }
+  return null;
+}
+
+// Deriva la moneda soportada (COP/USD/EUR) desde la región. Fallback: COP.
+function detectCurrency() {
+  const region = detectRegion();
+  const byRegion = {
+    CO: "COP",
+    US: "USD", EC: "USD", PA: "USD", SV: "USD",
+    ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR",
+  };
+  const supported = ["COP", "USD", "EUR"];
+  const cur = byRegion[region];
+  return supported.includes(cur) ? cur : "COP";
+}
+
 const DEFAULT_USER = {
   displayName: "Luis Daniel",
   firstName: "Test",
@@ -37,8 +80,8 @@ const DEFAULT_USER = {
   email: "test@test.com",
   phone: "+57 1111111111",
   authProvider: "google", // "google" | "apple" | null (registro normal)
-  currency: "COP",
-  language: "ES",
+  currency: detectCurrency(), // default segun region del dispositivo
+  language: detectLanguage(), // default segun idioma del dispositivo
   userId: generateUserId(), // Genera un ID único
 };
 
