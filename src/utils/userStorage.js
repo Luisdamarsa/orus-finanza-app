@@ -34,7 +34,8 @@ const generateUserId = () => {
 function detectLanguage() {
   if (typeof navigator === "undefined") return "ES";
   const lang = (navigator.language || "es").split("-")[0].toLowerCase();
-  return lang === "en" ? "EN" : "ES"; // hoy solo soportamos ES/EN
+  const supported = { es: "ES", en: "EN", fr: "FR", it: "IT", pt: "PT" };
+  return supported[lang] || "ES";
 }
 
 // Detecta la región (país) del dispositivo/sesión: locale -> zona horaria. Fallback: null.
@@ -66,9 +67,11 @@ function detectCurrency() {
   const byRegion = {
     CO: "COP",
     US: "USD", EC: "USD", PA: "USD", SV: "USD",
-    ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR",
+    ES: "EUR", FR: "EUR", DE: "EUR", IT: "EUR", PT: "EUR", NL: "EUR", IE: "EUR",
+    GB: "GBP", JP: "JPY", CN: "CNY", AU: "AUD", CA: "CAD", CH: "CHF",
+    HK: "HKD", SG: "SGD", IN: "INR", KR: "KRW", BR: "BRL", MX: "MXN",
   };
-  const supported = ["COP", "USD", "EUR"];
+  const supported = ["COP", "USD", "EUR", "GBP", "JPY", "CNY", "AUD", "CAD", "CHF", "HKD", "SGD", "INR", "KRW", "BRL", "MXN"];
   const cur = byRegion[region];
   return supported.includes(cur) ? cur : "COP";
 }

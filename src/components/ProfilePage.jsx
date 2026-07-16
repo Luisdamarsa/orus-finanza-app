@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { userStorage } from "../utils/userStorage";
+import { CURRENCIES, LANGUAGES } from "../constants";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
@@ -146,17 +147,10 @@ export default function ProfilePage({
   };
 
   // Opciones de moneda
-  const currencyOptions = [
-    { value: "COP", label: "Peso Colombiano (COP) - $" },
-    { value: "USD", label: "Dólar Estadounidense (USD) - $" },
-    { value: "EUR", label: "Euro (EUR) - €" },
-  ];
+  const currencyOptions = CURRENCIES;
 
   // Opciones de idioma
-  const languageOptions = [
-    { value: "ES", label: "Español (ES)" },
-    { value: "EN", label: "English (EN)" },
-  ];
+  const languageOptions = LANGUAGES;
 
   const getCurrencyLabel = () => currencyOptions.find(o => o.value === currency)?.label || "Peso Colombiano (COP) - $";
   const getLanguageLabel = () => languageOptions.find(o => o.value === language)?.label || "Español (ES)";

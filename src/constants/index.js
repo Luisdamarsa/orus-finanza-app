@@ -449,3 +449,35 @@ export const TRANSACTIONS = [
   { id:25, date:"2026-02-10", time:"08:00", description:"Agua EAAB", method:"Banco", amount:-60000, pillar:"fijos", category:"Servicios" },
   { id:26, date:"2026-02-05", time:"07:45", description:"Recarga TransMilenio", method:"Llave", amount:-12000, pillar:"varios", category:"Transporte" },
 ];
+
+// 🌎 Monedas soportadas (value, label, symbol). El símbolo lo usa fmt() y se
+// propaga por toda la app. Editar aquí cambia el catálogo en todos lados.
+export const CURRENCIES = [
+  { value: "COP", label: "Peso Colombiano (COP) - $", symbol: "$" },
+  { value: "USD", label: "Dólar Estadounidense (USD) - $", symbol: "$" },
+  { value: "EUR", label: "Euro (EUR) - €", symbol: "€" },
+  { value: "GBP", label: "Libra Esterlina (GBP) - £", symbol: "£" },
+  { value: "JPY", label: "Yen Japonés (JPY) - ¥", symbol: "¥" },
+  { value: "CNY", label: "Yuan Chino (CNY) - CN¥", symbol: "CN¥" },
+  { value: "AUD", label: "Dólar Australiano (AUD) - A$", symbol: "A$" },
+  { value: "CAD", label: "Dólar Canadiense (CAD) - C$", symbol: "C$" },
+  { value: "CHF", label: "Franco Suizo (CHF) - CHF", symbol: "CHF" },
+  { value: "HKD", label: "Dólar de Hong Kong (HKD) - HK$", symbol: "HK$" },
+  { value: "SGD", label: "Dólar de Singapur (SGD) - S$", symbol: "S$" },
+  { value: "INR", label: "Rupia India (INR) - ₹", symbol: "₹" },
+  { value: "KRW", label: "Won Surcoreano (KRW) - ₩", symbol: "₩" },
+  { value: "BRL", label: "Real Brasileño (BRL) - R$", symbol: "R$" },
+  { value: "MXN", label: "Peso Mexicano (MXN) - MX$", symbol: "MX$" },
+];
+
+// Mapa código -> símbolo (derivado de CURRENCIES).
+export const CURRENCY_SYMBOLS = Object.fromEntries(CURRENCIES.map(c => [c.value, c.symbol]));
+
+// 🗣️ Idiomas soportados.
+export const LANGUAGES = [
+  { value: "ES", label: "Español (ES)" },
+  { value: "EN", label: "English (EN)" },
+  { value: "FR", label: "Français (FR)" },
+  { value: "IT", label: "Italiano (IT)" },
+  { value: "PT", label: "Português (PT)" },
+];

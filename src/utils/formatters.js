@@ -1,4 +1,4 @@
-import { MONTHS_SHORT } from "../constants";
+import { MONTHS_SHORT, CURRENCY_SYMBOLS } from "../constants";
 import { userStorage } from "./userStorage";
 
 /**
@@ -8,12 +8,7 @@ import { userStorage } from "./userStorage";
  */
 export const fmt = (n) => {
   const currency = userStorage.getCurrency();
-  const symbols = {
-    COP: "$",
-    USD: "$",
-    EUR: "€",
-  };
-  const symbol = symbols[currency] || "$";
+  const symbol = CURRENCY_SYMBOLS[currency] || "$";
   return symbol + Math.abs(n).toLocaleString("es-CO");
 };
 

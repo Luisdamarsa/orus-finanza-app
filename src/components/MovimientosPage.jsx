@@ -230,7 +230,7 @@ export default function MovimientosPage({
               textAlign: "right",
               minWidth: 80,
             }}>
-            ${fmt(totalSpent)}
+            {fmt(totalSpent)}
           </div>
         </div>
 
