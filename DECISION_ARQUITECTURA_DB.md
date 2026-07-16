@@ -53,3 +53,20 @@ acciones async-tolerant justo para esto.
 - **Cumplimiento:** en Colombia aplica la Ley 1581 de 2012 (Habeas Data). Revisar con
   compliance antes de producción. *(No es asesoría legal.)*
 - Logs de auditoría de accesos y cambios.
+
+---
+
+## Pendientes para la fase BD (transacciones huérfanas al borrar categorías)
+
+Cuando se borra una categoría que tiene transacciones, esas transacciones quedan
+apuntando a un id borrado (soft delete). Hoy se muestran igual (el nombre se resuelve
+porque la categoría sigue en el catálogo con `deletedAt`), pero es un parche.
+
+**En la fase BD, al borrar una categoría, manejar sus transacciones:**
+- Reasignarlas a otra categoría elegida por el usuario, o
+- Moverlas a un bucket "Sin categoría", o
+- Bloquear/advertir el borrado si tiene movimientos en el período.
+
+Esto elimina de raíz los casos de borde actuales:
+- Dos categorías con el mismo nombre (vieja borrada + nueva) conviviendo en un mes.
+- El popup/Movimientos mostrando categorías borradas que aún tienen gasto.
