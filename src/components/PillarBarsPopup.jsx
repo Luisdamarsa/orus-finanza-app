@@ -43,8 +43,19 @@ export default function PillarBarsPopup({
     ? { border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
 
-  // 🆕 Obtener categorías del pilar desde el prop (datos del usuario) - ahora con IDs
-  const pillarCategoryIds = categories[pillar.id] || [];
+  // 🆕 Categorías del pilar que EXISTÍAN en el período visto (historización: createdAt/deletedAt)
+  const periodKey = selectedPeriod && selectedPeriod.month && selectedPeriod.year
+    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`
+    : null;
+  const pillarCategoryIds = ALL_CATS
+    .filter((cat) => cat.pillar === pillar.id)
+    .filter((cat) => {
+      if (!periodKey) return !cat.deletedAt;
+      const createdOk = !cat.createdAt || cat.createdAt.slice(0, 7) <= periodKey;
+      const notDeleted = !cat.deletedAt || cat.deletedAt.slice(0, 7) > periodKey;
+      return createdOk && notDeleted;
+    })
+    .map((cat) => cat.id);
 
   // 🆕 Calcular gastos dinámicamente por período (usando IDs)
   const categorySpent = {};
