@@ -11,7 +11,7 @@ import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
-import { addHistoryEntry } from "./services/attributeHistoryService";
+import * as catalog from "./services/categoryCatalogService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
 
@@ -478,122 +478,28 @@ function Dashboard() {
   }, []);
 
   // 🆕 FUNCIONES CRUD PARA MUTACION DIRECTA DE ALL_CATS
+  // Catálogo (mutaciones vía categoryCatalogService) + sincronización de estado React
   const createCategory = (pillarId, categoryName) => {
-    // Generar ID: "cat_nombre" o "cat_nombre_1", "cat_nombre_2", etc.
-    const baseName = categoryName
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "_")
-      .replace(/[^a-z0-9_]/g, "");
-
-    // Contar cuántas categorías con este nombre ya existen en este pilar
-    const count = ALL_CATS.filter(
-      cat => cat.pillar === pillarId &&
-      cat.name.toLowerCase() === categoryName.toLowerCase()
-    ).length;
-
-    const newId = count === 0 ? `cat_${baseName}` : `cat_${baseName}_${count}`;
-
-    // Crear nueva categoría
-    const now = new Date().toISOString();
-    const newCategory = {
-      id: newId,
-      name: categoryName,
-      pillar: pillarId,
-      spent: 0,
-      budget: null,
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null
-    };
-
-    // 1. Agregar directamente a ALL_CATS
-    ALL_CATS.push(newCategory);
-
-    // 2. Actualizar estado React del hook
+    const newId = catalog.createCategoryEntry(pillarId, categoryName);
     addCategoryToHook(pillarId, newId);
-
-    console.log("✅ Categoría creada:", newCategory);
   };
 
   const editCategory = (categoryId, updates) => {
-    // Encontrar y editar categoría
-    const category = ALL_CATS.find(cat => cat.id === categoryId);
-    if (!category) return;
-
-    const oldPillar = category.pillar;
-    const oldName = category.name;
-
-    // 🆕 Guardar en historial si cambia nombre
-    if (updates.name && updates.name !== category.name) {
-      addHistoryEntry(category, "name", category.name, updates.name);
-      category.name = updates.name;
-    }
-
-    // 🆕 Guardar en historial si cambia pilar
-    if (updates.pillar && updates.pillar !== category.pillar) {
-      addHistoryEntry(category, "pillar", category.pillar, updates.pillar);
-      category.pillar = updates.pillar;
-    }
-
-    // Actualizar estado React si cambió de pilar
-    if (updates.pillar && oldPillar !== updates.pillar) {
-      editCategoryInHook(categoryId, updates.pillar);
-    }
-
-    category.updatedAt = new Date().toISOString();
-    console.log("✅ Categoría editada:", category);
+    const res = catalog.renameOrMoveCategory(categoryId, updates);
+    if (res && res.pillarChanged) editCategoryInHook(categoryId, updates.pillar);
   };
 
   const deleteCategory = (categoryId) => {
-    // Encontrar categoría antes de eliminar (necesitamos su pilar)
-    const category = ALL_CATS.find(cat => cat.id === categoryId);
-    if (!category) return;
-
-    const pillarId = category.pillar;
-
-    // 🆕 Soft delete: marcar como borrada (conservar para históricos), NO destruir
-    const idx = ALL_CATS.findIndex(cat => cat.id === categoryId);
-    if (idx !== -1) {
-      ALL_CATS[idx].deletedAt = new Date().toISOString();
-    }
-
-    // Actualizar estado React del hook
-    deleteCategoryFromHook(categoryId, pillarId);
-
-    console.log("✅ Categoría eliminada:", categoryId);
+    const pillarId = catalog.softDeleteCategory(categoryId);
+    if (pillarId) deleteCategoryFromHook(categoryId, pillarId);
   };
 
   const editCategoryBudget = (categoryId, newBudget) => {
-    // Editar presupuesto de categoría
-    const category = ALL_CATS.find(cat => cat.id === categoryId);
-    if (!category) return;
-
-    const oldBudget = category.budget;
-
-    // 🆕 Guardar en historial si cambia presupuesto
-    if (newBudget !== oldBudget) {
-      addHistoryEntry(category, "budget", oldBudget, newBudget);
-      category.budget = newBudget;
-    }
-
-    console.log("✅ Presupuesto de categoría actualizado:", categoryId, newBudget);
+    catalog.setCategoryBudget(categoryId, newBudget);
   };
 
   const editPillarBudget = (pillarId, newBudget) => {
-    // Editar presupuesto de pilar
-    const pillar = PILLARS.find(p => p.id === pillarId);
-    if (!pillar) return;
-
-    const oldBudget = pillar.budget;
-
-    // 🆕 Guardar en historial si cambia presupuesto
-    if (newBudget !== oldBudget) {
-      addHistoryEntry(pillar, "budget", oldBudget, newBudget);
-      pillar.budget = newBudget;
-    }
-
-    console.log("✅ Presupuesto de pilar actualizado:", pillarId, newBudget);
+    catalog.setPillarBudget(pillarId, newBudget);
   };
 
   // 🆕 FUNCIONES CRUD PARA TRANSACCIONES
