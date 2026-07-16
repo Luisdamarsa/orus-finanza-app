@@ -37,11 +37,15 @@ export default function MovimientosPage({
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
 
   // Filtrar transacciones por pilar y período
+  // ¿Es un mes específico? (si no: año o "todo el tiempo" → sin presupuestos)
+  const isMonthPeriod = !!selectedPeriod && selectedPeriod.month != null;
+
   const pillarTxns = transactions.filter((tx) => {
     const matchesPillar = tx.pillar === pilar.id;
-    if (!selectedPeriod) return matchesPillar; // "Todo"
-    const [y, m, d] = tx.date.split("-").map(Number);
-    return matchesPillar && y === selectedPeriod.year && m === selectedPeriod.month;
+    if (!selectedPeriod) return matchesPillar; // "Todo el tiempo"
+    const [y, m] = tx.date.split("-").map(Number);
+    if (selectedPeriod.month === null) return matchesPillar && y === selectedPeriod.year; // año
+    return matchesPillar && y === selectedPeriod.year && m === selectedPeriod.month; // mes
   });
 
   // Calcular total gastado (sum de amounts negativos)
@@ -78,7 +82,7 @@ export default function MovimientosPage({
   });
 
   // Porcentaje del presupuesto
-  const budget = pilar.budget || null;
+  const budget = isMonthPeriod ? (pilar.budget || null) : null;
   const percentage = budget ? (totalSpent / budget) * 100 : null;
   const isOverBudget = percentage && percentage > 100;
 
@@ -299,14 +303,13 @@ export default function MovimientosPage({
                   if (category && queryDate) {
                     categoryName = getAttributeAtDate(category, "name", queryDate);
                   }
-                  // 🆕 Presupuesto: fuente única = ALL_CATS con historial.
-                  // Consultar al FIN del mes para incluir cambios del período en curso.
-                  const budgetQueryDate = selectedPeriod && selectedPeriod.month && selectedPeriod.year
-                    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-${String(new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate()).padStart(2, '0')}`
-                    : null;
-                  const categoryBudget = category
-                    ? (budgetQueryDate ? getAttributeAtDate(category, "budget", budgetQueryDate) : category.budget) || null
-                    : null;
+                  // 🆕 Presupuesto solo en vista de mes específico (al fin del mes).
+                  // En agregados (año / todo el tiempo) no hay presupuesto → barra proporcional.
+                  let categoryBudget = null;
+                  if (isMonthPeriod && category) {
+                    const budgetQueryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-${String(new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate()).padStart(2, '0')}`;
+                    categoryBudget = getAttributeAtDate(category, "budget", budgetQueryDate) || null;
+                  }
 
                   return (
                     <CategoryProgressBar

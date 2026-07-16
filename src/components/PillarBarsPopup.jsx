@@ -47,6 +47,8 @@ export default function PillarBarsPopup({
   const periodKey = selectedPeriod && selectedPeriod.month && selectedPeriod.year
     ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`
     : null;
+  // ¿Es un mes específico? (si no: año o "todo el tiempo" → sin presupuesto)
+  const isMonthPeriod = !!selectedPeriod && selectedPeriod.month != null;
   const pillarCategoryIds = ALL_CATS
     .filter((cat) => cat.pillar === pillar.id)
     .filter((cat) => {
@@ -154,7 +156,9 @@ export default function PillarBarsPopup({
             <div style={{ fontSize: 14, fontWeight: 900, color: t.text, lineHeight: 1.1, marginTop: 4 }}>
               {fmt(totalSpent)}
             </div>
-            <div style={{ fontSize: 9, color: t.sub, marginTop: 2 }}>de {fmt(pillar.budget)}</div>
+            {isMonthPeriod && (
+              <div style={{ fontSize: 9, color: t.sub, marginTop: 2 }}>de {fmt(pillar.budget)}</div>
+            )}
           </div>
         )}
 
