@@ -10,6 +10,7 @@ import { useCategoryEditing } from "./hooks/useCategoryEditing";
 import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
+import { useTransactions } from "./hooks/useTransactions";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
@@ -451,7 +452,13 @@ function Dashboard() {
   const [pressingFAB, setPressingFAB] = useState(null);
   // 🆕 Pilar seleccionado para la página de movimientos
   const [customConcepts, setCustomConcepts] = useState([]);
-  const [transactions, setTransactions] = useState(DUMMY_TRANSACTIONS); // 🔄 DEV: Inicia con DUMMY siempre
+  const {
+    transactions,
+    addTransaction: addTx,
+    editTransaction: applyEditTx,
+    deleteTransaction: removeTx,
+    loadTransactions,
+  } = useTransactions();
 
   // 🆕 Usar hook independiente para categorías (será la BD del usuario)
   const { categories, addCategory: addCategoryToHook, deleteCategory: deleteCategoryFromHook, editCategory: editCategoryInHook } = useCategories();
@@ -631,31 +638,14 @@ function Dashboard() {
 
   // 🆕 FUNCIONES CRUD PARA TRANSACCIONES
   const editTransaction = (transactionId, updatedData) => {
-    // Buscar y actualizar transacción (sobrescribe datos pero mantiene id, date, time)
-    const txIndex = transactions.findIndex(tx => tx.id === transactionId);
-    if (txIndex === -1) return;
-
-    const updatedTransactions = [...transactions];
-    updatedTransactions[txIndex] = {
-      ...transactions[txIndex],
-      ...updatedData,
-      id: transactions[txIndex].id, // Mantener ID
-      date: transactions[txIndex].date, // Mantener fecha
-      time: transactions[txIndex].time, // Mantener hora
-    };
-
-    setTransactions(updatedTransactions);
+    applyEditTx(transactionId, updatedData);
     resetTransactionEditing();
-
     console.log("✅ Transacción editada:", transactionId);
   };
 
   const deleteTransaction = (transactionId) => {
-    // Eliminar transacción
-    const updatedTransactions = transactions.filter(tx => tx.id !== transactionId);
-    setTransactions(updatedTransactions);
+    removeTx(transactionId);
     resetTransactionEditing();
-
     console.log("✅ Transacción eliminada:", transactionId);
   };
 
@@ -696,7 +686,7 @@ function Dashboard() {
       try {
         const stored = localStorage.getItem("orus_transactions");
         if (stored) {
-          setTransactions(JSON.parse(stored));
+          loadTransactions(JSON.parse(stored));
         }
       } catch (e) {
         console.error("Error loading transactions:", e);
@@ -706,11 +696,6 @@ function Dashboard() {
     // 🆕 NO cargar presupuestos desde localStorage - siempre reiniciar desde ALL_CATS
     // Los presupuestos se reinician cada sesión, no persisten
   }, []); // Solo ejecutar una vez al montar
-
-  // Guardar transacciones cuando cambien
-  useEffect(() => {
-    localStorage.setItem("orus_transactions", JSON.stringify(transactions));
-  }, [transactions]);
 
   // 🆕 NO guardar presupuestos en localStorage - se reinician cada sesión
 
@@ -883,7 +868,6 @@ function Dashboard() {
               const categoryId = concept || null;
 
               const newTx = {
-                id: Math.max(...transactions.map(t => t.id || 0), 0) + 1,
                 date: dateStr,
                 time: timeStr,
                 description: desc,  // ✅ Usar "description" para consistencia
@@ -893,9 +877,8 @@ function Dashboard() {
                 category: categoryId,  // ✅ Ya es ID desde TransactionPage
               };
 
-              // Guardar en estado (useEffect automaticamente guarda en localStorage)
-              const updatedTxns = [...transactions, newTx];
-              setTransactions(updatedTxns);
+              // El servicio asigna el id; el hook persiste automáticamente.
+              addTx(newTx);
 
               setSelectedPeriod({ year: now.getFullYear(), month: now.getMonth() + 1 });
               // 🆕 Cerrar Estado 2 automáticamente cuando se agrega una transacción
