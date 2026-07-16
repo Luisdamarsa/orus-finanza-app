@@ -7,6 +7,7 @@ import { PopupProvider } from "./services/PopupService";
 // 🆕 Importar hooks
 import { useCategories } from "./hooks/useCategories";
 import { useCategoryEditing } from "./hooks/useCategoryEditing";
+import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
@@ -475,8 +476,10 @@ function Dashboard() {
   } = useCategoryEditing();
 
   // 🆕 Estados para editar transacción
-  const [editingTransactionId, setEditingTransactionId] = useState(null);
-  const [selectedTransactionForEdit, setSelectedTransactionForEdit] = useState(null);
+  const {
+    editingTransactionId, selectedTransactionForEdit,
+    startEditing: startTransactionEditing, resetEditing: resetTransactionEditing,
+  } = useTransactionEditing();
 
   // 🆕 Estado para trackear qué tag del donut está siendo presionado
   const [pressingSegmentId, setPressingSegmentId] = useState(null);
@@ -639,8 +642,7 @@ function Dashboard() {
     };
 
     setTransactions(updatedTransactions);
-    setEditingTransactionId(null);
-    setSelectedTransactionForEdit(null);
+    resetTransactionEditing();
 
     console.log("✅ Transacción editada:", transactionId);
   };
@@ -649,8 +651,7 @@ function Dashboard() {
     // Eliminar transacción
     const updatedTransactions = transactions.filter(tx => tx.id !== transactionId);
     setTransactions(updatedTransactions);
-    setEditingTransactionId(null);
-    setSelectedTransactionForEdit(null);
+    resetTransactionEditing();
 
     console.log("✅ Transacción eliminada:", transactionId);
   };
@@ -922,8 +923,7 @@ function Dashboard() {
             isEditing={true}
             editingTransaction={selectedTransactionForEdit}
             onBack={() => {
-              setEditingTransactionId(null);
-              setSelectedTransactionForEdit(null);
+              resetTransactionEditing();
             }}
             onSave={(transactionId, updatedData) => {
               editTransaction(transactionId, updatedData);
@@ -1050,8 +1050,7 @@ function Dashboard() {
             categories={categories}
             categoryBudgets={categoryBudgets}
             onEditTransaction={(tx) => {
-              setSelectedTransactionForEdit(tx);
-              setEditingTransactionId(tx.id);
+              startTransactionEditing(tx);
             }}
           />
         </div>
@@ -1290,8 +1289,7 @@ function Dashboard() {
                 isDark={isDark}
                 transactions={filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType })}
                 onEditTransaction={(tx) => {
-                  setSelectedTransactionForEdit(tx);
-                  setEditingTransactionId(tx.id);
+                  startTransactionEditing(tx);
                 }}
               />
             </div>
