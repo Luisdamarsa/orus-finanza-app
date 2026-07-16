@@ -118,24 +118,6 @@ export default function MovimientosPage({
   const [movimientosHeight, setMovimientosHeight] = useState(0); // 0 inicialmente
   const movimientosRef = useRef(null);
   const scrollContainerRef = useRef(null);
-  // 🆕 Altura dinámica del header del pilar (evita el gap con offset hardcodeado)
-  const titleSectionRef = useRef(null);
-  const [titleSectionHeight, setTitleSectionHeight] = useState(76);
-
-  // 🆕 Top del scroll = base fija (104) + altura REAL del header (medida dinámicamente)
-  const contentTop = 104 + titleSectionHeight;
-
-  // 🆕 Medir el header con ResizeObserver (se actualiza si cambia su contenido:
-  // con/sin presupuesto, filtros, etc.) → el scroll arranca justo debajo, sin gap.
-  useLayoutEffect(() => {
-    const el = titleSectionRef.current;
-    if (!el) return;
-    const update = () => setTitleSectionHeight(el.offsetHeight);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   // 🆕 Medir altura de MOVIMIENTOS
   useEffect(() => {
@@ -167,19 +149,15 @@ export default function MovimientosPage({
   }, [groups]);
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
+    <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", paddingTop: 52, boxSizing: "border-box" }}>
       {/* Header fijo (top: 52, height: 52) */}
       <div style={{
-        position: "absolute",
-        top: 52,
-        left: 0,
-        right: 0,
+        flexShrink: 0,
         height: 52,
         background: t.bg,
         padding: "8px 22px",
         boxSizing: "border-box",
         borderBottom: `1px solid ${t.border}`,
-        zIndex: 30,
         display: "flex",
         alignItems: "center",
       }}>
@@ -217,18 +195,13 @@ export default function MovimientosPage({
         </div>
       </div>
 
-      {/* Sección de Título - Barra del Pilar + Filtros (altura dinámica, medida) */}
+      {/* Sección de Título - Barra del Pilar + Filtros */}
       <div
-        ref={titleSectionRef}
         style={{
-          position: "absolute",
-          top: 104,
-          left: 0,
-          right: 0,
+          flexShrink: 0,
           background: t.bg,
           padding: "10px 22px",
           boxSizing: "border-box",
-          zIndex: 25,
           display: "flex",
           flexDirection: "column",
           gap: 8,
@@ -277,15 +250,12 @@ export default function MovimientosPage({
         )}
       </div>
 
-      {/* Contenido scrolleable (top: 184px = 104 + 60 + 20) */}
+      {/* Contenido scrolleable (flex:1 → arranca justo debajo del título, sin gap ni offset) */}
       <div
         ref={scrollContainerRef}
         style={{
-          position: "absolute",
-          top: contentTop,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          flex: 1,
+          minHeight: 0,
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
