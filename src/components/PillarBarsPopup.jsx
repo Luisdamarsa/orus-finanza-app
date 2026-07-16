@@ -149,7 +149,7 @@ export default function PillarBarsPopup({
 
         {/* Categorías - desde el prop categories (datos del usuario) - ahora con IDs */}
         <div style={{ marginBottom: 12 }}>
-          {pillarCategoryIds
+          {[...pillarCategoryIds]
             .sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0))
             .map((catId) => {
               // 🆕 Obtener nombre histórico de la categoría en la fecha del período
