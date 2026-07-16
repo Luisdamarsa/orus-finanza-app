@@ -8,6 +8,7 @@ import { PopupProvider } from "./services/PopupService";
 import { useCategories } from "./hooks/useCategories";
 import { useCategoryEditing } from "./hooks/useCategoryEditing";
 import { useTransactionEditing } from "./hooks/useTransactionEditing";
+import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
@@ -20,9 +21,6 @@ import {
 } from "./constants";
 
 import { fmt, fmtDate, getPeriodLabel, groupByDate } from "./utils/formatters";
-import {
-  getLastMonthWithData
-} from "./utils/calculations";
 import { calculateDashboard, getPillarPercentage, getTagPercentage } from "./utils/dashboardCalculations";
 import { getCategoryName } from "./utils/categoryUtils";
 
@@ -426,8 +424,14 @@ function getBudgetForMonth(pillarId, month, year, customBudgets) {
 function Dashboard() {
   const isDark = true; // Solo modo oscuro
   const [scrollY, setScrollY] = useState(0);
-  const [activeId, setActiveId] = useState(null);
-  const [filteredPillar, setFilteredPillar] = useState(null);
+  const {
+    selectedPeriod, setSelectedPeriod,
+    filterType, setFilterType,
+    filteredPillar, setFilteredPillar,
+    activeId, setActiveId,
+    isMovementOpen, setIsMovementOpen,
+    movementOpenedFrom, setMovementOpenedFrom,
+  } = useDashboardFilters();
   const [showPillarBars, setShowPillarBars] = useState(false);
 
   // 🆕 Memoizar función de toggle para el donut
@@ -448,12 +452,8 @@ function Dashboard() {
   // 🆕 Usar hook independiente para categorías (será la BD del usuario)
   const { categories, addCategory: addCategoryToHook, deleteCategory: deleteCategoryFromHook, editCategory: editCategoryInHook } = useCategories();
   // 🆕 Inicia con el último mes que tiene datos (sin hardcodear)
-  const [selectedPeriod, setSelectedPeriod] = useState(() => getLastMonthWithData(DUMMY_TRANSACTIONS));
-  const [isMovementOpen, setIsMovementOpen] = useState(false);
   // 🆕 Filtro de Gastado/Ingresos
-  const [filterType, setFilterType] = useState(null); // null | "gastado" | "ingresos"
   // 🆕 Rastrear cómo se abrió Estado 2 (por cuál "puerta")
-  const [movementOpenedFrom, setMovementOpenedFrom] = useState(null); // null | "gastado" | "ingresos" | "bar"
   // 🆕 Hooks independientes
   const { customBudgets, setCustomBudgets } = usePillarBudgets();
   const { categoryBudgets, setCategoryBudgets, updateWithNewCategories } = useBudgets();
