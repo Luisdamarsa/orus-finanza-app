@@ -7,6 +7,7 @@ import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
 import { getCategoryById, getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
+import { COLORS, withAlpha, getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
 
 /**
  * Página de Movimientos de un pilar específico
@@ -75,16 +76,14 @@ export default function MovimientosPage({
   // Si es Ahorro: verde si se pasa, gris si no
   // Si no es Ahorro: rojo si se pasa, gris si no
   const isAhorrosPillar = pilar.id === "ahorro";
-  const getOverBudgetColor = () => {
-    if (!isOverBudget) return t.sub; // Gris por defecto
-    return isAhorrosPillar ? "#22C55E" : "#FCA5A5"; // Verde (Ahorros) o Rojo (otros)
-  };
+  const getOverBudgetColor = () =>
+    getOverBudgetColorSvc({ isOver: isOverBudget, isAhorros: isAhorrosPillar, fallback: t.sub });
 
   // 🆕 Obtener el color oscuro del pilar CON OPACIDAD (15%) para la barra de categorías
-  const pillarSoftColor = (pilar.darkColor || "#22C55E") + "26";
+  const pillarSoftColor = withAlpha(pilar.darkColor || COLORS.ingreso, "26");
 
   // 🆕 Obtener color suave de Deuda para cuando se pasa presupuesto
-  const debtSoftColor = "#FCA5A5";
+  const debtSoftColor = COLORS.overSoft;
 
   // 🆕 Estado para filtros de categorías seleccionadas (ahora con IDs)
   const [selectedCategories, setSelectedCategories] = useState([]);

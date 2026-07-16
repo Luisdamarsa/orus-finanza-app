@@ -18,6 +18,8 @@
  *   isDark - Tema oscuro
  *   isSelected - Si está seleccionada
  */
+import { COLORS, withAlpha, getOverBudgetColor } from "../services/colorService";
+
 export default function PillarProgressBar({
   pillarId,
   pillarName,
@@ -59,12 +61,12 @@ export default function PillarProgressBar({
               : "#FEF2F2"
             : isSelected
               ? isDark
-                ? pillarColor + "33"
-                : pillarColor + "22"
+                ? withAlpha(pillarColor, "33")
+                : withAlpha(pillarColor, "22")
               : isDark
                 ? "#1E1E2E"
                 : "#FFFFFF",
-          border: `1.5px solid ${isSelected ? pillarColor + "88" : isOverBudget ? "#EF444488" : isDark ? "#2D2D3A" : "#E5E3F5"}`,
+          border: `1.5px solid ${isSelected ? withAlpha(pillarColor, "88") : isOverBudget ? withAlpha(COLORS.gasto, "88") : isDark ? "#2D2D3A" : "#E5E3F5"}`,
         }}
       >
         {/* Barra de relleno */}
@@ -76,7 +78,7 @@ export default function PillarProgressBar({
               top: 0,
               height: "100%",
               width: `${Math.min(percentage, 100)}%`,
-              background: isOverBudget ? "#FCA5A5" : pillarColor,
+              background: getOverBudgetColor({ isOver: isOverBudget, fallback: pillarColor }),
               borderRadius: 8,
             }}
           />
@@ -120,7 +122,7 @@ export default function PillarProgressBar({
             style={{
               fontSize: 10,
               fontWeight: 600,
-              color: isOverBudget ? "#EF4444" : pillarColor,
+              color: getOverBudgetColor({ isOver: isOverBudget, strong: true, fallback: pillarColor }),
             }}
           >
             {isOverBudget ? `+${Math.ceil(percentage - 100)}%` : `${Math.round(percentage)}%`}

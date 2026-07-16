@@ -2,6 +2,7 @@ import { useState } from "react";
 import { fmt } from "../utils/formatters";
 import { PILLARS } from "../constants";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
+import { COLORS, withAlpha } from "../services/colorService";
 
 /**
  * PillarCardsGrid.jsx
@@ -122,14 +123,14 @@ export default function PillarCardsGrid({
                 // 🎨 CAMBIO: Resalta en verde (Ahorro) o rojo (otros) si pasa presupuesto
                 background: over
                   ? p.id === "ahorro"
-                    ? isDark ? p.color + "33" : p.color + "22"  // Verde para Ahorro
-                    : isDark ? "#EF444433" : "#FCA5A522"  // Rojo para otros
+                    ? isDark ? withAlpha(p.color, "33") : withAlpha(p.color, "22")  // Verde para Ahorro
+                    : isDark ? withAlpha(COLORS.gasto, "33") : withAlpha(COLORS.overSoft, "22")  // Rojo para otros
                   : isAct
                     ? (isDark ? p.darkBg : p.bg)  // Con color cuando está activo
                     : (isDark ? "#252535" : "#FFFFFF"),  // Gris cuando no está activo
                 border: `1.5px solid ${
                   over
-                    ? (p.id === "ahorro" ? p.color + "88" : "#EF444488")  // Rojo/Verde si pasa presupuesto
+                    ? (p.id === "ahorro" ? withAlpha(p.color, "88") : withAlpha(COLORS.gasto, "88"))  // Rojo/Verde si pasa presupuesto
                     : isAct
                     ? p.color  // 🆕 Color del pilar cuando está seleccionado
                     : t.border  // Gris cuando no está activo
@@ -163,8 +164,8 @@ export default function PillarCardsGrid({
                     fontWeight: 700,
                     padding: "2px 4px",
                     borderRadius: 6,
-                    background: over ? (p.id === "ahorro" ? p.color + "33" : "#FCA5A522") : p.color + "22",
-                    color: over ? (p.id === "ahorro" ? p.color : "#EF4444") : (isDark ? p.color : p.darkColor),
+                    background: over ? (p.id === "ahorro" ? withAlpha(p.color, "33") : withAlpha(COLORS.overSoft, "22")) : withAlpha(p.color, "22"),
+                    color: over ? (p.id === "ahorro" ? p.color : COLORS.gasto) : (isDark ? p.color : p.darkColor),
                   }}
                 >
                   {badgeLabel}
@@ -205,9 +206,9 @@ export default function PillarCardsGrid({
                 : (isDark ? "#1E1E2E" : "#FFFFFF"),
               border: `1.5px solid ${
                 saldo < 0
-                  ? "#EF444488"  // Rojo si saldo es negativo
+                  ? withAlpha(COLORS.gasto, "88")  // Rojo si saldo es negativo
                   : activeId === "saldo"
-                  ? "#64748B"  // 🆕 Color gris/plata cuando está seleccionado
+                  ? COLORS.neutral  // 🆕 Color gris/plata cuando está seleccionado
                   : t.border  // Gris normal cuando no está seleccionado
               }`,
               borderRadius: 11,
@@ -240,15 +241,15 @@ export default function PillarCardsGrid({
                   fontWeight: 700,
                   padding: "2px 4px",
                   borderRadius: 6,
-                  background: saldo < 0 ? "#EF444422" : SALDO_COLOR + "33",
-                  color: saldo < 0 ? "#EF4444" : "#64748B",
+                  background: saldo < 0 ? withAlpha(COLORS.gasto, "22") : withAlpha(SALDO_COLOR, "33"),
+                  color: saldo < 0 ? COLORS.gasto : COLORS.neutral,
                   flexShrink: 0,
                 }}
               >
                 {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
               </span>
             </div>
-            <div style={{ fontSize: 12, color: saldo < 0 ? "#EF4444" : t.sub, marginBottom: 0 }}>
+            <div style={{ fontSize: 12, color: saldo < 0 ? COLORS.gasto : t.sub, marginBottom: 0 }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
           </div>

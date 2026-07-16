@@ -1,4 +1,5 @@
 import ProgressBar from "./ProgressBar";
+import { getOverBudgetColor } from "../services/colorService";
 
 /**
  * CategoryProgressBar.jsx
@@ -62,11 +63,12 @@ export default function CategoryProgressBar({
   // Si es Ahorro: verde si se pasa, gris si no
   // Si no es Ahorro: rojo si se pasa, gris si no
   const isAhorrosPillar = pillarId === "ahorro";
-  const getPercentageColor = () => {
-    if (!showDashedBorder) return textColor; // Gris si no mostrar borde (< 50%)
-    if (percentage <= 100) return textColor; // Gris si está dentro del presupuesto
-    return isAhorrosPillar ? "#22C55E" : "#FCA5A5"; // Verde (Ahorros) o Rojo (otros)
-  };
+  const getPercentageColor = () =>
+    getOverBudgetColor({
+      isOver: showDashedBorder && percentage > 100,
+      isAhorros: isAhorrosPillar,
+      fallback: textColor,
+    });
 
   // 🆕 Calcular porcentajes relativos a maxSpent (para proporcionalidad)
   const spentPercentageOfMax = (spent / maxSpent) * 100;
