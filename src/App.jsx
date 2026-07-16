@@ -9,6 +9,7 @@ import { useCategories } from "./hooks/useCategories";
 import { useCategoryEditing } from "./hooks/useCategoryEditing";
 import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { useDashboardFilters } from "./hooks/useDashboardFilters";
+import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
@@ -432,20 +433,23 @@ function Dashboard() {
     isMovementOpen, setIsMovementOpen,
     movementOpenedFrom, setMovementOpenedFrom,
   } = useDashboardFilters();
-  const [showPillarBars, setShowPillarBars] = useState(false);
+  const {
+    screen, setScreen,
+    selectedPillarDetail, setSelectedPillarDetail,
+    selectedPillarForMovements, setSelectedPillarForMovements,
+    showPillarBars, setShowPillarBars,
+    showUpdateBalance, setShowUpdateBalance,
+    showPeriodPicker, setShowPeriodPicker,
+    showIncomes, setShowIncomes,
+  } = useDashboardNavigation();
 
   // 🆕 Memoizar función de toggle para el donut
   const handleSelectPillar = useCallback((id) => {
     setActiveId(prevActiveId => prevActiveId === id ? null : id);
   }, []);
-  const [selectedPillarDetail, setSelectedPillarDetail] = useState(null);
-  const [showUpdateBalance, setShowUpdateBalance] = useState(false);
-  const [screen, setScreen] = useState("dashboard");
   // 🆕 Estado para trackear qué botón FAB está siendo presionado
   const [pressingFAB, setPressingFAB] = useState(null);
   // 🆕 Pilar seleccionado para la página de movimientos
-  const [selectedPillarForMovements, setSelectedPillarForMovements] = useState(null);
-  const [showPeriodPicker, setShowPeriodPicker] = useState(false);
   const [customConcepts, setCustomConcepts] = useState([]);
   const [transactions, setTransactions] = useState(DUMMY_TRANSACTIONS); // 🔄 DEV: Inicia con DUMMY siempre
 
@@ -467,7 +471,6 @@ function Dashboard() {
   });
   // 🆕 Estado para mostrar/ocultar sección de GASTADO/INGRESOS (controlado por toggle en Settings)
   // 🔄 DEV: Siempre inicia en true (se reinicia con refresh) - NO usar localStorage en DEV
-  const [showIncomes, setShowIncomes] = useState(false);
 
   // 🆕 Estados para editar categoría
   const {
