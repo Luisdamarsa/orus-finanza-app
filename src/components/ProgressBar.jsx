@@ -44,6 +44,8 @@ export default function ProgressBar({
 
   // 🆕 Determinar si la categoría está deshabilitada (sin gasto)
   const isDisabled = spent === 0;
+  // Solo se ve/comporta clickeable si recibe un onClickBar real
+  const clickable = !isDisabled && typeof onClickBar === "function";
 
   // 🆕 Calcular porcentaje del presupuesto (vs presupuesto)
   const budgetPercentage = hasBudget ? (spent / budget) * 100 : 0;
@@ -98,7 +100,7 @@ export default function ProgressBar({
     >
       {/* Barra de Progreso - Contenedor clickeable */}
       <div
-        onClick={isDisabled ? undefined : onClickBar}
+        onClick={clickable ? onClickBar : undefined}
         style={{
           width: "100%",
           height: 32,
@@ -110,16 +112,16 @@ export default function ProgressBar({
           top: 0,
           left: 0,
           overflow: "hidden",
-          cursor: isDisabled ? "not-allowed" : "pointer",
+          cursor: isDisabled ? "not-allowed" : (clickable ? "pointer" : "default"),
           transition: "all 0.2s",
           background: isDark ? "#000000" : "#1A1830",
           opacity: isDisabled ? 0.5 : 1,
         }}
         onMouseEnter={(e) => {
-          if (!isDisabled) e.currentTarget.style.opacity = "0.8";
+          if (clickable) e.currentTarget.style.opacity = "0.8";
         }}
         onMouseLeave={(e) => {
-          if (!isDisabled) e.currentTarget.style.opacity = "1";
+          if (clickable) e.currentTarget.style.opacity = "1";
         }}
       >
         {/* Barra de relleno - Siempre mostrar */}
