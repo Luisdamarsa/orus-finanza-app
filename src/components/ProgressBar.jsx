@@ -74,7 +74,8 @@ export default function ProgressBar({
     if (percentage > 100) {
       barFillPercentage = spentPercentageOfMax; // Crece proporcional al gasto real
     } else {
-      barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax);
+      // Relleno proporcional al presupuesto: gasto/presupuesto respecto a la punteada
+      barFillPercentage = (budgetPercentage / 100) * Math.min(budgetPercentageOfMax, 100);
     }
 
     // Línea punteada: hasta el presupuesto relativo a maxSpent
