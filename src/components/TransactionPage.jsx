@@ -152,8 +152,9 @@ export default function TransactionPage({
   const amountColor = hasAmount ? (isIncome ? "#22C55E" : "#EF4444") : t.sub;
 
   // Validación
+  // Los ingresos no tienen categoría (concept) ni pilar → solo se exigen a gastos.
   const canSave = isEditing
-    ? desc.trim() && hasAmount && method && concept && pillarId && hasChanged
+    ? desc.trim() && hasAmount && method && hasChanged && (isIncome || (concept && pillarId))
     : desc.trim() && hasAmount;
 
   /**
