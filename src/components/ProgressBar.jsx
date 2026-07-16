@@ -65,7 +65,7 @@ export default function ProgressBar({
   let barFillPercentage = 0;
   let budgetLinePercentage = 0; // Hasta dónde llega la línea punteada
 
-  if (hasBudget && isOverHalfBudget) {
+  if (hasBudget && (alwaysShowDashedBorder || isOverHalfBudget)) {
     // Modo presupuesto: mostrar progreso vs presupuesto (para el indicador)
     percentage = budgetPercentage; // Puede ser > 100%
 
