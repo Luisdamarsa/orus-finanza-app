@@ -7,6 +7,7 @@ import { PopupProvider } from "./services/PopupService";
 // 🆕 Importar hooks
 import { useCategories } from "./hooks/useCategories";
 import { addHistoryEntry } from "./services/attributeHistoryService";
+import { filterTransactions } from "./services/transactionFilterService";
 import { useBudgets } from "./hooks/useBudgets";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
 
@@ -137,26 +138,6 @@ function initializeCategoriesFromAllCats(allCats) {
 }
 
 // 🆕 Función auxiliar para filtrar transacciones en Dashboard
-function getFilteredTransactionsForDashboard(transactions, selectedPeriod, filteredPillar, filterType) {
-  return transactions.filter(tx => {
-    const matchesPeriod = !selectedPeriod || (() => {
-      const [txYear, txMonth] = tx.date.split("-").map(Number);
-      // ✅ Si month es null, mostrar todo el año
-      if (selectedPeriod.month === null) {
-        return txYear === selectedPeriod.year;
-      }
-      return txYear === selectedPeriod.year && txMonth === selectedPeriod.month;
-    })();
-    const matchesPillar = !filteredPillar || tx.pillar === filteredPillar;
-    const isIngreso = tx.amount > 0 || tx.pillar === "ingreso";
-    let matchesType = true;
-    if (filterType === "gastado") matchesType = !isIngreso;
-    else if (filterType === "ingresos") matchesType = isIngreso;
-
-    return matchesPeriod && matchesPillar && matchesType;
-  });
-}
-
 function Movimientos({ isDark, transactions, filteredPillar, setFilteredPillar, stickyTop, selectedPeriod, onOpen, isOpen, filterType, setFilterType, movementOpenedFrom, setMovementOpenedFrom, setFilterTypeExternal }) {
   // 🆕 Estado para trackear si el botón está siendo presionado
   const [pressingMovimientos, setPressingMovimientos] = useState(false);
@@ -177,24 +158,7 @@ function Movimientos({ isDark, transactions, filteredPillar, setFilteredPillar, 
   const t = isDark ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" } : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
 
   // Filtra por período, pillar y tipo (gastado/ingresos)
-  const displayTxns = transactions.filter(tx => {
-    const matchesPeriod = !selectedPeriod || (() => {
-      const [txYear, txMonth] = tx.date.split("-").map(Number);
-      // ✅ Si month es null, mostrar todo el año
-      if (selectedPeriod.month === null) {
-        return txYear === selectedPeriod.year;
-      }
-      return txYear === selectedPeriod.year && txMonth === selectedPeriod.month;
-    })();
-    const matchesPillar = !filteredPillar || tx.pillar === filteredPillar;
-    // 🆕 Filtro por tipo: gastado vs ingresos
-    const isIngreso = tx.amount > 0 || tx.pillar === "ingreso";
-    let matchesType = true;
-    if (filterType === "gastado") matchesType = !isIngreso;
-    else if (filterType === "ingresos") matchesType = isIngreso;
-
-    return matchesPeriod && matchesPillar && matchesType;
-  });
+  const displayTxns = filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType });
 
   return (
     <div style={{ marginTop: 0 }}>
@@ -1330,7 +1294,7 @@ function Dashboard() {
               <style>{`::-webkit-scrollbar { display: none; }`}</style>
               <TransactionsListService
                 isDark={isDark}
-                transactions={getFilteredTransactionsForDashboard(transactions, selectedPeriod, filteredPillar, filterType)}
+                transactions={filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType })}
                 onEditTransaction={(tx) => {
                   setSelectedTransactionForEdit(tx);
                   setEditingTransactionId(tx.id);
