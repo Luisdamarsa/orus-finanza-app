@@ -13,7 +13,6 @@ import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
 import { addHistoryEntry } from "./services/attributeHistoryService";
 import { filterTransactions } from "./services/transactionFilterService";
-import { useBudgets } from "./hooks/useBudgets";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
 
 // Imports desde los nuevos módulos organizados
@@ -424,7 +423,6 @@ function Dashboard() {
   // 🆕 Rastrear cómo se abrió Estado 2 (por cuál "puerta")
   // 🆕 Hooks independientes
   const { customBudgets, setCustomBudgets } = usePillarBudgets();
-  const { categoryBudgets, setCategoryBudgets, updateWithNewCategories } = useBudgets();
 
   // 🆕 Estados de loading para diferentes secciones
   const { isLoading, startLoading, stopLoading } = useMultipleLoading({
@@ -996,7 +994,6 @@ function Dashboard() {
             transactions={transactions}
             selectedPeriod={selectedPeriod}
             categories={categories}
-            categoryBudgets={categoryBudgets}
             onEditTransaction={(tx) => {
               startTransactionEditing(tx);
             }}

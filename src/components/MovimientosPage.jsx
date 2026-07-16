@@ -24,7 +24,6 @@ export default function MovimientosPage({
   transactions,
   selectedPeriod,
   categories = {},
-  categoryBudgets = {},
   onEditTransaction, // 🆕 Callback para editar transacción
 }) {
   // 🆕 Hooks para animación de press en botones
@@ -307,7 +306,7 @@ export default function MovimientosPage({
                     : null;
                   const categoryBudget = category
                     ? (budgetQueryDate ? getAttributeAtDate(category, "budget", budgetQueryDate) : category.budget) || null
-                    : (categoryBudgets[categoryId] || null);
+                    : null;
 
                   return (
                     <CategoryProgressBar
