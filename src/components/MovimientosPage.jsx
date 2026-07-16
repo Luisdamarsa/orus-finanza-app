@@ -118,9 +118,24 @@ export default function MovimientosPage({
   const [movimientosHeight, setMovimientosHeight] = useState(0); // 0 inicialmente
   const movimientosRef = useRef(null);
   const scrollContainerRef = useRef(null);
+  // 🆕 Altura dinámica del header del pilar (evita el gap con offset hardcodeado)
+  const titleSectionRef = useRef(null);
+  const [titleSectionHeight, setTitleSectionHeight] = useState(76);
 
-  // 🆕 Calcular top del contenedor scrolleable (constante: 104 header + 76 presupuesto = 180px)
-  const contentTop = 180;
+  // 🆕 Top del scroll = base fija (104) + altura REAL del header (medida dinámicamente)
+  const contentTop = 104 + titleSectionHeight;
+
+  // 🆕 Medir el header con ResizeObserver (se actualiza si cambia su contenido:
+  // con/sin presupuesto, filtros, etc.) → el scroll arranca justo debajo, sin gap.
+  useLayoutEffect(() => {
+    const el = titleSectionRef.current;
+    if (!el) return;
+    const update = () => setTitleSectionHeight(el.offsetHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // 🆕 Medir altura de MOVIMIENTOS
   useEffect(() => {
@@ -202,8 +217,9 @@ export default function MovimientosPage({
         </div>
       </div>
 
-      {/* Sección de Título - Barra del Pilar + Filtros (top: 104, height: 76px) */}
+      {/* Sección de Título - Barra del Pilar + Filtros (altura dinámica, medida) */}
       <div
+        ref={titleSectionRef}
         style={{
           position: "absolute",
           top: 104,
