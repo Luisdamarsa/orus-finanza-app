@@ -396,7 +396,7 @@ export default function ProfilePage({
                 disabled
                 style={{
                   width: "100%",
-                  padding: "6px 34px 6px 14px",
+                  padding: "6px 14px 6px 34px",
                   borderRadius: 8,
                   border: `1px solid ${t.border}`,
                   background: t.disabledBg,
@@ -408,12 +408,12 @@ export default function ProfilePage({
                 }}
               />
               {user.authProvider === "google" && (
-                <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
                   <GoogleIcon size={16} />
                 </span>
               )}
               {user.authProvider === "apple" && (
-                <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
+                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
                   <AppleIcon size={16} color={isDark ? "#F0EEFF" : "#1A1830"} />
                 </span>
               )}
