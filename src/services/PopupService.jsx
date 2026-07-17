@@ -39,8 +39,13 @@ export function PopupProvider({ children }) {
     showPopup(`${resourceName} eliminada exitosamente`, 'delete');
   };
 
+  // 🆕 Popup de ERROR (rojo) para acciones que fallan
+  const showErrorPopup = (message) => {
+    showPopup(message, 'error');
+  };
+
   return (
-    <PopupContext.Provider value={{ popup, showCreatePopup, showEditPopup, showDeletePopup }}>
+    <PopupContext.Provider value={{ popup, showCreatePopup, showEditPopup, showDeletePopup, showErrorPopup }}>
       {/* 🆕 Agregar animaciones CSS */}
       <style>{`@keyframes slideInDown { from { transform:translateY(-100%);opacity:0 } to { transform:translateY(0);opacity:1 } }`}</style>
 
@@ -63,10 +68,12 @@ export const usePopup = () => {
 
 // 🆕 Componente que renderiza el popup
 function PopupDisplay({ popup }) {
-  const isDelete = popup.type === 'delete';
-  const bgColor = isDelete ? '#EF444433' : '#22C55E33';
-  const borderColor = isDelete ? '#EF444466' : '#22C55E66';
-  const textColor = isDelete ? '#DC2626' : '#16A34A';
+  const isError = popup.type === 'error';
+  const isRed = isError || popup.type === 'delete';
+  const bgColor = isRed ? '#EF444433' : '#22C55E33';
+  const borderColor = isRed ? '#EF444466' : '#22C55E66';
+  const textColor = isRed ? '#DC2626' : '#16A34A';
+  const icon = isError ? '⚠️' : '✓';
 
   return (
     <div
@@ -85,7 +92,7 @@ function PopupDisplay({ popup }) {
         animation: "slideInDown 0.3s ease",
         zIndex: 999,
       }}>
-      <span style={{ fontSize: 16 }}>✓</span>
+      <span style={{ fontSize: 16 }}>{icon}</span>
       <span
         style={{
           fontSize: 13,

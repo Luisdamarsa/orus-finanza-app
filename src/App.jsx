@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Component } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // 🆕 Importar PopupProvider
 import { PopupProvider } from "./services/PopupService";
@@ -40,67 +40,7 @@ import CatBar from "./components/CatBar";
 
 // 🆕 Importar userStorage para datos del usuario
 
-class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("Error caught:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{
-          width: "100vw", height: "100vh",
-          background: "#0D0D1A",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          padding: 20
-        }}>
-          <div style={{
-            maxWidth: "400px", textAlign: "center"
-          }}>
-            {/* Símbolo de cuidado */}
-            <div style={{ fontSize: 100, marginBottom: 24, lineHeight: 1 }}>⚠️</div>
-
-            {/* Título */}
-            <div style={{ fontSize: 26, fontWeight: 800, color: "#F0EEFF", marginBottom: 8 }}>
-              Oops! Algo salió mal
-            </div>
-
-            {/* Mensaje de soporte */}
-            <div style={{ fontSize: 14, color: "#7B7A99", marginBottom: 32, lineHeight: 1.8 }}>
-              Estamos trabajando para mejorar
-            </div>
-
-            {/* Botón CTA */}
-            <button onClick={() => window.location.reload()} style={{
-              width: "100%", padding: "14px 0", borderRadius: 14,
-              border: "none", background: "linear-gradient(135deg, #9B6DFF, #6366F1)",
-              color: "#fff", fontSize: 15, fontWeight: 700,
-              cursor: "pointer", transition: "all 0.3s",
-              boxShadow: "0 8px 24px rgba(155, 109, 255, 0.3)"
-            }}
-            onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-            onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-            >
-              Recargar la app →
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 
 
