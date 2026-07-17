@@ -590,7 +590,13 @@ export default function MovimientosPage({
 
         {/* Grupos de transacciones por fecha */}
         {pillarTxns.length > 0 ? (
+          <ErrorBoundary resetKey={selectedPeriod} fallback={
+            <div style={{ padding: "24px 0", textAlign: "center", color: t.sub, fontSize: 13 }}>
+              No se pudieron cargar los movimientos
+            </div>
+          }>
           <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} />
+          </ErrorBoundary>
         ) : (
           <div
             style={{
