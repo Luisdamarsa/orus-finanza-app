@@ -13,7 +13,7 @@
 |---|------|------|-----|
 | 1.1 | ✅ | ~~Nombre de categoría en periodos anteriores al editar~~ — **analizado; diferido a fase BD** (ver Decisión 1.1) | 🟡 |
 | 1.2 | ✅ | ~~Página de Movimientos cuando el periodo es anual~~ — **resuelto junto con 1.1** (nombre = actual/Opción 1; sin presupuesto en agregados) | 🟡 |
-| 1.3 | 🐛 | Si una **sesión no carga** → colapsarla y ocultarla (no dejar bloque vacío/roto) | 🟢 |
+| 1.3 | ✅ | ~~Sesión que no carga → colapsar y ocultar~~ — **hecho** (boundaries por sección que ocultan + Oops a nivel página + toast rojo en acciones) | 🟢 |
 
 > **Decisión 1.1 (17 jul 2026) — diferido a fase BD.**
 > Hoy el nombre en el desglose usa un `queryDate` fijo al día 15, lo que hace que el mes del cambio dependa arbitrariamente de si editaste antes/después del 15.
