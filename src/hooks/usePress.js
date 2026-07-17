@@ -31,7 +31,6 @@ export function usePress() {
     const {
       scale = 0.98,
       opacity = 0.7,
-      darkColor = "rgba(0, 0, 0, 0.3)",
     } = options;
 
     return pressing

@@ -69,7 +69,6 @@ export const shouldLoadBalance = (savedBalance, now = new Date()) => {
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
 
-  const isCurrentMonth = savedBalance.month === currentMonth && savedBalance.year === currentYear;
   const isPastMonth = savedBalance.year < currentYear ||
     (savedBalance.year === currentYear && savedBalance.month < currentMonth);
 

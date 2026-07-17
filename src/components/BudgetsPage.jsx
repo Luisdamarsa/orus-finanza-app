@@ -7,7 +7,6 @@ import { useBudgets } from "../hooks/useBudgets";
 import PageLayout from "./PageLayout";
 import { CheckmarkIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
-import { getAttributeAtDate } from "../services/attributeHistoryService";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
 
@@ -30,7 +29,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   // 🆕 Estado para pilares expandidos
   const [expandedPillars, setExpandedPillars] = useState({});
   // 🆕 Estado de loading para skeleton
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   // 🆕 Usar ref para guardar valores iniciales solo una vez
   const initialCategoryBudgetsRef = useRef(null);
   // 🆕 Ref para medir altura de descripción dinámicamente
@@ -193,11 +192,6 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   };
 
   // 🆕 Parsear número desde formato colombiano
-  const parseNumber = (str) => {
-    // Solo números y comas
-    return str.replace(/[^\d,]/g, "");
-  };
-
   return (
     <>
     <PageLayout
@@ -329,7 +323,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
                       // 🆕 También guardar en editedBudgets para detectar cambios
                       handleBudgetChange(pillar.id, validatedValue);
                     }}
-                    onBlur={(e) => {
+                    onBlur={() => {
                       // Al salir del input, guardar el valor procesado
                       const rawValue = editingInputs[`pillar_${pillar.id}`];
                       if (rawValue !== undefined) {
@@ -417,7 +411,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
                               // 🆕 También guardar en categoryBudgets para detectar cambios
                               handleCategoryBudgetChange(categoryId, validatedValue);
                             }}
-                            onBlur={(e) => {
+                            onBlur={() => {
                               // Al salir del input, guardar el valor procesado
                               const rawValue = editingInputs[`cat_${categoryId}`];
                               if (rawValue !== undefined) {

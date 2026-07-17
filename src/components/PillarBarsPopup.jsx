@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { usePress } from "../hooks/usePress";
 import { fmt } from "../utils/formatters";
 import CatBar from "./CatBar";
@@ -29,7 +28,6 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  */
 export default function PillarBarsPopup({
   pillar,
-  categories = {},
   onClose,
   onViewMovements,
   isDark,

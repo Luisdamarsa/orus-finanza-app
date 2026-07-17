@@ -57,7 +57,7 @@ export default function TransactionPage({
   const [pressingConcept, setPressingConcept] = useState(null);
 
   // 🆕 Estado de loading para skeleton
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   // Estado del formulario
   const [desc, setDesc] = useState("");

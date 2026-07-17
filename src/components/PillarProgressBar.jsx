@@ -21,13 +21,11 @@
 import { COLORS, withAlpha, getOverBudgetColor } from "../services/colorService";
 
 export default function PillarProgressBar({
-  pillarId,
   pillarName,
   spent,
   budget = null,
   percentage = 0,
   pillarColor = "#22C55E",
-  pillarDarkColor = "#16A34A",
   isDark = true,
   isSelected = false,
 }) {

@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect, useLayoutEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
 import { groupByDate, fmt } from "../utils/formatters";
 import { METHOD_META, ALL_CATS } from "../constants";
 import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
-import { getCategoryById, getCategoryName } from "../utils/categoryUtils";
+import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
-import { COLORS, withAlpha, getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
+import { getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
 
 /**
  * Página de Movimientos de un pilar específico
@@ -23,7 +23,6 @@ export default function MovimientosPage({
   pilar,
   transactions,
   selectedPeriod,
-  categories = {},
   onEditTransaction, // 🆕 Callback para editar transacción
 }) {
   // 🆕 Hooks para animación de press en botones
@@ -94,10 +93,8 @@ export default function MovimientosPage({
     getOverBudgetColorSvc({ isOver: isOverBudget, isAhorros: isAhorrosPillar, fallback: t.sub });
 
   // 🆕 Obtener el color oscuro del pilar CON OPACIDAD (15%) para la barra de categorías
-  const pillarSoftColor = withAlpha(pilar.darkColor || COLORS.ingreso, "26");
 
   // 🆕 Obtener color suave de Deuda para cuando se pasa presupuesto
-  const debtSoftColor = COLORS.overSoft;
 
   // 🆕 Estado para filtros de categorías seleccionadas (ahora con IDs)
   const [selectedCategories, setSelectedCategories] = useState([]);

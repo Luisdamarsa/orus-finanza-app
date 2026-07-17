@@ -1,4 +1,3 @@
-import { useRef } from "react";
 
 /**
  * Hook para manejar el efecto de presión en botones
@@ -9,7 +8,6 @@ import { useRef } from "react";
  * @returns {Function} Función para usar en onClick
  */
 export function useButtonPress(callback, duration = 300) {
-  const buttonRef = useRef(null);
 
   const handlePress = (e) => {
     const button = e.currentTarget;

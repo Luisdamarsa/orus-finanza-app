@@ -12,7 +12,6 @@ import LoadingSpinner from "./LoadingSpinner";
  */
 export function DonutSkeleton({ isDark }) {
   const bgColor = isDark ? "#1E1E2E" : "#F0EFF8";
-  const shimmerColor = isDark ? "#252535" : "#E5E3F5";
 
   return (
     <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4 }}>

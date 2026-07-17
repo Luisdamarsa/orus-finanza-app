@@ -57,15 +57,6 @@ export default function ProfilePage({
   const pressLogout = usePress();
 
   // Función para generar User ID único (10 caracteres alfanuméricos)
-  const generateUserId = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let userId = '';
-    for (let i = 0; i < 10; i++) {
-      userId += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return userId;
-  };
-
   // Cargar datos del usuario al montar
   useEffect(() => {
     const userData = userStorage.getUser();

@@ -41,7 +41,7 @@ export default function CategoriesPage({
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
 
   // 🆕 Estado de loading para skeleton
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   // 🆕 Medir altura dinámicamente de la descripción
   useEffect(() => {

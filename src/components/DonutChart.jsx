@@ -46,19 +46,17 @@ export default function DonutChart({
   activeId,
   onSelect,
   isDark,
-  gastos,
   total,
   totalSpent,
   pillarSpends,
   hasSaldoAsignado,
   saldoValue,
   selectedPeriod,
-  SALDO_COLOR,
 }) {
   const [hovered, setHovered] = useState(null);
 
   // 🆕 Estado de animación del donut
-  const [animatingSegments, setAnimatingSegments] = useState({});
+  const [, setAnimatingSegments] = useState({});
   const previousPeriodRef = useRef(null);
 
   // 🆕 Orden de animación (mismo que en la barra del Estado 2)

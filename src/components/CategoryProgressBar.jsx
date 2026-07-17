@@ -22,7 +22,6 @@ import { getOverBudgetColor } from "../services/colorService";
  *   isSelected - Si está seleccionada
  */
 export default function CategoryProgressBar({
-  categoryId,
   categoryName,
   spent,
   budget = null,
@@ -35,7 +34,6 @@ export default function CategoryProgressBar({
   isSelected = false,
 }) {
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
-  const borderWidth = 2; // px
 
   // 🆕 Factores de compensación para alineación visual de la barra azul
   // Primera categoría (100%): resta borderWidth * 5.5 = 11px
@@ -71,33 +69,15 @@ export default function CategoryProgressBar({
     });
 
   // 🆕 Calcular porcentajes relativos a maxSpent (para proporcionalidad)
-  const spentPercentageOfMax = (spent / maxSpent) * 100;
-  const budgetPercentageOfMax = hasBudget ? (budget / maxSpent) * 100 : 0;
-
   // 🆕 Determinar indicador de porcentaje a mostrar
   let percentage = 0;
-  let barFillPercentage = 0;
-  let budgetLinePercentage = 0;  // Hasta dónde llega la línea punteada
 
   if (hasBudget && isOverHalfBudget) {
     // Modo presupuesto: mostrar progreso vs presupuesto (para el indicador)
     percentage = budgetPercentage;  // Puede ser > 100%
-
-    // 🆕 Si sobrepasó presupuesto: barra crece libremente
-    // Si está dentro del presupuesto: barra limitada al presupuesto
-    if (percentage > 100) {
-      barFillPercentage = spentPercentageOfMax; // Crece proporcional al gasto real
-    } else {
-      barFillPercentage = Math.min(spentPercentageOfMax, budgetPercentageOfMax);
-    }
-
-    // Línea punteada: hasta el presupuesto relativo a maxSpent
-    budgetLinePercentage = budgetPercentageOfMax;
   } else {
     // Modo sin presupuesto: mostrar progreso relativo a maxSpent
     percentage = (spent / maxSpent) * 100;
-    barFillPercentage = percentage;
-    budgetLinePercentage = 0;  // Sin línea punteada
   }
 
   return (

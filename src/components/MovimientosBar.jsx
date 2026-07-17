@@ -11,7 +11,7 @@ import { PILLAR_MAP } from "../constants";
  * Refactor del Dashboard — HU-5. Extraído tal cual desde App.jsx (idéntico).
  * Recibe props (no usa contexto) — igual que antes.
  */
-export default function Movimientos({ isDark, transactions, filteredPillar, setFilteredPillar, stickyTop, selectedPeriod, onOpen, isOpen, filterType, setFilterType, movementOpenedFrom, setMovementOpenedFrom, setFilterTypeExternal }) {
+export default function Movimientos({ isDark, transactions, filteredPillar, setFilteredPillar, selectedPeriod, onOpen, isOpen, filterType, setFilterType, setMovementOpenedFrom, setFilterTypeExternal }) {
   // 🆕 Estado para trackear si el botón está siendo presionado
   const [pressingMovimientos, setPressingMovimientos] = useState(false);
 

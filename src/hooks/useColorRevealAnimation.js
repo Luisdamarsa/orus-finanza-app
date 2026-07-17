@@ -16,7 +16,7 @@ import { useEffect } from "react";
  *   getSegmentAnimation: (index) => objeto con estilo de animación
  * }
  */
-export function useColorRevealAnimation(saldoColor = "#94A3B8") {
+export function useColorRevealAnimation() {
   // ✅ Inyectar keyframes UNA SOLA VEZ
   useEffect(() => {
     if (!document.getElementById("colorbar-reveal-animation-keyframes")) {

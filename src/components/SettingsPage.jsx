@@ -10,7 +10,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
   const [pressingButton, setPressingButton] = useState(null);
   // 🆕 Estado de loading para skeleton
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
@@ -43,7 +43,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
         <>
           {/* Menu Items + Toggles */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
-            {allItems.map((item, idx) => {
+            {allItems.map((item) => {
               // Si es un toggle, renderizar con switch clickeable
               if (item.type === "toggle") {
                 const isPressingToggleRow = pressingButton === "toggle-row-" + item.id;

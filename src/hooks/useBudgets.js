@@ -46,7 +46,7 @@ export function useBudgets() {
   }, []);
 
   // Agregar múltiples categorías (ej: cuando vienen del hook useCategories)
-  const updateWithNewCategories = useCallback((categoriesMap) => {
+  const updateWithNewCategories = useCallback(() => {
     setCategoryBudgets(prev => {
       const updated = { ...prev };
 

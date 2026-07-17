@@ -17,7 +17,7 @@ import { useEffect } from "react";
  *   containerStyle       // Estilos para el contenedor
  * }
  */
-export function usePillarProgressAnimation({ shouldAnimate = true, isDark = false }) {
+export function usePillarProgressAnimation() {
   const containerStyle = {
     position: "relative",
     width: "100%",

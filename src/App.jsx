@@ -13,7 +13,6 @@ import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
-import { filterTransactions } from "./services/transactionFilterService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
 
 // Imports desde los nuevos módulos organizados
@@ -22,8 +21,8 @@ import {
   ALL_CATS, MANUAL_METHODS, TRANSACTIONS, DUMMY_TRANSACTIONS
 } from "./constants";
 
-import { fmt, fmtDate, getPeriodLabel, groupByDate } from "./utils/formatters";
-import { calculateDashboard, getPillarPercentage, getTagPercentage } from "./utils/dashboardCalculations";
+import { fmt, groupByDate } from "./utils/formatters";
+import { calculateDashboard } from "./utils/dashboardCalculations";
 import { getCategoryName } from "./utils/categoryUtils";
 
 // 🆕 Importar páginas de nuevas secciones
@@ -40,7 +39,6 @@ import DashboardScreen from "./components/DashboardScreen";
 import CatBar from "./components/CatBar";
 
 // 🆕 Importar userStorage para datos del usuario
-import { userStorage } from "./utils/userStorage";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -111,18 +109,6 @@ class ErrorBoundary extends Component {
  * @param {array} allCats - Array de {name, pillar}
  * @returns {object} {pillarId: [cat1, cat2, ...]}
  */
-function initializeCategoriesFromAllCats(allCats) {
-  const result = {};
-  PILLARS.forEach(p => {
-    result[p.id] = [];
-  });
-  allCats.forEach(cat => {
-    if (result[cat.pillar]) {
-      result[cat.pillar].push(cat.name);
-    }
-  });
-  return result;
-}
 
 
 // 🆕 NewTransactionPage ha sido movido a componente separado: AddTransactionPage.jsx
@@ -425,13 +411,12 @@ function Dashboard() {
   };
 
   // 🆕 Refs para medir alturas dinámicamente
-  const expandedStateRef = useRef(null);
   const donutRef = useRef(null);
   const donutContainerRef = useRef(null);
   const pillarsGridRef = useRef(null);
   const colorBarRef = useRef(null);
   const pillarButtonsRef = useRef(null);
-  const [measuredHeights, setMeasuredHeights] = useState({
+  const [, setMeasuredHeights] = useState({
     expanded: 0,
     donut: 0,
     pillarsGrid: 0,
@@ -561,13 +546,9 @@ function Dashboard() {
     });
   };
 
-  const sy = scrollY || 0;
-  const clamp01 = v => Math.min(1, Math.max(0, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
 
   // Colapso instantáneo basado en click (no scroll)
   const p1 = isMovementOpen ? 1 : 0;
-  const p2 = isMovementOpen ? 1 : 0;
 
   // 🆕 Medir dinámicamente el bottom del Área 1 (Sticky Zone)
   const stickyZoneRef = useRef(null);
@@ -592,18 +573,6 @@ function Dashboard() {
   // ============================================================
   const dashboardMetrics = calculateDashboard(filteredByPeriod, PILLARS, SALDO_COLOR, isDark, showIncomes);
 
-  const {
-    totalSpent,
-    incomingTotal,
-    pillarSpends,
-    saldo,
-    saldoForDonut,
-    donutTotal,
-    hasSaldo,
-    chipPcts,
-    saldoPctFinal,
-    segments,
-  } = dashboardMetrics;
 
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }

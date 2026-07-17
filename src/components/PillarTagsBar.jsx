@@ -20,10 +20,7 @@ export default function PillarTagsBar({
   SALDO_COLOR,
   filteredPillar,
   setFilteredPillar,
-  filterType,
   setFilterType,
-  isDark,
-  t,
 }) {
   // 🆕 Estado para trackear qué tag está siendo presionado
   const [pressingId, setPressingId] = useState(null);

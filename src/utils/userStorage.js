@@ -44,7 +44,7 @@ function detectRegion() {
   try {
     const r = new Intl.Locale(navigator.language).region;
     if (r) return r.toUpperCase(); // ej "es-CO" -> "CO"
-  } catch (e) { /* noop */ }
+  } catch { /* noop */ }
   const part = (navigator.language || "").split("-")[1];
   if (part && part.length === 2) return part.toUpperCase();
   try {
@@ -57,7 +57,7 @@ function detectRegion() {
       "Europe/Paris": "FR", "Europe/Berlin": "DE",
     };
     if (tzToRegion[tz]) return tzToRegion[tz];
-  } catch (e) { /* noop */ }
+  } catch { /* noop */ }
   return null;
 }
 

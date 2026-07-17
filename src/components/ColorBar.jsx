@@ -91,7 +91,7 @@ export default function ColorBar({
       overflow: "hidden",
       gap: 2,
     }}>
-      {segments.map((seg, index) => {
+      {segments.map((seg) => {
         const isAnimated = animatingSegments.has(seg.id);
         const displayColor = isAnimated ? seg.color : SALDO_GRAY;
 

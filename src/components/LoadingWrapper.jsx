@@ -13,7 +13,7 @@
  *     <DonutChartComponent {...props} />
  *   </LoadingWrapper>
  */
-export default function LoadingWrapper({ isLoading, skeleton, children, isDark }) {
+export default function LoadingWrapper({ isLoading, skeleton, children }) {
   if (isLoading) {
     return (
       <div style={{ position: "relative" }}>

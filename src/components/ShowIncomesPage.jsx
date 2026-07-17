@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import { usePress } from "../hooks/usePress";
 import PageHeader from "./PageHeader";
 import { PAGE_HEADERS } from "../data/pageHeaders";
