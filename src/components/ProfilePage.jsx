@@ -118,16 +118,22 @@ export default function ProfilePage({
   const handleSave = () => {
     if (!hasChanged) return; // No hacer nada si no hay cambios
 
-    userStorage.updateUser({
-      displayName,
-      currency,
-      language,
-    });
+    try {
+      userStorage.updateUser({
+        displayName,
+        currency,
+        language,
+      });
 
-    setHasChanged(false);
+      setHasChanged(false);
 
-    // 🆕 Mostrar popup de éxito usando el servicio
-    popup.showEditPopup('Perfil');
+      // 🆕 Mostrar popup de éxito usando el servicio
+      popup.showEditPopup('Perfil');
+    } catch (err) {
+      console.error("Error al actualizar perfil:", err);
+      popup.showErrorPopup("No se pudo actualizar el perfil");
+      return;
+    }
 
     // Llamar a callback y regresa a Settings
     if (onSaveSuccess) {

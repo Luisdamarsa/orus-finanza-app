@@ -138,6 +138,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   };
 
   const handleSave = () => {
+    try {
     // 🆕 Llamar a funciones CRUD para mutar ALL_CATS y PILLARS directamente
 
     // 1. Guardar presupuestos de pilares
@@ -169,6 +170,10 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
     // Llamar al nuevo callback
     if (onSaveSuccess) {
       onSaveSuccess();
+    }
+    } catch (err) {
+      console.error("Error al actualizar presupuesto:", err);
+      popup.showErrorPopup("No se pudo actualizar el presupuesto");
     }
   };
 

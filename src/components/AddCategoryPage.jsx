@@ -121,22 +121,32 @@ export default function AddCategoryPage({
     const finalName = isEditing ? description.trim() : getDeduplicatedName(description);
     const pillarToSave = selectedPillar || "varios";
 
-    onSave(pillarToSave, finalName);
+    try {
+      onSave(pillarToSave, finalName);
 
-    // 🆕 Mostrar popup de éxito usando el servicio
-    if (isEditing) {
-      popup.showEditPopup('Categoría');
-    } else {
-      popup.showCreatePopup('Categoría');
+      // 🆕 Mostrar popup de éxito usando el servicio
+      if (isEditing) {
+        popup.showEditPopup('Categoría');
+      } else {
+        popup.showCreatePopup('Categoría');
+      }
+    } catch (err) {
+      console.error("Error al guardar categoría:", err);
+      popup.showErrorPopup(`No se pudo ${isEditing ? "actualizar" : "crear"} la categoría`);
     }
   };
 
   const handleDelete = () => {
     if (isEditing && onDelete) {
-      // Eliminar directamente sin confirmación
-      onDelete();
-      // 🆕 Mostrar popup de éxito usando el servicio
-      popup.showDeletePopup('Categoría');
+      try {
+        // Eliminar directamente sin confirmación
+        onDelete();
+        // 🆕 Mostrar popup de éxito usando el servicio
+        popup.showDeletePopup('Categoría');
+      } catch (err) {
+        console.error("Error al eliminar categoría:", err);
+        popup.showErrorPopup("No se pudo eliminar la categoría");
+      }
     }
   };
 
