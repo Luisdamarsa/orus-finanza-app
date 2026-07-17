@@ -196,6 +196,7 @@ export default function MovimientosPage({
       </div>
 
       {/* Sección de Título - Barra del Pilar + Filtros */}
+      {/* position+zIndex: el título pinta ENCIMA del scroll y su fondo opaco tapa el borde de recorte (marginBottom negativo = solape) */}
       <div
         style={{
           flexShrink: 0,
@@ -205,6 +206,9 @@ export default function MovimientosPage({
           display: "flex",
           flexDirection: "column",
           gap: 8,
+          position: "relative",
+          zIndex: 2,
+          marginBottom: -3,
         }}>
         {/* 🆕 Barra del pilar usando ProgressBar */}
         <div
@@ -256,7 +260,7 @@ export default function MovimientosPage({
         style={{
           flex: 1,
           minHeight: 0,
-          marginTop: -2, // solape con el título → sin costura subpixel a cualquier escala/densidad
+          marginTop: 0,
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
