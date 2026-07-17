@@ -5,6 +5,7 @@ import { METHOD_META, ALL_CATS } from "../constants";
 import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
+import ErrorBoundary from "./ErrorBoundary";
 import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 import { getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
@@ -214,6 +215,7 @@ export default function MovimientosPage({
             alignItems: "center",
             gap: 12,
           }}>
+          <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
           <ProgressBar
             spent={totalSpent}
             budget={budget}
@@ -226,6 +228,7 @@ export default function MovimientosPage({
             onClickBar={undefined}
             alwaysShowDashedBorder={true}
           />
+          </ErrorBoundary>
           <div
             style={{
               fontSize: 12,
@@ -300,6 +303,7 @@ export default function MovimientosPage({
                   }
 
                   return (
+                    <ErrorBoundary key={categoryId} fallback={null} resetKey={selectedPeriod}>
                     <CategoryProgressBar
                       key={categoryId}
                       categoryId={categoryId}
@@ -321,6 +325,7 @@ export default function MovimientosPage({
                       }}
                       isSelected={selectedCategories.includes(categoryId)}
                     />
+                    </ErrorBoundary>
                   );
                 });
               })()}
