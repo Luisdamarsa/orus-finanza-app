@@ -36,16 +36,10 @@ import MovimientosPage from "./components/MovimientosPage";
 import HeaderService from "./components/HeaderService";
 import ProfilePage from "./components/ProfilePage";
 import TransactionPage from "./components/TransactionPage";
-import PillarTagsBar from "./components/PillarTagsBar";
-import ColorBar from "./components/ColorBar";
-import LoadingWrapper from "./components/LoadingWrapper";
-import {
-  ColorBarSkeleton,
-  TagsBarSkeleton,
-} from "./components/LoadingSkeleton";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardOverlays from "./components/DashboardOverlays";
 import DashboardExpandedState from "./components/DashboardExpandedState";
+import DashboardCollapsedState from "./components/DashboardCollapsedState";
 import CatBar from "./components/CatBar";
 import TransactionsListService from "./components/TransactionsListService";
 
@@ -970,6 +964,7 @@ function Dashboard() {
   const dashboard = {
     isDark, t, monthHasData, getBudgetForMonth,
     donutRef, donutContainerRef, pillarsGridRef,
+    colorBarRef, pillarButtonsRef,
     scrollY, setScrollY,
     selectedPeriod, setSelectedPeriod, filterType, setFilterType,
     filteredPillar, setFilteredPillar, activeId, setActiveId,
@@ -1046,48 +1041,7 @@ function Dashboard() {
 
               {/* ESTADO 2: COLLAPSED (Barra + Tags) - Solo si NO es INGRESOS */}
               {isMovementOpen === true && filterType !== "ingresos" && (
-              <div style={{ overflow: "visible", marginBottom: 12 }}>
-                {/* Barra de colores */}
-                <div ref={colorBarRef} style={{ marginBottom: 9 }}>
-                  <LoadingWrapper
-                    isLoading={isLoading("colorBar")}
-                    skeleton={<ColorBarSkeleton isDark={isDark} />}
-                    isDark={isDark}
-                  >
-                    <ColorBar
-                      segments={segments}
-                      filteredPillar={filteredPillar}
-                      setFilteredPillar={setFilteredPillar}
-                      setFilterType={setFilterType}
-                      isActive={true}
-                      selectedPeriod={selectedPeriod}
-                    />
-                  </LoadingWrapper>
-                </div>
-
-                {/* Botones de pilares */}
-                <div ref={pillarButtonsRef}>
-                  <LoadingWrapper
-                    isLoading={isLoading("tagsBar")}
-                    skeleton={<TagsBarSkeleton isDark={isDark} />}
-                    isDark={isDark}
-                  >
-                    <PillarTagsBar
-                      PILLARS={PILLARS}
-                      chipPcts={chipPcts}
-                      saldoPctFinal={saldoPctFinal}
-                      hasSaldo={hasSaldo}
-                      SALDO_COLOR={SALDO_COLOR}
-                      filteredPillar={filteredPillar}
-                      setFilteredPillar={setFilteredPillar}
-                      filterType={filterType}
-                      setFilterType={setFilterType}
-                      isDark={isDark}
-                      t={t}
-                    />
-                  </LoadingWrapper>
-                </div>
-              </div>
+              <DashboardCollapsedState />
               )}
 
               {/* Movimientos - SIEMPRE visible */}
