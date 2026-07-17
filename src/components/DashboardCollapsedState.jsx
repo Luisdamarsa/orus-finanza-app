@@ -1,4 +1,5 @@
 import LoadingWrapper from "./LoadingWrapper";
+import ErrorBoundary from "./ErrorBoundary";
 import { ColorBarSkeleton, TagsBarSkeleton } from "./LoadingSkeleton";
 import ColorBar from "./ColorBar";
 import PillarTagsBar from "./PillarTagsBar";
@@ -23,7 +24,8 @@ export default function DashboardCollapsedState() {
     <div style={{ overflow: "visible", marginBottom: 12 }}>
       {/* Barra de colores */}
       <div ref={colorBarRef} style={{ marginBottom: 9 }}>
-        <LoadingWrapper
+        <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+<LoadingWrapper
           isLoading={isLoading("colorBar")}
           skeleton={<ColorBarSkeleton isDark={isDark} />}
           isDark={isDark}
@@ -37,11 +39,13 @@ export default function DashboardCollapsedState() {
             selectedPeriod={selectedPeriod}
           />
         </LoadingWrapper>
+</ErrorBoundary>
       </div>
 
       {/* Botones de pilares */}
       <div ref={pillarButtonsRef}>
-        <LoadingWrapper
+        <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+<LoadingWrapper
           isLoading={isLoading("tagsBar")}
           skeleton={<TagsBarSkeleton isDark={isDark} />}
           isDark={isDark}
@@ -60,6 +64,7 @@ export default function DashboardCollapsedState() {
             t={t}
           />
         </LoadingWrapper>
+</ErrorBoundary>
       </div>
     </div>
   );

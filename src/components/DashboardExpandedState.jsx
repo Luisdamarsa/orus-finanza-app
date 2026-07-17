@@ -1,4 +1,5 @@
 import LoadingWrapper from "./LoadingWrapper";
+import ErrorBoundary from "./ErrorBoundary";
 import { DonutSkeleton, CardsGridSkeleton } from "./LoadingSkeleton";
 import DonutTagsBar from "./DonutTagsBar";
 import DonutChartComponent from "./DonutChart";
@@ -30,17 +31,20 @@ export default function DashboardExpandedState() {
       <div ref={donutContainerRef}>
         {/* Donut */}
         <div ref={donutRef} style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4 }}>
-          <LoadingWrapper
+          <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+<LoadingWrapper
             isLoading={isLoading("donut")}
             skeleton={<DonutSkeleton isDark={isDark} />}
             isDark={isDark}
           >
             <DonutChartComponent segments={segments} cx={114} cy={114} outerR={90} innerR={54} activeId={activeId} onSelect={handleSelectPillar} isDark={isDark} gastos={totalSpent} total={totalSpent + saldoForDonut} totalSpent={totalSpent} pillarSpends={pillarSpends} hasSaldoAsignado={saldoForDonut > 0} saldoValue={saldoForDonut} selectedPeriod={selectedPeriod} SALDO_COLOR={SALDO_COLOR} />
           </LoadingWrapper>
+</ErrorBoundary>
         </div>
 
         {/* Botones/Tags del donut - Componente separado */}
-        <DonutTagsBar
+        <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+<DonutTagsBar
           segments={segments}
           activeId={activeId}
           setActiveId={setActiveId}
@@ -50,11 +54,13 @@ export default function DashboardExpandedState() {
           isDark={isDark}
           t={t}
         />
+</ErrorBoundary>
       </div>
 
       {/* 🆕 Ocultar barra de categorías cuando filterType es "ingresos" - con ref para medir altura */}
       <div ref={pillarsGridRef} style={{ display: filterType === "ingresos" ? "none" : "block", marginBottom: filterType === "ingresos" ? 0 : 12 }}>
-        <LoadingWrapper
+        <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+<LoadingWrapper
           isLoading={isLoading("cardsGrid")}
           skeleton={<CardsGridSkeleton isDark={isDark} />}
           isDark={isDark}
@@ -78,6 +84,7 @@ export default function DashboardExpandedState() {
             t={t}
           />
         </LoadingWrapper>
+</ErrorBoundary>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import HeaderService from "./HeaderService";
+import ErrorBoundary from "./ErrorBoundary";
 import Movimientos from "./MovimientosBar";
 import TransactionsListService from "./TransactionsListService";
 import DashboardExpandedState from "./DashboardExpandedState";
@@ -94,8 +95,9 @@ export default function DashboardScreen() {
 
           {/* Transacciones - position absolute si está abierto */}
           {isMovementOpen && (
-            <div style={{ position: "absolute", top: `calc(${stickyH}px - 2px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
+            <div style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
               <style>{`::-webkit-scrollbar { display: none; }`}</style>
+              <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
               <TransactionsListService
                 isDark={isDark}
                 transactions={filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType })}
@@ -103,6 +105,7 @@ export default function DashboardScreen() {
                   startTransactionEditing(tx);
                 }}
               />
+              </ErrorBoundary>
             </div>
           )}
         </div>
