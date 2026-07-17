@@ -1,5 +1,6 @@
 import HeaderService from "./HeaderService";
 import ErrorBoundary from "./ErrorBoundary";
+import { FailProbe } from "../utils/failSwitch";
 import Movimientos from "./MovimientosBar";
 import TransactionsListService from "./TransactionsListService";
 import DashboardExpandedState from "./DashboardExpandedState";
@@ -70,10 +71,13 @@ export default function DashboardScreen() {
                   <span style={{ fontSize: 13 }}>💰</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? "#C4C2E0" : "#6B7280" }}>Saldo actual</span>
                 </button>
+                <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+                <FailProbe section="period" />
                 <button onClick={() => setShowPeriodPicker(true)} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "4px 8px", borderRadius: 20, border: "none", cursor: "pointer", background: selectedPeriod ? "#9B6DFF22" : (isDark ? "#1E1E2E" : "#F0EFF8"), outline: `1.5px solid ${selectedPeriod ? "#9B6DFF88" : "transparent"}`, transition: "all 0.15s" }}>
                   <span style={{ fontSize: 13 }}>📅</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: selectedPeriod ? "#9B6DFF" : (isDark ? "#C4C2E0" : "#6B7280") }}>{getPeriodLabel(selectedPeriod)}</span>
                 </button>
+                </ErrorBoundary>
               </div>
 
               {/* ESTADO 1: EXPANDED (Donut + Tarjetas) */}

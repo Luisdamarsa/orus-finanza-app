@@ -1,5 +1,7 @@
 import { forwardRef } from "react";
 import { usePress } from "../hooks/usePress";
+import ErrorBoundary from "./ErrorBoundary";
+import { FailProbe } from "../utils/failSwitch";
 
 /**
  * HeaderService
@@ -54,6 +56,8 @@ const HeaderService = forwardRef(({
           <div style={{ fontSize: showIncomes ? 10 : 12, color: t.sub }}>Buenos días 👋</div>
         </div>
         {/* Botón Settings (Engranaje) */}
+        <ErrorBoundary fallback={null}>
+        <FailProbe section="settings" />
         <button
           onClick={() => setScreen("settings")}
           {...pressSettings.handlers}
@@ -70,6 +74,7 @@ const HeaderService = forwardRef(({
             <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
           </svg>
         </button>
+        </ErrorBoundary>
       </div>
 
       {/* Row 2: GASTADO/INGRESOS (solo si showIncomes = true) */}

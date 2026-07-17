@@ -5,7 +5,7 @@
  *   Ej:  ?fail=donut           → falla el donut
  *        ?fail=donut,colorbar  → fallan varias a la vez
  *
- * Secciones válidas: donut, donuttags, colorbar, tags, cards, txns, catbar
+ * Secciones válidas: donut, donuttags, colorbar, tags, cards, txns, catbar, fab, settings, period
  *
  * Es inofensivo en producción (solo lanza si tú pones el parámetro).
  * Quitar las llamadas failIf(...) y este archivo cuando termines de probar.
@@ -18,4 +18,15 @@ export function failIf(section) {
   if (fails.includes(section)) {
     throw new Error(`[TEST fail-switch] Fallo forzado en sección: ${section}`);
   }
+}
+
+/**
+ * FailProbe — componente auxiliar: lanza si su sección está activa.
+ * Colócalo como hijo de un ErrorBoundary junto al bloque que quieres poder
+ * "fallar" sin extraerlo a su propio componente:
+ *   <ErrorBoundary fallback={null}><FailProbe section="settings" />{boton}</ErrorBoundary>
+ */
+export function FailProbe({ section }) {
+  failIf(section);
+  return null;
 }
