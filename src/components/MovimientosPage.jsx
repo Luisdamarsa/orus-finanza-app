@@ -256,7 +256,7 @@ export default function MovimientosPage({
         style={{
           flex: 1,
           minHeight: 0,
-          marginTop: -1, // solape de 1px con el título → cero gap en cualquier navegador/zoom
+          marginTop: -2, // solape con el título → sin costura subpixel a cualquier escala/densidad
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
