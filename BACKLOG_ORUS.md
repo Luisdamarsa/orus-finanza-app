@@ -23,6 +23,20 @@
 > - **Año/"todo"** = Opción 1: un solo nombre (el actual) agrupa todo el `id`; las filas conservan el nombre histórico. Si la categoría se "vuelve otra cosa" → eso es **crear categoría nueva**, no un rename.
 > Motivo de diferir: la precisión hora + zona horaria sólo tiene sentido con timestamps de BD; no vale reescribir el resolver ahora.
 
+## Refactor — Adelgazar App.jsx (siguiente prioridad, tras 1.3)
+> Principio: **App orquesta** (estado + routing), **no contiene UI**. Aún tiene **6 pantallas inline**.
+> Extraerlas a componentes propios **una a una**, y al final un `ScreenRouter` simple. App queda como estado + `<ScreenRouter/>`.
+> Ya hecho en esta línea: `DashboardScreen`, `Periodo`, `FloatingActionButtons`, hook `useTransactionToast`.
+
+| # | Pantalla inline en App | Estado |
+|---|------------------------|--------|
+| R.1 | `new-transaction` (nueva transacción) | pendiente |
+| R.2 | editar transacción | pendiente |
+| R.3 | `settings` | pendiente |
+| R.4 | `profile` | pendiente |
+| R.5 | `show-incomes` | pendiente |
+| R.6 | `pillar-detail` | pendiente |
+
 ## Hito 2 — Rendimiento de movimientos
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
