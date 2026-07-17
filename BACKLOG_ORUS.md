@@ -12,7 +12,7 @@
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
 | 1.1 | ✅ | ~~Nombre de categoría en periodos anteriores al editar~~ — **analizado; diferido a fase BD** (ver Decisión 1.1) | 🟡 |
-| 1.2 | 🐛 | Definir qué muestra la **página de Movimientos cuando el periodo es anual** (hoy los presupuestos se ocultan; falta el detalle) | 🟡 |
+| 1.2 | ✅ | ~~Página de Movimientos cuando el periodo es anual~~ — **resuelto junto con 1.1** (nombre = actual/Opción 1; sin presupuesto en agregados) | 🟡 |
 | 1.3 | 🐛 | Si una **sesión no carga** → colapsarla y ocultarla (no dejar bloque vacío/roto) | 🟢 |
 
 > **Decisión 1.1 (17 jul 2026) — diferido a fase BD.**
