@@ -36,20 +36,16 @@ import MovimientosPage from "./components/MovimientosPage";
 import HeaderService from "./components/HeaderService";
 import ProfilePage from "./components/ProfilePage";
 import TransactionPage from "./components/TransactionPage";
-import PillarCardsGrid from "./components/PillarCardsGrid";
 import PillarTagsBar from "./components/PillarTagsBar";
-import DonutTagsBar from "./components/DonutTagsBar";
-import DonutChartComponent from "./components/DonutChart";
 import ColorBar from "./components/ColorBar";
 import LoadingWrapper from "./components/LoadingWrapper";
 import {
-  DonutSkeleton,
-  CardsGridSkeleton,
   ColorBarSkeleton,
   TagsBarSkeleton,
 } from "./components/LoadingSkeleton";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardOverlays from "./components/DashboardOverlays";
+import DashboardExpandedState from "./components/DashboardExpandedState";
 import CatBar from "./components/CatBar";
 import TransactionsListService from "./components/TransactionsListService";
 
@@ -972,7 +968,8 @@ function Dashboard() {
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
   const dashboard = {
-    isDark, t, monthHasData,
+    isDark, t, monthHasData, getBudgetForMonth,
+    donutRef, donutContainerRef, pillarsGridRef,
     scrollY, setScrollY,
     selectedPeriod, setSelectedPeriod, filterType, setFilterType,
     filteredPillar, setFilteredPillar, activeId, setActiveId,
@@ -1044,61 +1041,7 @@ function Dashboard() {
 
               {/* ESTADO 1: EXPANDED (Donut + Tarjetas) */}
               {isMovementOpen === false && (
-              <div style={{ overflow: "visible" }}>
-                {/* 🆕 Contenedor del donut + botones para detectar click outside */}
-                <div ref={donutContainerRef}>
-                  {/* Donut */}
-                  <div ref={donutRef} style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4 }}>
-                    <LoadingWrapper
-                      isLoading={isLoading("donut")}
-                      skeleton={<DonutSkeleton isDark={isDark} />}
-                      isDark={isDark}
-                    >
-                      <DonutChartComponent segments={segments} cx={114} cy={114} outerR={90} innerR={54} activeId={activeId} onSelect={handleSelectPillar} isDark={isDark} gastos={totalSpent} total={totalSpent + saldoForDonut} totalSpent={totalSpent} pillarSpends={pillarSpends} hasSaldoAsignado={saldoForDonut > 0} saldoValue={saldoForDonut} selectedPeriod={selectedPeriod} SALDO_COLOR={SALDO_COLOR} />
-                    </LoadingWrapper>
-                  </div>
-
-                  {/* Botones/Tags del donut - Componente separado */}
-                  <DonutTagsBar
-                    segments={segments}
-                    activeId={activeId}
-                    setActiveId={setActiveId}
-                    pressingSegmentId={pressingSegmentId}
-                    setPressingSegmentId={setPressingSegmentId}
-                    isMovementOpen={isMovementOpen}
-                    isDark={isDark}
-                    t={t}
-                  />
-                </div>
-
-                {/* 🆕 Ocultar barra de categorías cuando filterType es "ingresos" - con ref para medir altura */}
-                <div ref={pillarsGridRef} style={{ display: filterType === "ingresos" ? "none" : "block", marginBottom: filterType === "ingresos" ? 0 : 12 }}>
-                  <LoadingWrapper
-                    isLoading={isLoading("cardsGrid")}
-                    skeleton={<CardsGridSkeleton isDark={isDark} />}
-                    isDark={isDark}
-                  >
-                    <PillarCardsGrid
-                      PILLARS={PILLARS}
-                      chipPcts={chipPcts}
-                      pillarSpends={pillarSpends}
-                      activeId={activeId}
-                      setActiveId={setActiveId}
-                      selectedPeriod={selectedPeriod}
-                      customBudgets={customBudgets}
-                      getBudgetForMonth={getBudgetForMonth}
-                      hasSaldo={hasSaldo}
-                      saldo={saldo}
-                      saldoPctFinal={saldoPctFinal}
-                      SALDO_COLOR={SALDO_COLOR}
-                      setSelectedPillarDetail={setSelectedPillarDetail}
-                      setShowPillarBars={setShowPillarBars}
-                      isDark={isDark}
-                      t={t}
-                    />
-                  </LoadingWrapper>
-                </div>
-              </div>
+              <DashboardExpandedState />
               )}
 
               {/* ESTADO 2: COLLAPSED (Barra + Tags) - Solo si NO es INGRESOS */}
