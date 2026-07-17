@@ -97,25 +97,27 @@ export default function ColorBar({
 
         // 🆕 ¿Este segmento está siendo presionado?
         const isPressingThisSegment = pressingSegmentId === seg.id;
+        const isSaldoSeg = seg.id === "saldo"; // el saldo no filtra (como el tag)
 
         return (
           <div
             key={seg.id}
             onClick={() => {
+              if (isSaldoSeg) return; // saldo no filtra (nada que filtrar)
               // Filtros mutuamente excluyentes: limpiar filterType
               if (filteredPillar !== seg.id) {
                 setFilterType(null);
               }
               setFilteredPillar(filteredPillar === seg.id ? null : seg.id);
             }}
-            onPointerDown={() => setPressingSegmentId(seg.id)}
-            onPointerUp={() => setPressingSegmentId(null)}
-            onPointerLeave={() => setPressingSegmentId(null)}
+            onPointerDown={isSaldoSeg ? undefined : () => setPressingSegmentId(seg.id)}
+            onPointerUp={isSaldoSeg ? undefined : () => setPressingSegmentId(null)}
+            onPointerLeave={isSaldoSeg ? undefined : () => setPressingSegmentId(null)}
             style={{
               flex: seg.pct,
               background: displayColor, // Sin overlay al presionar
               borderRadius: 3,
-              cursor: "pointer",
+              cursor: isSaldoSeg ? "default" : "pointer",
               opacity: isPressingThisSegment ? 0.6 : (filteredPillar && filteredPillar !== seg.id ? 0.28 : 1),
               // 🆕 Transición rápida para press, lenta para animación
               transition: isPressingThisSegment
