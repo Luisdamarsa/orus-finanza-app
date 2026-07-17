@@ -11,6 +11,7 @@ import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
+import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 import { filterTransactions } from "./services/transactionFilterService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
@@ -971,7 +972,30 @@ function Dashboard() {
     );
   }
 
+  // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
+  const dashboard = {
+    isDark, t,
+    scrollY, setScrollY,
+    selectedPeriod, setSelectedPeriod, filterType, setFilterType,
+    filteredPillar, setFilteredPillar, activeId, setActiveId,
+    isMovementOpen, setIsMovementOpen, movementOpenedFrom, setMovementOpenedFrom,
+    screen, setScreen, selectedPillarDetail, setSelectedPillarDetail,
+    selectedPillarForMovements, setSelectedPillarForMovements,
+    showPillarBars, setShowPillarBars, showUpdateBalance, setShowUpdateBalance,
+    showPeriodPicker, setShowPeriodPicker, showIncomes, setShowIncomes,
+    handleSelectPillar, pressingFAB, setPressingFAB,
+    pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts,
+    transactions, categories, customBudgets, setCustomBudgets,
+    isLoading, startLoading, stopLoading,
+    editingCategoryId, editingCategoryName, editingPillarId,
+    startCategoryEditing, resetCategoryEditing,
+    editingTransactionId, selectedTransactionForEdit,
+    startTransactionEditing, resetTransactionEditing,
+    ...dashboardMetrics,
+  };
+
   return (
+    <DashboardContext.Provider value={dashboard}>
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
       <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
 
@@ -1251,6 +1275,7 @@ function Dashboard() {
       </div>
 
     </div>
+    </DashboardContext.Provider>
   );
 }
 
