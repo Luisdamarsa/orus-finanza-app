@@ -1,6 +1,7 @@
 import HeaderService from "./HeaderService";
 import ErrorBoundary from "./ErrorBoundary";
 import { FailProbe } from "../utils/failSwitch";
+import NewTransactionToast from "./NewTransactionToast";
 import Movimientos from "./MovimientosBar";
 import TransactionsListService from "./TransactionsListService";
 import DashboardExpandedState from "./DashboardExpandedState";
@@ -25,7 +26,7 @@ export default function DashboardScreen() {
     showIncomes, setScreen, isMovementOpen, movementOpenedFrom, filterType, setFilterType,
     setFilteredPillar, setIsMovementOpen, setMovementOpenedFrom, totalSpent, incomingTotal,
     setScrollY, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, filteredPillar,
-    transactions, startTransactionEditing,
+    transactions, startTransactionEditing, newTxnToast,
   } = useDashboard();
 
   return (
@@ -66,7 +67,7 @@ export default function DashboardScreen() {
             <div ref={stickyZoneRef} style={{ position: "sticky", top: 0, zIndex: 30, background: t.bg, margin: "0 -22px", padding: "8px 22px", overflow: "visible", boxShadow: p1 > 0.05 ? "0 4px 16px rgba(0,0,0,0.4)" : "none" }}>
 
               {/* Saldo y Mes - SIEMPRE visible */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <button disabled onClick={() => setShowUpdateBalance(true)} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "4px 8px", borderRadius: 20, border: "none", cursor: "not-allowed", background: isDark ? "#1E1E2E" : "#F0EFF8", outline: `1.5px solid transparent`, transition: "all 0.15s", justifyContent: "center", opacity: 0.5 }}>
                   <span style={{ fontSize: 13 }}>💰</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? "#C4C2E0" : "#6B7280" }}>Saldo actual</span>
@@ -78,6 +79,7 @@ export default function DashboardScreen() {
                   <span style={{ fontSize: 13, fontWeight: 700, color: selectedPeriod ? "#9B6DFF" : (isDark ? "#C4C2E0" : "#6B7280") }}>{getPeriodLabel(selectedPeriod)}</span>
                 </button>
                 </ErrorBoundary>
+                <NewTransactionToast toast={newTxnToast} />
               </div>
 
               {/* ESTADO 1: EXPANDED (Donut + Tarjetas) */}

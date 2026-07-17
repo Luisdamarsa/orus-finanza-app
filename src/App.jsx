@@ -495,6 +495,15 @@ function Dashboard() {
   const headerRef = useRef(null);
   const [stickyH, setStickyH] = useState(152); // Default
 
+  // 🆕 Toast de nueva transacción (aparece 1.5s en el hueco saldo/mes)
+  const [newTxnToast, setNewTxnToast] = useState(null);
+  const newTxnToastTimer = useRef(null);
+  const triggerNewTxnToast = (data) => {
+    setNewTxnToast({ ...data, key: Date.now() });
+    if (newTxnToastTimer.current) clearTimeout(newTxnToastTimer.current);
+    newTxnToastTimer.current = setTimeout(() => setNewTxnToast(null), 1500);
+  };
+
   useEffect(() => {
     const measureHeight = () => {
       if (stickyZoneRef.current && isMovementOpen) {
@@ -563,6 +572,9 @@ function Dashboard() {
 
               // El servicio asigna el id; el hook persiste automáticamente.
               addTx(newTx);
+
+              // 🆕 Toast de confirmación de la transacción recién creada
+              triggerNewTxnToast({ isIncome, pillarId, categoryId, amount: newTx.amount });
 
               setSelectedPeriod({ year: now.getFullYear(), month: now.getMonth() + 1 });
               // 🆕 Cerrar Estado 2 automáticamente cuando se agrega una transacción
@@ -791,6 +803,7 @@ function Dashboard() {
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
   const dashboard = {
+    newTxnToast,
     isDark, t, monthHasData, getBudgetForMonth,
     donutRef, donutContainerRef, pillarsGridRef,
     colorBarRef, pillarButtonsRef,
