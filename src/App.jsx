@@ -11,6 +11,7 @@ import { useTransactionEditing } from "./hooks/useTransactionEditing";
 import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
+import { useTransactionToast } from "./hooks/useTransactionToast";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
@@ -495,14 +496,8 @@ function Dashboard() {
   const headerRef = useRef(null);
   const [stickyH, setStickyH] = useState(152); // Default
 
-  // 🆕 Toast de nueva transacción (aparece 1.5s en el hueco saldo/mes)
-  const [newTxnToast, setNewTxnToast] = useState(null);
-  const newTxnToastTimer = useRef(null);
-  const triggerNewTxnToast = (data) => {
-    setNewTxnToast({ ...data, key: Date.now() });
-    if (newTxnToastTimer.current) clearTimeout(newTxnToastTimer.current);
-    newTxnToastTimer.current = setTimeout(() => setNewTxnToast(null), 1500);
-  };
+  // 🆕 Toast de nueva transacción (hook)
+  const { toast: newTxnToast, showTransactionToast: triggerNewTxnToast } = useTransactionToast();
 
   useEffect(() => {
     const measureHeight = () => {
