@@ -33,15 +33,11 @@ import CategoriesPage from "./components/CategoriesPage";
 import AddCategoryPage from "./components/AddCategoryPage";
 import BudgetsPage from "./components/BudgetsPage";
 import MovimientosPage from "./components/MovimientosPage";
-import HeaderService from "./components/HeaderService";
 import ProfilePage from "./components/ProfilePage";
 import TransactionPage from "./components/TransactionPage";
 import { useMultipleLoading } from "./hooks/useLoading";
-import DashboardOverlays from "./components/DashboardOverlays";
-import DashboardExpandedState from "./components/DashboardExpandedState";
-import DashboardCollapsedState from "./components/DashboardCollapsedState";
+import DashboardScreen from "./components/DashboardScreen";
 import CatBar from "./components/CatBar";
-import TransactionsListService from "./components/TransactionsListService";
 
 // 🆕 Importar userStorage para datos del usuario
 import { userStorage } from "./utils/userStorage";
@@ -128,82 +124,6 @@ function initializeCategoriesFromAllCats(allCats) {
   return result;
 }
 
-// 🆕 Función auxiliar para filtrar transacciones en Dashboard
-function Movimientos({ isDark, transactions, filteredPillar, setFilteredPillar, stickyTop, selectedPeriod, onOpen, isOpen, filterType, setFilterType, movementOpenedFrom, setMovementOpenedFrom, setFilterTypeExternal }) {
-  // 🆕 Estado para trackear si el botón está siendo presionado
-  const [pressingMovimientos, setPressingMovimientos] = useState(false);
-
-  const handleOpen = () => {
-    // 🆕 Lógica: la barra SIEMPRE puede cerrar, sin importar cómo se abrió
-    if (isOpen) {
-      // Cerrar Estado 2 (importa cómo se abrió)
-      onOpen(false);
-      setMovementOpenedFrom(null);
-      setFilterTypeExternal(null);
-    } else if (!isOpen) {
-      // Abrir desde la barra
-      onOpen(true);
-      setMovementOpenedFrom("bar");
-    }
-  };
-  const t = isDark ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" } : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
-
-  // Filtra por período, pillar y tipo (gastado/ingresos)
-  const displayTxns = filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType });
-
-  return (
-    <div style={{ marginTop: 0 }}>
-      <button
-        onClick={handleOpen}
-        onPointerDown={() => {
-          console.log("🔻 Movimientos presionado");
-          setPressingMovimientos(true);
-        }}
-        onPointerUp={() => {
-          console.log("🔺 Movimientos soltado");
-          setPressingMovimientos(false);
-        }}
-        onPointerLeave={() => {
-          console.log("🚫 Mouse salió de Movimientos");
-          setPressingMovimientos(false);
-        }}
-        style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: pressingMovimientos ? "rgba(0, 0, 0, 0.2)" : t.bg,
-          border: `1.5px solid ${t.divider}`, padding: "10px 8px 10px", cursor: "pointer",
-          position: "sticky", top: 0, zIndex: 20, borderRadius: 24, marginBottom: 0,
-          overflow: "hidden", boxSizing: "border-box",
-          transform: pressingMovimientos ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
-          boxShadow: pressingMovimientos ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none",
-          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: t.text }}>Movimientos</span>
-          <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 10, background: isDark ? "#2D2D3A" : "#E5E3F5", color: t.sub }}>{displayTxns.length}</span>
-          {/* 🆕 Badge para filtro de tipo (Gastado/Ingresos) */}
-          {filterType && (
-            <div onClick={e => { e.stopPropagation(); setFilterType(null); }} style={{
-              marginLeft: 6, padding: "1px 7px", borderRadius: 10, border: "none",
-              background: filterType === "gastado" ? "#EF444422" : "#22C55E22",
-              color: filterType === "gastado" ? "#EF4444" : "#22C55E",
-              fontSize: 10, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-            }}>
-              {filterType === "gastado" ? "Gastado" : "Ingresos"}<span>✕</span>
-            </div>
-          )}
-          {filteredPillar && (
-            <div onClick={e => { e.stopPropagation(); setFilteredPillar(null); }} style={{
-              marginLeft: 6, padding: "1px 7px", borderRadius: 10, border: "none", background: PILLAR_MAP[filteredPillar]?.color + "22", color: PILLAR_MAP[filteredPillar]?.color, fontSize: 10, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-            }}>
-              {PILLAR_MAP[filteredPillar]?.icon}{PILLAR_MAP[filteredPillar]?.label}<span>✕</span>
-            </div>
-          )}
-        </div>
-        <span style={{ fontSize: 11, color: t.sub, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s", marginRight: 8 }}>▼</span>
-      </button>
-    </div>
-  );
-}
 
 // 🆕 NewTransactionPage ha sido movido a componente separado: AddTransactionPage.jsx
 
@@ -965,6 +885,7 @@ function Dashboard() {
     isDark, t, monthHasData, getBudgetForMonth,
     donutRef, donutContainerRef, pillarsGridRef,
     colorBarRef, pillarButtonsRef,
+    headerRef, stickyZoneRef, stickyH, p1,
     scrollY, setScrollY,
     selectedPeriod, setSelectedPeriod, filterType, setFilterType,
     filteredPillar, setFilteredPillar, activeId, setActiveId,
@@ -986,93 +907,7 @@ function Dashboard() {
 
   return (
     <DashboardContext.Provider value={dashboard}>
-    <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-      <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
-
-
-        {/* Header Service */}
-        <HeaderService
-          ref={headerRef}
-          isDark={isDark}
-          showIncomes={showIncomes}
-          setScreen={setScreen}
-          isMovementOpen={isMovementOpen}
-          movementOpenedFrom={movementOpenedFrom}
-          filterType={filterType}
-          setFilterType={setFilterType}
-          setFilteredPillar={setFilteredPillar}
-          setIsMovementOpen={setIsMovementOpen}
-          setMovementOpenedFrom={setMovementOpenedFrom}
-          totalSpent={totalSpent}
-          incomingTotal={incomingTotal}
-          t={t}
-          fmt={fmt}
-          userStorage={userStorage}
-        />
-
-        {/* Scroll Container */}
-        <div onScroll={e => setScrollY(e.target.scrollTop)} style={{
-          position: "absolute", top: showIncomes ? 149 : 115, left: 0, right: 0, bottom: isMovementOpen ? 0 : "auto",
-          overflowY: isMovementOpen ? "auto" : "hidden", overflowX: "hidden", paddingBottom: 280, boxSizing: "border-box", scrollbarWidth: "none"
-        }}>
-          <style>{`::-webkit-scrollbar { display: none; }`}</style>
-
-          <div style={{ padding: "0 22px 120px 22px", height: "100%", display: "flex", flexDirection: "column" }}>
-            {/* Sticky Zone */}
-            {/* 🆕 Sticky Zone simple y eficiente */}
-            <div ref={stickyZoneRef} style={{ position: "sticky", top: 0, zIndex: 30, background: t.bg, margin: "0 -22px", padding: "8px 22px", overflow: "visible", boxShadow: p1 > 0.05 ? "0 4px 16px rgba(0,0,0,0.4)" : "none" }}>
-
-              {/* Saldo y Mes - SIEMPRE visible */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                <button disabled onClick={() => setShowUpdateBalance(true)} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "4px 8px", borderRadius: 20, border: "none", cursor: "not-allowed", background: isDark ? "#1E1E2E" : "#F0EFF8", outline: `1.5px solid transparent`, transition: "all 0.15s", justifyContent: "center", opacity: 0.5 }}>
-                  <span style={{ fontSize: 13 }}>💰</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? "#C4C2E0" : "#6B7280" }}>Saldo actual</span>
-                </button>
-                <button onClick={() => setShowPeriodPicker(true)} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "4px 8px", borderRadius: 20, border: "none", cursor: "pointer", background: selectedPeriod ? "#9B6DFF22" : (isDark ? "#1E1E2E" : "#F0EFF8"), outline: `1.5px solid ${selectedPeriod ? "#9B6DFF88" : "transparent"}`, transition: "all 0.15s" }}>
-                  <span style={{ fontSize: 13 }}>📅</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: selectedPeriod ? "#9B6DFF" : (isDark ? "#C4C2E0" : "#6B7280") }}>{getPeriodLabel(selectedPeriod)}</span>
-                </button>
-              </div>
-
-              {/* ESTADO 1: EXPANDED (Donut + Tarjetas) */}
-              {isMovementOpen === false && (
-              <DashboardExpandedState />
-              )}
-
-              {/* ESTADO 2: COLLAPSED (Barra + Tags) - Solo si NO es INGRESOS */}
-              {isMovementOpen === true && filterType !== "ingresos" && (
-              <DashboardCollapsedState />
-              )}
-
-              {/* Movimientos - SIEMPRE visible */}
-              <div style={{ marginTop: 0 }}>
-                <Movimientos isDark={isDark} transactions={transactions} filteredPillar={filteredPillar} setFilteredPillar={setFilteredPillar} stickyTop={stickyH} selectedPeriod={selectedPeriod} onOpen={setIsMovementOpen} isOpen={isMovementOpen} filterType={filterType} setFilterType={setFilterType} movementOpenedFrom={movementOpenedFrom} setMovementOpenedFrom={setMovementOpenedFrom} setFilterTypeExternal={setFilterType} />
-              </div>
-            </div>
-          </div>
-
-          {/* Transacciones - position absolute si está abierto */}
-          {isMovementOpen && (
-            <div style={{ position: "absolute", top: `calc(${stickyH}px + 0px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
-              <style>{`::-webkit-scrollbar { display: none; }`}</style>
-              <TransactionsListService
-                isDark={isDark}
-                transactions={filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType })}
-                onEditTransaction={(tx) => {
-                  startTransactionEditing(tx);
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Fade */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 56, pointerEvents: "none", zIndex: 34, background: `linear-gradient(to bottom, transparent, ${t.bg})` }} />
-
-        <DashboardOverlays />
-      </div>
-
-    </div>
+      <DashboardScreen />
     </DashboardContext.Provider>
   );
 }
