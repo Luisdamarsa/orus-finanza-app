@@ -62,4 +62,19 @@
 | 7.1 | 🔍 | Investigar **qué datos pide la app** en login Google/Apple (ref. TikTok) | 🟢 |
 | 7.2 | ⚖️ | **Términos y Condiciones + Aviso de Privacidad** (ref. TikTok; Ley 1581/2012 Habeas Data — ver `DECISION_ARQUITECTURA_DB.md`) | 🟡 |
 
-## Hito 8 — Auth 
+## Hito 8 — Auth & Onboarding (grande, cierra el flujo de entrada)
+| # | Tipo | Item | Dif |
+|---|------|------|-----|
+| 8.1 | 📄 | **Login page** (Google / Apple). *Conecta con `detectLanguage`/`detectCurrency` que ya dejamos listos para onboarding real.* | 🔴 |
+| 8.2 | 🔔 | **Onboarding** (primeros pasos, sin fricción) | 🔴 |
+| 8.3 | 🔔 | **Notificaciones** — permisos + lectura de notificaciones bancarias (**core del producto**, probablemente su propio épico) | 🔴 |
+
+---
+
+## Orden sugerido para arrancar
+Primero los **quick wins** que cierran cosas ya construidas y no dependen de nada:
+**1.3 → 1.1 → 1.2 → 4.4 → 4.3 (tras hablar con MJ)**.
+Luego escoges track: **pulido visual (Hito 4)**, **páginas de config (Hito 6)** o **rendimiento (2.1)**.
+Los grandes (Auth/Onboarding/Notificaciones, Hito 8) y lo legal (Hito 7) los dejamos para cuando entremos a la fase BD, porque dependen de backend real.
+
+> Nota: la **fase BD** (Supabase + Auth + RLS) es transversal — varios items (login, notificaciones, suscripciones, T&C) se cierran de verdad ahí. Ver `DECISION_ARQUITECTURA_DB.md`.
