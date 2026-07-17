@@ -5,7 +5,7 @@
  *   Ej:  ?fail=donut           → falla el donut
  *        ?fail=donut,colorbar  → fallan varias a la vez
  *
- * Secciones válidas: donut, donuttags, colorbar, tags, cards, txns, catbar, fab, settings, period
+ * Secciones válidas: donut, donuttags, colorbar, tags, cards, txns, catbar, fab, settings, period, incomes
  *
  * Es inofensivo en producción (solo lanza si tú pones el parámetro).
  * Quitar las llamadas failIf(...) y este archivo cuando termines de probar.
