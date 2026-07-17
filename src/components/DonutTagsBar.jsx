@@ -1,3 +1,4 @@
+import { failIf } from "../utils/failSwitch";
 /**
  * DonutTagsBar.jsx
  *
@@ -25,6 +26,7 @@ export default function DonutTagsBar({
   isDark,
   t,
 }) {
+  failIf("donuttags"); // TEST: ?fail=donuttags
   return (
     <div style={{ display: "flex", flexWrap: "nowrap", gap: 3, justifyContent: "center", marginBottom: 6, overflow: "hidden" }}>
       {segments.map(seg => {

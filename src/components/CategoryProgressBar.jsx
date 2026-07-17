@@ -1,3 +1,4 @@
+import { failIf } from "../utils/failSwitch";
 import ProgressBar from "./ProgressBar";
 import { getOverBudgetColor } from "../services/colorService";
 
@@ -33,6 +34,7 @@ export default function CategoryProgressBar({
   onClickBar,
   isSelected = false,
 }) {
+  failIf("catbar"); // TEST: ?fail=catbar
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
 
   // 🆕 Factores de compensación para alineación visual de la barra azul
