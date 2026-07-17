@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 
 /**
  * FloatingActionButtons.jsx
@@ -7,7 +6,6 @@ import { failIf } from "../utils/failSwitch";
  * Extraído de DashboardOverlays para que tenga su propio ErrorBoundary (aislar fallos).
  */
 export default function FloatingActionButtons({ isDark, pressingFAB, setPressingFAB, setScreen }) {
-  failIf("fab"); // TEST: ?fail=fab
   return (
     <div style={{
       position: "absolute", bottom: 24, right: 22, zIndex: 35,

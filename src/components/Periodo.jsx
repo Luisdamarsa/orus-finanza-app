@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { getPeriodLabel } from "../utils/formatters";
 import NewTransactionToast from "./NewTransactionToast";
 
@@ -10,7 +9,6 @@ import NewTransactionToast from "./NewTransactionToast";
  * Se llama "Periodo" porque el saldo está inactivo. Falla como unidad (?fail=period).
  */
 export default function Periodo({ isDark, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, newTxnToast }) {
-  failIf("period"); // TEST: ?fail=period (falla toda la barra)
   return (
     <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
       <button disabled onClick={() => setShowUpdateBalance(true)} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "4px 8px", borderRadius: 20, border: "none", cursor: "not-allowed", background: isDark ? "#1E1E2E" : "#F0EFF8", outline: `1.5px solid transparent`, transition: "all 0.15s", justifyContent: "center", opacity: 0.5 }}>

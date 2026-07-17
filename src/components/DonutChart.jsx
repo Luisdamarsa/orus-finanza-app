@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { useState, useRef, useEffect } from "react";
 import { fmt } from "../utils/formatters";
 
@@ -54,7 +53,6 @@ export default function DonutChart({
   saldoValue,
   selectedPeriod,
 }) {
-  failIf("donut"); // TEST: ?fail=donut
   const [hovered, setHovered] = useState(null);
 
   // 🆕 Estado de animación del donut

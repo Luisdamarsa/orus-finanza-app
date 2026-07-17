@@ -12,13 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Backups y snapshots viejos (no versionar)
+*.tar
+*.tar.gz
+PROD_V2.md
+PROD_V3.md
+
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+.vsco

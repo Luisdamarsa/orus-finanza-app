@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { useState } from "react";
 
 /**
@@ -23,7 +22,6 @@ export default function PillarTagsBar({
   setFilteredPillar,
   setFilterType,
 }) {
-  failIf("tags"); // TEST: ?fail=tags
   // 🆕 Estado para trackear qué tag está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 

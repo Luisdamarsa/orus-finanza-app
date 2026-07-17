@@ -1,5 +1,4 @@
 import { usePress } from "../hooks/usePress";
-import { failIf } from "../utils/failSwitch";
 
 /**
  * GastadoIngresosBar.jsx
@@ -8,7 +7,6 @@ import { failIf } from "../utils/failSwitch";
  * Extraída de HeaderService para tener su propio ErrorBoundary. Falla como unidad (?fail=incomes).
  */
 export default function GastadoIngresosBar({ isDark, t, fmt, filterType, setFilterType, setFilteredPillar, isMovementOpen, movementOpenedFrom, setIsMovementOpen, setMovementOpenedFrom, totalSpent, incomingTotal }) {
-  failIf("incomes"); // TEST: ?fail=incomes
   const pressGastado = usePress();
   const pressIngresos = usePress();
   return (

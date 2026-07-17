@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { useState } from "react";
 import { fmt } from "../utils/formatters";
 import { PILLARS } from "../constants";
@@ -40,7 +39,6 @@ export default function PillarCardsGrid({
   isDark,
   t,
 }) {
-  failIf("cards"); // TEST: ?fail=cards
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 

@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { useState } from "react";
 import { groupByDate, fmt } from "../utils/formatters";
 import { PILLAR_MAP, METHOD_META, ALL_CATS } from "../constants";
@@ -16,7 +15,6 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  * - onEditTransaction: function(transaction) - callback al hacer click en una transacción
  */
 export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction }) {
-  failIf("txns"); // TEST: ?fail=txns
   // 🆕 Estado para trackear qué transacción está siendo presionada
   const [pressingTransactionId, setPressingTransactionId] = useState(null);
   const t = isDark

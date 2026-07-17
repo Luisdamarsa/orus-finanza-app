@@ -1,4 +1,3 @@
-import { failIf } from "../utils/failSwitch";
 import { useState, useEffect, useRef } from "react";
 
 /**
@@ -32,7 +31,6 @@ export default function ColorBar({
   isActive,
   selectedPeriod,
 }) {
-  failIf("colorbar"); // TEST: ?fail=colorbar
   // 🆕 Estado para track de animación
   const [animatingSegments, setAnimatingSegments] = useState(new Set());
 

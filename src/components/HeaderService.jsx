@@ -2,7 +2,6 @@ import { forwardRef } from "react";
 import { usePress } from "../hooks/usePress";
 import ErrorBoundary from "./ErrorBoundary";
 import GastadoIngresosBar from "./GastadoIngresosBar";
-import { FailProbe } from "../utils/failSwitch";
 
 /**
  * HeaderService
@@ -56,7 +55,6 @@ const HeaderService = forwardRef(({
         </div>
         {/* Botón Settings (Engranaje) */}
         <ErrorBoundary fallback={null}>
-        <FailProbe section="settings" />
         <button
           onClick={() => setScreen("settings")}
           {...pressSettings.handlers}
