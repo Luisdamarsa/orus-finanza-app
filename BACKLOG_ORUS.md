@@ -23,21 +23,10 @@
 > - **Año/"todo"** = Opción 1: un solo nombre (el actual) agrupa todo el `id`; las filas conservan el nombre histórico. Si la categoría se "vuelve otra cosa" → eso es **crear categoría nueva**, no un rename.
 > Motivo de diferir: la precisión hora + zona horaria sólo tiene sentido con timestamps de BD; no vale reescribir el resolver ahora.
 
-## Refactor — Adelgazar App.jsx (en curso, tras 1.3)
-> Principio: **App orquesta** (estado + routing), **no contiene UI**. En realidad son **~10 ramas de pantalla** inline (el backlog las subcontó).
-> Cada `XPage` ya existe; lo "gordo" en App es el envoltorio repetido, la cadena de `if (screen===…)` y algo de lógica inline.
-> Proceso: **una historia a la vez** → build verde + commit + visto bueno → siguiente. Comportamiento idéntico.
-> Ya hecho: `DashboardScreen`, `Periodo`, `FloatingActionButtons`, `GastadoIngresosBar`, hook `useTransactionToast`.
-
-| # | Historia | Dif | Pts |
-|---|----------|-----|-----|
-| RS-1 | `ScreenShell` (envoltorio común full-screen) — base | 🟢 | 2 |
-| RS-2 | Extraer `PillarDetailPage` a su archivo (hoy vive dentro de App) | 🟢 | 2 |
-| RS-3 | Pantallas simples: `settings`, `profile`, `show-incomes` | 🟢 | 3 |
-| RS-4 | `TransactionScreen` (nueva + editar = mismo componente; lógica crear/editar/eliminar a un hook) | 🟡 | 5 |
-| RS-5 | `budgets` + `categories` + `add-category` (budgets tiene cálculo inline) | 🟡 | 5 |
-| RS-6 | `movimientos` | 🟢 | 2 |
-| RS-7 | `ScreenRouter` final + verificación integral (App = estado + `<ScreenRouter/>`) | 🟡 | 5 |
+## Refactor — Adelgazar App.jsx ✅ COMPLETADO (prod-v10.6.0)
+> App pasó de **841 → 438 líneas** (−48%). App = estado + `<ScreenRouter/>`; toda la UI en componentes.
+> RS-1 ScreenShell · RS-2 PillarDetailPage · RS-3 Settings/Profile/ShowIncomes · RS-4 TransactionScreen+hook ·
+> RS-5 Budgets/Categories/AddCategory · RS-6 Movimientos · RS-7 ScreenRouter. Todas ✅.
 
 ## Hito 2 — Rendimiento de movimientos
 | # | Tipo | Item | Dif |
