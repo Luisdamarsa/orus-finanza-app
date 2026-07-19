@@ -83,7 +83,7 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   // ============================================================
 
   let segments = donutTotal === 0
-    ? [{ id: "_empty", label: "Sin datos", color: isDark ? "#2D2D3A" : "#D5D3E8", pct: 100 }]
+    ? [{ id: "_empty", label: "Sin gastos", color: isDark ? "#2D2D3A" : "#D5D3E8", pct: 100 }]
     : PILLARS.filter(p => pillarSpends[p.id] > 0).map(p => ({
         id: p.id,
         label: p.label,

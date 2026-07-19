@@ -51,7 +51,7 @@ export default function NewTransactionToast({ toast }) {
           <>
             <span style={{ fontSize: 13 }}>{pillar?.icon}</span>
             <span style={{ color: "#C4C2E0" }}>{getCategoryName(categoryId)}</span>
-            <span style={{ color: "#F87171" }}>-{fmt(amountAbs)}</span>
+            <span style={{ color: pillarId === "ahorro" ? "#86EFAC" : "#FCA5A5" }}>-{fmt(amountAbs)}</span>
           </>
         )}
       </div>
