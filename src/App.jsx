@@ -26,9 +26,9 @@ import {
 import { calculateDashboard } from "./utils/dashboardCalculations";
 
 // 🆕 Importar páginas de nuevas secciones
-import MovimientosPage from "./components/MovimientosPage";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardScreen from "./components/DashboardScreen";
+import MovimientosScreen from "./components/MovimientosScreen";
 import BudgetsScreen from "./components/BudgetsScreen";
 import CategoriesScreen from "./components/CategoriesScreen";
 import AddCategoryScreen from "./components/AddCategoryScreen";
@@ -434,21 +434,7 @@ function Dashboard() {
 
   // 🆕 Pantalla de Movimientos por Pilar
   if (screen === "movimientos" && selectedPillarForMovements) {
-    return (
-      <ScreenShell bg={t.bg}>
-          <MovimientosPage
-            isDark={isDark}
-            onBack={() => setScreen("dashboard")}
-            pilar={selectedPillarForMovements}
-            transactions={transactions}
-            selectedPeriod={selectedPeriod}
-            categories={categories}
-            onEditTransaction={(tx) => {
-              startTransactionEditing(tx);
-            }}
-          />
-      </ScreenShell>
-    );
+    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} />;
   }
 
   // 🆕 Pantalla de Categorías
