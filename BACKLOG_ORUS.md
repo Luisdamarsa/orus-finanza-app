@@ -31,7 +31,7 @@
 ## Hito 2 — Rendimiento de movimientos
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
-| 2.1 | 🔔 | Cargar **movimientos en tandas de 15** (paginación / scroll infinito). *Prepara el mismo patrón para la fase BD (API paginada).* | 🟡 |
+| 2.1 | ✅ | ~~Movimientos en tandas de 15~~ — **hecho** (scroll infinito acumulativo + spinner; hook `usePagination` listo para API paginada) | 🟡 |
 
 ## Hito 3 — Loading real
 | # | Tipo | Item | Dif |
