@@ -101,7 +101,7 @@ export default function PillarCardsGrid({
           // 🎨 CAMBIO: Emoji diferente si Ahorro (🎉) o si otro pilar pasado (⚠️)
           // 🆕 Usar Math.ceil para redondear hacia arriba el exceso (ej: +0.5% → +1%)
           // 🆕 Consistencia: usar "del total" en lugar de "total"
-          const badgeLabel = pc === 0 ? "0%" : !hasBudget ? `${pc}% del total` : over ? `+${Math.ceil(pc - 100)}% ${p.id === "ahorro" ? "🎉" : "⚠️"}` : `${pc}%`;
+          const badgeLabel = filteredSpent > 0 ? (!hasBudget ? `${pc}% del total` : over ? `+${Math.ceil(pc - 100)}% ${p.id === "ahorro" ? "🎉" : "⚠️"}` : `${pc}%`) : "0%";
 
           // 🆕 ¿Este pilar está siendo presionado?
           const isPressingThisPillar = pressingId === p.id;

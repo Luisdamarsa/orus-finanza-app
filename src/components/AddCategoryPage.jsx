@@ -342,8 +342,8 @@ export default function AddCategoryPage({
                     alignItems: "center",
                     gap: 3,
                     outline: isSelected
-                      ? `1.5px solid ${pillar.color}66`
-                      : "1.5px solid transparent",
+                      ? `2px solid ${pillar.color}`
+                      : "2px solid transparent",
                     transition: "all 0.18s",
                     transform: pressingPillar === pillar.id ? "scale(0.94)" : "scale(1)",
                     opacity: pressingPillar === pillar.id ? 0.7 : 1,
