@@ -31,9 +31,10 @@ import CategoriesPage from "./components/CategoriesPage";
 import AddCategoryPage from "./components/AddCategoryPage";
 import BudgetsPage from "./components/BudgetsPage";
 import MovimientosPage from "./components/MovimientosPage";
-import TransactionPage from "./components/TransactionPage";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardScreen from "./components/DashboardScreen";
+import TransactionScreen from "./components/TransactionScreen";
+import { useTransactionActions } from "./hooks/useTransactionActions";
 import SettingsScreen from "./components/SettingsScreen";
 import ShowIncomesScreen from "./components/ShowIncomesScreen";
 import ProfileScreen from "./components/ProfileScreen";
@@ -384,6 +385,12 @@ function Dashboard() {
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
 
+  const txnActions = useTransactionActions({
+    addTx, editTransaction, deleteTransaction, triggerNewTxnToast,
+    setSelectedPeriod, setIsMovementOpen, setFilterType, setMovementOpenedFrom,
+    setScreen, screen,
+  });
+
   if (screen === "pillar-detail" && selectedPillarDetail) {
     return (
       <ScreenShell bg={t.bg}>
@@ -398,90 +405,12 @@ function Dashboard() {
   }
 
   if (screen === "new-transaction") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <TransactionPage
-            isEditing={false}
-            onBack={() => setScreen("dashboard")}
-            onDone={({ desc, rawAmount, isIncome, method, concept, pillarId }) => {
-              const absAmount = parseInt((rawAmount || "").replace(/\D/g, "")) || 0;
-              if (absAmount === 0 && !desc && !concept) { setScreen("dashboard"); return; }
-              const now = new Date();
-              const dateStr = now.toISOString().slice(0, 10);
-              const timeStr = now.toTimeString().slice(0, 5);
-
-              // Crear nueva transacción
-              // 🔄 concept es el ID de la categoría (viene desde TransactionPage)
-              const categoryId = concept || null;
-
-              const newTx = {
-                date: dateStr,
-                time: timeStr,
-                description: desc,  // ✅ Usar "description" para consistencia
-                method: method || "Banco",
-                amount: isIncome ? absAmount : -absAmount,
-                pillar: isIncome ? "ingreso" : pillarId,
-                category: categoryId,  // ✅ Ya es ID desde TransactionPage
-              };
-
-              // El servicio asigna el id; el hook persiste automáticamente.
-              addTx(newTx);
-
-              // 🆕 Toast de confirmación de la transacción recién creada
-              triggerNewTxnToast({ isIncome, pillarId, categoryId, amount: newTx.amount });
-
-              setSelectedPeriod({ year: now.getFullYear(), month: now.getMonth() + 1 });
-              // 🆕 Cerrar Estado 2 automáticamente cuando se agrega una transacción
-              setIsMovementOpen(false);
-              setFilterType(null);
-              setMovementOpenedFrom(null);
-              setScreen("dashboard");
-            }}
-            isDark={isDark}
-            customConcepts={customConcepts}
-            categories={categories}
-            onCreateCategory={(categoryName, pillarId) => {
-              // 🆕 Usar hook para agregar categoría
-              addCategoryToHook(pillarId, categoryName);
-            }}
-          />
-      </ScreenShell>
-    );
+    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} onBack={() => setScreen("dashboard")} onCreateCategory={(name, pillarId) => addCategoryToHook(pillarId, name)} />;
   }
 
   // 🆕 Pantalla de Editar Transacción
   if (editingTransactionId && selectedTransactionForEdit) {
-    return (
-      <ScreenShell bg={t.bg}>
-          <TransactionPage
-            isEditing={true}
-            editingTransaction={selectedTransactionForEdit}
-            onBack={() => {
-              resetTransactionEditing();
-            }}
-            onSave={(transactionId, updatedData) => {
-              editTransaction(transactionId, updatedData);
-              // Volver a la pantalla anterior (dashboard o movimientos)
-              if (screen === "movimientos") {
-                setScreen("movimientos");
-              } else {
-                setScreen("dashboard");
-              }
-            }}
-            onDelete={(transactionId) => {
-              deleteTransaction(transactionId);
-              // Volver a la pantalla anterior
-              if (screen === "movimientos") {
-                setScreen("movimientos");
-              } else {
-                setScreen("dashboard");
-              }
-            }}
-            isDark={isDark}
-            categories={categories}
-          />
-      </ScreenShell>
-    );
+    return <TransactionScreen mode="edit" isDark={isDark} t={t} categories={categories} editingTransaction={selectedTransactionForEdit} actions={txnActions} onBack={() => resetTransactionEditing()} />;
   }
 
   // 🆕 Pantalla de Configuraciones
