@@ -325,7 +325,7 @@ export default function AddCategoryPage({
                     minWidth: 60,
                     padding: "6px 8px",
                     borderRadius: 12,
-                    border: "none",
+                    border: isSelected ? `2px solid ${pillar.color}` : "2px solid transparent",
                     cursor: "pointer",
                     background: pressingPillar === pillar.id
                       ? `${pillar.color}44`
@@ -341,9 +341,7 @@ export default function AddCategoryPage({
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 3,
-                    outline: isSelected
-                      ? `2px solid ${pillar.color}`
-                      : "2px solid transparent",
+                    outline: "none",
                     transition: "all 0.18s",
                     transform: pressingPillar === pillar.id ? "scale(0.94)" : "scale(1)",
                     opacity: pressingPillar === pillar.id ? 0.7 : 1,
