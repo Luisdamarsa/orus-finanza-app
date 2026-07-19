@@ -12,6 +12,7 @@ import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
 import { useTransactionToast } from "./hooks/useTransactionToast";
+import ScreenShell from "./components/ScreenShell";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
@@ -524,23 +525,20 @@ function Dashboard() {
 
   if (screen === "pillar-detail" && selectedPillarDetail) {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <PillarDetailPage
             pillar={selectedPillarDetail}
             onBack={() => { setScreen("dashboard"); setShowPillarBars(false); setSelectedPillarDetail(null); }}
             isDark={isDark}
             transactions={transactions}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   if (screen === "new-transaction") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <TransactionPage
             isEditing={false}
             onBack={() => setScreen("dashboard")}
@@ -586,16 +584,14 @@ function Dashboard() {
               addCategoryToHook(pillarId, categoryName);
             }}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Editar Transacción
   if (editingTransactionId && selectedTransactionForEdit) {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <TransactionPage
             isEditing={true}
             editingTransaction={selectedTransactionForEdit}
@@ -623,16 +619,14 @@ function Dashboard() {
             isDark={isDark}
             categories={categories}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Configuraciones
   if (screen === "settings") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <SettingsPage
             isDark={isDark}
             onBack={() => setScreen("dashboard")}
@@ -643,39 +637,34 @@ function Dashboard() {
             showIncomes={showIncomes}
             setShowIncomes={setShowIncomes}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Mostrar Ingresos
   if (screen === "show-incomes") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <ShowIncomesPage
             isDark={isDark}
             onBack={() => setScreen("settings")}
             showIncomesEnabled={showIncomes}
             onToggleShowIncomes={setShowIncomes}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Perfil
   if (screen === "profile") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <ProfilePage
             isDark={isDark}
             onBack={() => setScreen("settings")}
             onSaveSuccess={() => setScreen("settings")}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
@@ -691,8 +680,7 @@ function Dashboard() {
     });
 
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <BudgetsPage
             isDark={isDark}
             onBack={() => setScreen("settings")}
@@ -708,16 +696,14 @@ function Dashboard() {
             }}
             onSaveSuccess={() => setScreen("settings")}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Movimientos por Pilar
   if (screen === "movimientos" && selectedPillarForMovements) {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <MovimientosPage
             isDark={isDark}
             onBack={() => setScreen("dashboard")}
@@ -729,16 +715,14 @@ function Dashboard() {
               startTransactionEditing(tx);
             }}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Categorías
   if (screen === "categories") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <CategoriesPage
             isDark={isDark}
             onBack={() => setScreen("settings")}
@@ -753,16 +737,14 @@ function Dashboard() {
             }}
             categories={categories}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 
   // 🆕 Pantalla de Agregar/Editar Categoría
   if (screen === "add-category") {
     return (
-      <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
+      <ScreenShell bg={t.bg}>
           <AddCategoryPage
             isDark={isDark}
             onBack={() => setScreen("categories")}
@@ -791,8 +773,7 @@ function Dashboard() {
               resetCategoryEditing();
             }}
           />
-        </div>
-      </div>
+      </ScreenShell>
     );
   }
 

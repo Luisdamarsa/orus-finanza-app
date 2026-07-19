@@ -23,19 +23,21 @@
 > - **Año/"todo"** = Opción 1: un solo nombre (el actual) agrupa todo el `id`; las filas conservan el nombre histórico. Si la categoría se "vuelve otra cosa" → eso es **crear categoría nueva**, no un rename.
 > Motivo de diferir: la precisión hora + zona horaria sólo tiene sentido con timestamps de BD; no vale reescribir el resolver ahora.
 
-## Refactor — Adelgazar App.jsx (siguiente prioridad, tras 1.3)
-> Principio: **App orquesta** (estado + routing), **no contiene UI**. Aún tiene **6 pantallas inline**.
-> Extraerlas a componentes propios **una a una**, y al final un `ScreenRouter` simple. App queda como estado + `<ScreenRouter/>`.
-> Ya hecho en esta línea: `DashboardScreen`, `Periodo`, `FloatingActionButtons`, hook `useTransactionToast`.
+## Refactor — Adelgazar App.jsx (en curso, tras 1.3)
+> Principio: **App orquesta** (estado + routing), **no contiene UI**. En realidad son **~10 ramas de pantalla** inline (el backlog las subcontó).
+> Cada `XPage` ya existe; lo "gordo" en App es el envoltorio repetido, la cadena de `if (screen===…)` y algo de lógica inline.
+> Proceso: **una historia a la vez** → build verde + commit + visto bueno → siguiente. Comportamiento idéntico.
+> Ya hecho: `DashboardScreen`, `Periodo`, `FloatingActionButtons`, `GastadoIngresosBar`, hook `useTransactionToast`.
 
-| # | Pantalla inline en App | Estado |
-|---|------------------------|--------|
-| R.1 | `new-transaction` (nueva transacción) | pendiente |
-| R.2 | editar transacción | pendiente |
-| R.3 | `settings` | pendiente |
-| R.4 | `profile` | pendiente |
-| R.5 | `show-incomes` | pendiente |
-| R.6 | `pillar-detail` | pendiente |
+| # | Historia | Dif | Pts |
+|---|----------|-----|-----|
+| RS-1 | `ScreenShell` (envoltorio común full-screen) — base | 🟢 | 2 |
+| RS-2 | Extraer `PillarDetailPage` a su archivo (hoy vive dentro de App) | 🟢 | 2 |
+| RS-3 | Pantallas simples: `settings`, `profile`, `show-incomes` | 🟢 | 3 |
+| RS-4 | `TransactionScreen` (nueva + editar = mismo componente; lógica crear/editar/eliminar a un hook) | 🟡 | 5 |
+| RS-5 | `budgets` + `categories` + `add-category` (budgets tiene cálculo inline) | 🟡 | 5 |
+| RS-6 | `movimientos` | 🟢 | 2 |
+| RS-7 | `ScreenRouter` final + verificación integral (App = estado + `<ScreenRouter/>`) | 🟡 | 5 |
 
 ## Hito 2 — Rendimiento de movimientos
 | # | Tipo | Item | Dif |
