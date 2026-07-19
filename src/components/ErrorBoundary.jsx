@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { reportError } from "../services/reportError";
 
 /**
  * ErrorBoundary.jsx
@@ -29,7 +30,7 @@ function OopsScreen() {
           Oops! Algo salió mal
         </div>
         <div style={{ fontSize: 14, color: "#7B7A99", marginBottom: 32, lineHeight: 1.8 }}>
-          Estamos trabajando para mejorar
+          No estamos seguros qué sucedió, pero ya estamos trabajando en solucionarlo.
         </div>
         <button onClick={() => window.location.reload()} style={{
           width: "100%", padding: "14px 0", borderRadius: 14,
@@ -37,11 +38,16 @@ function OopsScreen() {
           color: "#fff", fontSize: 15, fontWeight: 700,
           cursor: "pointer", transition: "all 0.3s",
           boxShadow: "0 8px 24px rgba(155, 109, 255, 0.3)",
+          display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}
-        onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-        onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+        onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+        onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
         >
-          Recargar la app →
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Inténtalo de nuevo
         </button>
       </div>
     </div>
@@ -59,7 +65,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary:", error, errorInfo);
+    reportError(error, { errorInfo, boundary: true });
   }
 
   componentDidUpdate(prevProps) {

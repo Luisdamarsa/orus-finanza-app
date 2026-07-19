@@ -40,6 +40,11 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
 
   return (
     <>
+      {groups.length === 0 && (
+        <div style={{ textAlign: "center", color: t.sub, fontSize: 13, padding: "28px 0" }}>
+          Sin movimientos
+        </div>
+      )}
       {groups.map((group) => (
         <div key={group.date} style={{ display: "contents" }}>
           {/* Fecha - Sticky Header */}
