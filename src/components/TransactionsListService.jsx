@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { usePagination } from "../hooks/usePagination";
 import { groupByDate, fmt } from "../utils/formatters";
 import { PILLAR_MAP, METHOD_META, ALL_CATS } from "../constants";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
@@ -21,8 +22,21 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
     ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" }
     : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
 
-  // Agrupar transacciones por fecha
-  const groups = groupByDate(transactions);
+  // 🆕 Paginación: 15 a la vez, carga más al llegar al final (acumulativo)
+  const { visibleItems, hasMore, loading, loadMore } = usePagination(transactions, 15, 350);
+  const sentinelRef = useRef(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) loadMore();
+    }, { rootMargin: "120px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [hasMore, loadMore]);
+
+  // Agrupar SOLO las visibles por fecha
+  const groups = groupByDate(visibleItems);
 
   return (
     <>
@@ -226,6 +240,12 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
           </div>
         </div>
       ))}
+      {hasMore && (
+        <div ref={sentinelRef} style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "18px 0 28px", minHeight: 20 }}>
+          <style>{`@keyframes orusSpin { to { transform: rotate(360deg); } }`}</style>
+          <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2.5px solid ${t.divider}`, borderTopColor: "#9B6DFF", animation: "orusSpin 0.7s linear infinite", opacity: loading ? 1 : 0 }} />
+        </div>
+      )}
     </>
   );
 }
