@@ -24,15 +24,14 @@ import {
 } from "./constants";
 
 import { calculateDashboard } from "./utils/dashboardCalculations";
-import { getCategoryName } from "./utils/categoryUtils";
 
 // 🆕 Importar páginas de nuevas secciones
-import CategoriesPage from "./components/CategoriesPage";
-import AddCategoryPage from "./components/AddCategoryPage";
-import BudgetsPage from "./components/BudgetsPage";
 import MovimientosPage from "./components/MovimientosPage";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardScreen from "./components/DashboardScreen";
+import BudgetsScreen from "./components/BudgetsScreen";
+import CategoriesScreen from "./components/CategoriesScreen";
+import AddCategoryScreen from "./components/AddCategoryScreen";
 import TransactionScreen from "./components/TransactionScreen";
 import { useTransactionActions } from "./hooks/useTransactionActions";
 import SettingsScreen from "./components/SettingsScreen";
@@ -430,34 +429,7 @@ function Dashboard() {
 
   // 🆕 Pantalla de Presupuestos
   if (screen === "budgets") {
-    const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
-    const currentYear = selectedPeriod?.year || new Date().getFullYear();
-    const key = `${currentYear}-${String(currentMonth).padStart(2, '0')}`;
-
-    const currentMonthBudgets = {};
-    PILLARS.forEach(p => {
-      currentMonthBudgets[p.id] = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets);
-    });
-
-    return (
-      <ScreenShell bg={t.bg}>
-          <BudgetsPage
-            isDark={isDark}
-            onBack={() => setScreen("settings")}
-            initialBudgets={currentMonthBudgets}
-            categories={categories}
-            editPillarBudget={editPillarBudget}
-            editCategoryBudget={editCategoryBudget}
-            onSave={(newBudgets) => {
-              setCustomBudgets(prev => ({
-                ...prev,
-                [key]: newBudgets
-              }));
-            }}
-            onSaveSuccess={() => setScreen("settings")}
-          />
-      </ScreenShell>
-    );
+    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} />;
   }
 
   // 🆕 Pantalla de Movimientos por Pilar
@@ -481,60 +453,12 @@ function Dashboard() {
 
   // 🆕 Pantalla de Categorías
   if (screen === "categories") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <CategoriesPage
-            isDark={isDark}
-            onBack={() => setScreen("settings")}
-            onAddCategory={() => {
-              resetCategoryEditing();
-              setScreen("add-category");
-            }}
-            onEditCategory={(categoryId, pillarId) => {
-              // ✅ Guardar ID y convertir ID a nombre para pasar a AddCategoryPage
-              startCategoryEditing(categoryId, getCategoryName(categoryId), pillarId);
-              setScreen("add-category");
-            }}
-            categories={categories}
-          />
-      </ScreenShell>
-    );
+    return <CategoriesScreen isDark={isDark} t={t} categories={categories} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} />;
   }
 
   // 🆕 Pantalla de Agregar/Editar Categoría
   if (screen === "add-category") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <AddCategoryPage
-            isDark={isDark}
-            onBack={() => setScreen("categories")}
-            categories={categories}
-            isEditing={editingCategoryName !== null}
-            editingCategoryName={editingCategoryName}
-            editingPillarId={editingPillarId}
-            onSave={(pillarId, categoryName) => {
-              if (editingCategoryId) {
-                // 🆕 MODO EDICIÓN: Editar categoría existente usando ID
-                editCategory(editingCategoryId, { name: categoryName, pillar: pillarId });
-              } else {
-                // 🆕 MODO NUEVO: Crear nueva categoría
-                createCategory(pillarId, categoryName);
-              }
-
-              setScreen("categories");
-              resetCategoryEditing();
-            }}
-            onDelete={() => {
-              // 🆕 Eliminar categoría por ID
-              if (editingCategoryId) {
-                deleteCategory(editingCategoryId);
-              }
-              setScreen("categories");
-              resetCategoryEditing();
-            }}
-          />
-      </ScreenShell>
-    );
+    return <AddCategoryScreen isDark={isDark} t={t} categories={categories} editingCategoryName={editingCategoryName} editingPillarId={editingPillarId} editingCategoryId={editingCategoryId} editCategory={editCategory} createCategory={createCategory} deleteCategory={deleteCategory} resetCategoryEditing={resetCategoryEditing} setScreen={setScreen} />;
   }
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
