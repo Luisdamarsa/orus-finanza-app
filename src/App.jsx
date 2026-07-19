@@ -12,7 +12,7 @@ import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
 import { useTransactionToast } from "./hooks/useTransactionToast";
-import ScreenShell from "./components/ScreenShell";
+import ScreenRouter from "./components/ScreenRouter";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
@@ -27,17 +27,7 @@ import { calculateDashboard } from "./utils/dashboardCalculations";
 
 // 🆕 Importar páginas de nuevas secciones
 import { useMultipleLoading } from "./hooks/useLoading";
-import DashboardScreen from "./components/DashboardScreen";
-import MovimientosScreen from "./components/MovimientosScreen";
-import BudgetsScreen from "./components/BudgetsScreen";
-import CategoriesScreen from "./components/CategoriesScreen";
-import AddCategoryScreen from "./components/AddCategoryScreen";
-import TransactionScreen from "./components/TransactionScreen";
 import { useTransactionActions } from "./hooks/useTransactionActions";
-import SettingsScreen from "./components/SettingsScreen";
-import ShowIncomesScreen from "./components/ShowIncomesScreen";
-import ProfileScreen from "./components/ProfileScreen";
-import PillarDetailPage from "./components/PillarDetailPage";
 
 // 🆕 Importar userStorage para datos del usuario
 
@@ -390,63 +380,6 @@ function Dashboard() {
     setScreen, screen,
   });
 
-  if (screen === "pillar-detail" && selectedPillarDetail) {
-    return (
-      <ScreenShell bg={t.bg}>
-          <PillarDetailPage
-            pillar={selectedPillarDetail}
-            onBack={() => { setScreen("dashboard"); setShowPillarBars(false); setSelectedPillarDetail(null); }}
-            isDark={isDark}
-            transactions={transactions}
-          />
-      </ScreenShell>
-    );
-  }
-
-  if (screen === "new-transaction") {
-    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} onBack={() => setScreen("dashboard")} onCreateCategory={(name, pillarId) => addCategoryToHook(pillarId, name)} />;
-  }
-
-  // 🆕 Pantalla de Editar Transacción
-  if (editingTransactionId && selectedTransactionForEdit) {
-    return <TransactionScreen mode="edit" isDark={isDark} t={t} categories={categories} editingTransaction={selectedTransactionForEdit} actions={txnActions} onBack={() => resetTransactionEditing()} />;
-  }
-
-  // 🆕 Pantalla de Configuraciones
-  if (screen === "settings") {
-    return <SettingsScreen isDark={isDark} t={t} setScreen={setScreen} showIncomes={showIncomes} setShowIncomes={setShowIncomes} />;
-  }
-
-  // 🆕 Pantalla de Mostrar Ingresos
-  if (screen === "show-incomes") {
-    return <ShowIncomesScreen isDark={isDark} t={t} setScreen={setScreen} showIncomes={showIncomes} setShowIncomes={setShowIncomes} />;
-  }
-
-  // 🆕 Pantalla de Perfil
-  if (screen === "profile") {
-    return <ProfileScreen isDark={isDark} t={t} setScreen={setScreen} />;
-  }
-
-  // 🆕 Pantalla de Presupuestos
-  if (screen === "budgets") {
-    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} />;
-  }
-
-  // 🆕 Pantalla de Movimientos por Pilar
-  if (screen === "movimientos" && selectedPillarForMovements) {
-    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} />;
-  }
-
-  // 🆕 Pantalla de Categorías
-  if (screen === "categories") {
-    return <CategoriesScreen isDark={isDark} t={t} categories={categories} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} />;
-  }
-
-  // 🆕 Pantalla de Agregar/Editar Categoría
-  if (screen === "add-category") {
-    return <AddCategoryScreen isDark={isDark} t={t} categories={categories} editingCategoryName={editingCategoryName} editingPillarId={editingPillarId} editingCategoryId={editingCategoryId} editCategory={editCategory} createCategory={createCategory} deleteCategory={deleteCategory} resetCategoryEditing={resetCategoryEditing} setScreen={setScreen} />;
-  }
-
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
   const dashboard = {
     newTxnToast,
@@ -473,9 +406,22 @@ function Dashboard() {
     ...dashboardMetrics,
   };
 
+  const routerProps = {
+    screen, isDark, t,
+    selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
+    categories, customConcepts, txnActions, addCategoryToHook,
+    editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
+    showIncomes, setShowIncomes,
+    selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
+    selectedPillarForMovements, startTransactionEditing,
+    resetCategoryEditing, startCategoryEditing,
+    editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
+    setScreen,
+  };
+
   return (
     <DashboardContext.Provider value={dashboard}>
-      <DashboardScreen />
+      <ScreenRouter {...routerProps} />
     </DashboardContext.Provider>
   );
 }
