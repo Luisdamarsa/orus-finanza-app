@@ -374,10 +374,22 @@ function Dashboard() {
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
 
+  // 🆕 Resuelve/crea la categoría "Varios" del pilar Varios (gastos sin categoría caen ahí)
+  const ensureVariosCategory = () => {
+    const existing = ALL_CATS.find(
+      (c) => c.pillar === "varios" && c.name?.toLowerCase() === "varios" && !c.deletedAt
+    );
+    if (existing) return existing.id;
+    const newId = catalog.createCategoryEntry("varios", "Varios");
+    addCategoryToHook("varios", newId); // refresca el estado -> aparece en Categorías/Presupuestos
+    return newId;
+  };
+
   const txnActions = useTransactionActions({
     addTx, editTransaction, deleteTransaction, triggerNewTxnToast,
     setSelectedPeriod, setIsMovementOpen, setFilterType, setMovementOpenedFrom,
     setScreen, screen,
+    ensureVariosCategory,
   });
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.

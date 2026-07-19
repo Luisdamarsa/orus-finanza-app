@@ -16,6 +16,7 @@ export function useTransactionActions({
   setMovementOpenedFrom,
   setScreen,
   screen,
+  ensureVariosCategory,
 }) {
   // Al guardar/eliminar en modo edición: volver a la pantalla de origen.
   const backToOrigin = () =>
@@ -28,7 +29,14 @@ export function useTransactionActions({
       return;
     }
     const now = new Date();
-    const categoryId = concept || null; // concept es el ID de la categoría (viene de TransactionPage)
+    let categoryId = concept || null; // concept es el ID de la categoría (viene de TransactionPage)
+    let pillar = isIncome ? "ingreso" : pillarId;
+
+    // 🆕 Gasto sin categoría → cae en la categoría "Varios" del pilar Varios (la crea si no existe)
+    if (!isIncome && !categoryId) {
+      categoryId = ensureVariosCategory();
+      pillar = "varios";
+    }
 
     const newTx = {
       date: now.toISOString().slice(0, 10),
@@ -36,12 +44,12 @@ export function useTransactionActions({
       description: desc,
       method: method || "Banco",
       amount: isIncome ? absAmount : -absAmount,
-      pillar: isIncome ? "ingreso" : pillarId,
+      pillar,
       category: categoryId,
     };
 
     addTx(newTx); // el servicio asigna el id; el hook persiste
-    triggerNewTxnToast({ isIncome, pillarId, categoryId, amount: newTx.amount });
+    triggerNewTxnToast({ isIncome, pillarId: pillar, categoryId, amount: newTx.amount });
 
     setSelectedPeriod({ year: now.getFullYear(), month: now.getMonth() + 1 });
     // Cerrar Estado 2 automáticamente al agregar
