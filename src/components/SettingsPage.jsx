@@ -139,14 +139,14 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                   }}
                   onMouseEnter={(e) => {
                     if (pressingButton !== item.id) {
-                      e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-                      e.target.style.borderColor = isDark ? "#3D3D4D" : "#D5D3E8";
+                      e.currentTarget.style.background = isDark ? "#252535" : "#F5F3FF";
+                      e.currentTarget.style.borderColor = isDark ? "#3D3D4D" : "#D5D3E8";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (pressingButton !== item.id) {
-                      e.target.style.background = t.card;
-                      e.target.style.borderColor = t.border;
+                      e.currentTarget.style.background = t.card;
+                      e.currentTarget.style.borderColor = t.border;
                     }
                   }}>
                   <span style={{ fontSize: 18 }}>{item.icon}</span>
