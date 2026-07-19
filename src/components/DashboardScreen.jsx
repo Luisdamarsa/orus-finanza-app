@@ -28,6 +28,9 @@ export default function DashboardScreen() {
     transactions, startTransactionEditing, newTxnToast,
   } = useDashboard();
 
+  // 🆕 key que reinicia scroll + paginación al cambiar de periodo/filtro
+  const listKey = `${selectedPeriod?.year ?? "all"}-${selectedPeriod?.month ?? "all"}-${filterType ?? "none"}-${filteredPillar ?? "none"}`;
+
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
       <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
@@ -95,7 +98,7 @@ export default function DashboardScreen() {
 
           {/* Transacciones - position absolute si está abierto */}
           {isMovementOpen && (
-            <div style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
+            <div key={listKey} style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
               <style>{`::-webkit-scrollbar { display: none; }`}</style>
               <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
               <TransactionsListService
