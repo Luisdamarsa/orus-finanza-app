@@ -206,6 +206,7 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
         <div style={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           gap: 8,
         }}>
           <span style={{ fontSize: 22 }}>💰</span>
