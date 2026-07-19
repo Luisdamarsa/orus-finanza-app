@@ -27,16 +27,16 @@ import { calculateDashboard } from "./utils/dashboardCalculations";
 import { getCategoryName } from "./utils/categoryUtils";
 
 // 🆕 Importar páginas de nuevas secciones
-import SettingsPage from "./components/SettingsPage";
-import ShowIncomesPage from "./components/ShowIncomesPage";
 import CategoriesPage from "./components/CategoriesPage";
 import AddCategoryPage from "./components/AddCategoryPage";
 import BudgetsPage from "./components/BudgetsPage";
 import MovimientosPage from "./components/MovimientosPage";
-import ProfilePage from "./components/ProfilePage";
 import TransactionPage from "./components/TransactionPage";
 import { useMultipleLoading } from "./hooks/useLoading";
 import DashboardScreen from "./components/DashboardScreen";
+import SettingsScreen from "./components/SettingsScreen";
+import ShowIncomesScreen from "./components/ShowIncomesScreen";
+import ProfileScreen from "./components/ProfileScreen";
 import PillarDetailPage from "./components/PillarDetailPage";
 
 // 🆕 Importar userStorage para datos del usuario
@@ -486,47 +486,17 @@ function Dashboard() {
 
   // 🆕 Pantalla de Configuraciones
   if (screen === "settings") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <SettingsPage
-            isDark={isDark}
-            onBack={() => setScreen("dashboard")}
-            onBudgets={() => setScreen("budgets")}
-            onProfile={() => setScreen("profile")}
-            onCategories={() => setScreen("categories")}
-            onShowIncomes={() => setScreen("show-incomes")}
-            showIncomes={showIncomes}
-            setShowIncomes={setShowIncomes}
-          />
-      </ScreenShell>
-    );
+    return <SettingsScreen isDark={isDark} t={t} setScreen={setScreen} showIncomes={showIncomes} setShowIncomes={setShowIncomes} />;
   }
 
   // 🆕 Pantalla de Mostrar Ingresos
   if (screen === "show-incomes") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <ShowIncomesPage
-            isDark={isDark}
-            onBack={() => setScreen("settings")}
-            showIncomesEnabled={showIncomes}
-            onToggleShowIncomes={setShowIncomes}
-          />
-      </ScreenShell>
-    );
+    return <ShowIncomesScreen isDark={isDark} t={t} setScreen={setScreen} showIncomes={showIncomes} setShowIncomes={setShowIncomes} />;
   }
 
   // 🆕 Pantalla de Perfil
   if (screen === "profile") {
-    return (
-      <ScreenShell bg={t.bg}>
-          <ProfilePage
-            isDark={isDark}
-            onBack={() => setScreen("settings")}
-            onSaveSuccess={() => setScreen("settings")}
-          />
-      </ScreenShell>
-    );
+    return <ProfileScreen isDark={isDark} t={t} setScreen={setScreen} />;
   }
 
   // 🆕 Pantalla de Presupuestos
