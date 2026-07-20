@@ -4,7 +4,7 @@ import PageLayout from "./PageLayout";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
 
-export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout, onPermissions }) {
+export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout, onPermissions, onSubscription }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
@@ -21,6 +21,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
     { id: "categorias", icon: "🏷️", label: "Categorías", type: "menu" },
     { id: "presupuestos", icon: "💰", label: "Presupuestos", type: "menu" },
     { id: "ingresos", icon: "📈", label: "Mostrar Ingresos", type: "toggle", value: showIncomes, onChange: setShowIncomes },
+    { id: "plan", icon: "💎", label: "Mi Plan", type: "menu" },
     { id: "automatizacion", icon: "⚙️", label: "Automatización", type: "menu" },
     { id: "permisos", icon: "🔐", label: "Permisos", type: "menu" },
     { id: "informes", icon: "📊", label: "Informes", type: "menu" },
@@ -125,6 +126,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     else if (item.id === "categorias" && onCategories) onCategories();
                     else if (item.id === "acerca" && onAbout) onAbout();
                     else if (item.id === "permisos" && onPermissions) onPermissions();
+                    else if (item.id === "plan" && onSubscription) onSubscription();
                   }}
                   onPointerDown={() => setPressingButton(item.id)}
                   onPointerUp={() => setPressingButton(null)}
