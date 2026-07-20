@@ -47,7 +47,7 @@ function renderMarkdown(md, t, isDark) {
     flush();
     if (line.startsWith("# ")) continue; // título lo pone PageLayout
     else if (line.startsWith("### ")) out.push(<h3 key={key++} style={{ fontSize: 13.5, fontWeight: 700, color: t.text, margin: "12px 0 4px" }}>{inline(line.slice(4), key)}</h3>);
-    else if (line.startsWith("## ")) out.push(<h2 key={key++} style={{ fontSize: 15, fontWeight: 800, color: t.text, margin: "18px 0 6px" }}>{inline(line.slice(3), key)}</h2>);
+    else if (line.startsWith("## ")) out.push(<h2 key={key++} style={{ fontSize: 15, fontWeight: 800, color: t.text, margin: "30px 0 6px" }}>{inline(line.slice(3), key)}</h2>);
     else if (line.startsWith("> ")) out.push(
       <div key={key++} style={{ borderLeft: `3px solid #9B6DFF88`, padding: "7px 10px", margin: "8px 0", background: isDark ? "#1A1730" : "#F3F0FF", color: t.sub, fontSize: 12, lineHeight: 1.5, borderRadius: 6 }}>{inline(line.slice(2), key)}</div>
     );
