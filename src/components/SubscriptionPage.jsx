@@ -73,6 +73,12 @@ const PLANS = [
     price: 2.99,
     tagline: "Que la app registre por ti. Sin escribir, sin anuncios.",
     highlight: true, // el más popular
+    perks: ["Sin anuncios", "Lectura automática por correo", "IA que categoriza tus gastos"],
+    reviews: [
+      { name: "Camila R.", stars: 5, text: "Dejé de anotar todo a mano. Llegan mis gastos solos y ya no veo anuncios. Vale cada peso." },
+      { name: "Andrés M.", stars: 5, text: "Lo mejor: conecté mi correo y la app clasifica sola. Súper cómodo." },
+      { name: "Valentina P.", stars: 4, text: "Muy bueno por el precio. La categorización automática me ahorra un montón de tiempo." },
+    ],
     features: [
       { t: "Todo lo del plan Free, ilimitado", ok: true },
       { t: "Sin anuncios", ok: true },
@@ -94,6 +100,12 @@ const PLANS = [
     tagline: "Tu asistente financiero con IA. Solo o en equipo.",
     gold: true,
     badge: "MÁS COMPLETO",
+    perks: ["Asistente de IA para tus finanzas", "Informes mensuales y anuales", "Workspaces compartidos"],
+    reviews: [
+      { name: "Daniela S.", stars: 5, text: "El asistente de IA me dice en qué estoy gastando de más. Es como tener un contador en el bolsillo." },
+      { name: "Juan Felipe", stars: 5, text: "Comparto un workspace con mi novia para los gastos de la casa. Nos organizó la vida." },
+      { name: "Mariana G.", stars: 5, text: "Los informes anuales son oro para mi negocio. Ahora sé exactamente cómo me fue el año." },
+    ],
     features: [
       { t: "Todo lo del plan Plus", ok: true },
       { t: "Asistente de IA: pregúntale sobre tus finanzas", ok: true, note: "hasta 100 consultas/mes" },
@@ -111,6 +123,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
   // Plan activo del usuario (desde userStorage). Ej: "FREE" -> "free"
   const [currentPlan, setCurrentPlan] = useState(() => userStorage.getSubscription().toLowerCase());
   const [selected, setSelected] = useState(null);
+  const [confirming, setConfirming] = useState(null); // id del plan en pantalla de confirmación
   const [expanded, setExpanded] = useState(() => userStorage.getSubscription().toLowerCase()); // abre el plan activo
 
   // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
@@ -130,6 +143,116 @@ export default function SubscriptionPage({ isDark, onBack }) {
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
 
   const toggle = (id) => setExpanded((cur) => (cur === id ? null : id));
+
+  const confirmChange = (id) => {
+    userStorage.setSubscription(id.toUpperCase()); // cambia la suscripción del usuario
+    setCurrentPlan(id);
+    setExpanded(id);
+    setSelected(id);
+    setConfirming(null);
+  };
+
+  const Stars = ({ n }) => (
+    <span style={{ color: "#F5C451", fontSize: 11, letterSpacing: 1 }}>
+      {"★".repeat(n)}<span style={{ color: t.border }}>{"★".repeat(5 - n)}</span>
+    </span>
+  );
+
+  // Pantalla de CONFIRMACIÓN (antes de aplicar / pagar)
+  const cp = confirming ? PLANS.find((x) => x.id === confirming) : null;
+  if (cp) {
+    const accent = cp.gold ? "#E0A93E" : cp.highlight ? "#9B6DFF" : t.text;
+    return (
+      <PageLayout
+        isDark={isDark}
+        onBack={() => setConfirming(null)}
+        pressBack={pressBack}
+        title={
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+            <span style={{ fontSize: 18 }}>💎</span>CONFIRMAR PLAN
+          </span>
+        }
+      >
+        <div style={{ textAlign: "left" }}>
+          {/* Resumen del plan */}
+          <div style={{ background: t.card, border: `2px solid ${accent}`, borderRadius: 16, padding: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: cp.tint + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>
+                {cp.id === "free" ? <DonutIcon size={28} /> : cp.icon}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <b style={{ fontSize: 17, color: t.text }}>{cp.name}</b>
+                <div style={{ fontSize: 11.5, color: t.sub, marginTop: 2 }}>{cp.tagline}</div>
+              </div>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              {cp.price === 0
+                ? <span style={{ fontSize: 22, fontWeight: 800, color: t.text }}>Gratis</span>
+                : <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: t.text }}>${cp.price}</span>
+                    <span style={{ fontSize: 12, color: t.sub, fontWeight: 600 }}>USD/mes</span>
+                    <span style={{ fontSize: 10, color: t.sub, marginLeft: 6 }}>{cop(cp.price)}</span>
+                  </span>}
+            </div>
+          </div>
+
+          {/* Ventajas destacadas */}
+          {cp.perks && (
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8 }}>Lo que obtienes</div>
+              {cp.perks.map((perk, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
+                  <span style={{ color: accent, fontWeight: 800, fontSize: 13 }}>✓</span>
+                  <span style={{ fontSize: 12.5, color: t.text, lineHeight: 1.4 }}>{perk}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Reseñas */}
+          {cp.reviews && (
+            <div style={{ marginTop: 18 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8 }}>Lo que dicen quienes lo usan</div>
+              {cp.reviews.map((r, i) => (
+                <div key={i} style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                    <b style={{ fontSize: 12, color: t.text }}>{r.name}</b>
+                    <Stars n={r.stars} />
+                  </div>
+                  <div style={{ fontSize: 11.5, color: t.sub, lineHeight: 1.5 }}>“{r.text}”</div>
+                </div>
+              ))}
+              <div style={{ fontSize: 9, color: t.sub, fontStyle: "italic", marginTop: 2 }}>Reseñas de ejemplo.</div>
+            </div>
+          )}
+
+          {/* Botones */}
+          <button
+            onClick={() => confirmChange(cp.id)}
+            style={{
+              width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "none",
+              background: cp.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (cp.highlight ? "#9B6DFF" : (cp.id === "free" ? "#22C55E" : t.text)),
+              color: cp.gold ? "#3D2B00" : (cp.id === "free" || cp.highlight ? "#fff" : t.bg),
+              fontSize: 14, fontWeight: 800, cursor: "pointer",
+            }}
+          >
+            {cp.price === 0 ? "Cambiar a ORUS Free" : `Continuar con ${cp.name}`}
+          </button>
+          <button
+            onClick={() => setConfirming(null)}
+            style={{ width: "100%", marginTop: 10, padding: "11px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: "transparent", color: t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+          >
+            Cancelar
+          </button>
+          {cp.price !== 0 && (
+            <div style={{ fontSize: 10, color: t.sub, textAlign: "center", marginTop: 10, paddingBottom: 10, lineHeight: 1.5 }}>
+              🔒 El pago se procesará de forma segura por tu tienda (App Store / Google Play). Cancela cuando quieras.
+            </div>
+          )}
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout
@@ -238,10 +361,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isCurrent) return;
-                  userStorage.setSubscription(p.id.toUpperCase()); // cambia la suscripción del usuario
-                  setCurrentPlan(p.id);
-                  setExpanded(p.id);
-                  setSelected(p.id);
+                  setConfirming(p.id); // abre la pantalla de confirmación
                 }}
                 style={{
                   width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
