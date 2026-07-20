@@ -127,7 +127,7 @@ export default function AboutPage({ isDark, onBack }) {
         </svg>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 6 }}>
           {PILLARS_LEGEND.map(([l, c]) => (
-            <span key={l} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: c + "22", color: c }}>● {l}</span>
+            <span key={l} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: c + "22", color: c }}>{l}</span>
           ))}
         </div>
         <div style={{ fontSize: 12, color: t.sub, textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
