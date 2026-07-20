@@ -4,7 +4,7 @@ import PageLayout from "./PageLayout";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
 
-export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout }) {
+export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout, onPermissions }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
@@ -124,6 +124,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     else if (item.id === "presupuestos" && onBudgets) onBudgets();
                     else if (item.id === "categorias" && onCategories) onCategories();
                     else if (item.id === "acerca" && onAbout) onAbout();
+                    else if (item.id === "permisos" && onPermissions) onPermissions();
                   }}
                   onPointerDown={() => setPressingButton(item.id)}
                   onPointerUp={() => setPressingButton(null)}

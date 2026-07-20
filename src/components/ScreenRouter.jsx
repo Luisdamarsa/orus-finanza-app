@@ -11,6 +11,7 @@ import AddCategoryScreen from "./AddCategoryScreen";
 import DashboardScreen from "./DashboardScreen";
 import LegalPage from "./LegalPage";
 import AboutPage from "./AboutPage";
+import PermissionsPage from "./PermissionsPage";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -100,6 +101,14 @@ export default function ScreenRouter({
     return (
       <ScreenShell bg={t.bg}>
         <AboutPage isDark={isDark} onBack={() => setScreen("settings")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "permissions") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <PermissionsPage isDark={isDark} onBack={() => setScreen("settings")} />
       </ScreenShell>
     );
   }
