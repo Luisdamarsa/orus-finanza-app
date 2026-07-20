@@ -108,7 +108,16 @@ export default function ScreenRouter({
   if (screen === "permissions") {
     return (
       <ScreenShell bg={t.bg}>
-        <PermissionsPage isDark={isDark} onBack={() => setScreen("settings")} />
+        <PermissionsPage isDark={isDark} onBack={() => setScreen("settings")} onOpenPrivacy={() => setScreen("privacy-perms")} />
+      </ScreenShell>
+    );
+  }
+
+  // Privacidad abierta DESDE Permisos → Atrás vuelve a Permisos
+  if (screen === "privacy-perms") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <LegalPage variant="privacy" isDark={isDark} onBack={() => setScreen("permissions")} />
       </ScreenShell>
     );
   }
