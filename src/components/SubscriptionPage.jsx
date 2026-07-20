@@ -6,18 +6,52 @@ import PageLayout from "./PageLayout";
  * SubscriptionPage.jsx — "Mi Plan".
  * Presenta los 3 planes de ORUS (Free / Plus / Pro) con sus beneficios.
  * Precios en USD (universal). Las tarjetas aparecen desde abajo al entrar en pantalla
- * (reveal por scroll, IntersectionObserver). Mismo formato que las demás (PageLayout).
- * Extraída — ruteo en ScreenRouter.
+ * (reveal por scroll) y están COLAPSADAS: se ve nombre + descripción + precio + botón;
+ * al tocar la tarjeta (menos el botón) se despliegan todas las características.
+ * Mismo formato que las demás (PageLayout). Extraída — ruteo en ScreenRouter.
  */
 
 const USD_TO_COP = 3300; // ref. 20 jul 2026
 const cop = (usd) => "≈ $" + Math.round((usd * USD_TO_COP) / 100) * 100 + " COP/mes";
 
+// Donut de ORUS (símbolo) — mismos pilares/colores del dashboard
+const DONUT = [
+  { c: "#93C5FD", pct: 30 },
+  { c: "#FCA5A5", pct: 20 },
+  { c: "#86EFAC", pct: 15 },
+  { c: "#C4B5FD", pct: 20 },
+  { c: "#FDE68A", pct: 15 },
+];
+function polar(cx, cy, r, deg) {
+  const a = ((deg - 90) * Math.PI) / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
+function arcPath(cx, cy, r, s, e) {
+  const [x1, y1] = polar(cx, cy, r, s);
+  const [x2, y2] = polar(cx, cy, r, e);
+  const large = e - s > 180 ? 1 : 0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+function DonutIcon({ size = 26 }) {
+  const cx = size / 2, cy = size / 2, r = size / 2 - 3;
+  let cursor = 0;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {DONUT.map((s, i) => {
+        const sweep = s.pct * 3.6;
+        const start = cursor;
+        const end = cursor + sweep - 8;
+        cursor += sweep;
+        return <path key={i} d={arcPath(cx, cy, r, start, end)} stroke={s.c} strokeWidth={4} fill="none" strokeLinecap="round" />;
+      })}
+    </svg>
+  );
+}
+
 const PLANS = [
   {
     id: "free",
-    name: "Free",
-    icon: "🆓",
+    name: "ORUS Free",
     tint: "#86EFAC",
     price: 0,
     tagline: "Empieza a tomar el control, sin pagar nada.",
@@ -33,7 +67,7 @@ const PLANS = [
   },
   {
     id: "plus",
-    name: "Plus",
+    name: "ORUS Plus",
     icon: "⭐",
     tint: "#93C5FD",
     price: 2.99,
@@ -53,7 +87,7 @@ const PLANS = [
   },
   {
     id: "pro",
-    name: "Pro",
+    name: "ORUS Pro",
     icon: "👑",
     tint: "#C4B5FD",
     price: 5.99,
@@ -73,6 +107,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
   const pressBack = usePress();
   const containerRef = useRef(null);
   const [selected, setSelected] = useState(null);
+  const [expanded, setExpanded] = useState(null); // id de la tarjeta desplegada
 
   // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
   useEffect(() => {
@@ -89,6 +124,8 @@ export default function SubscriptionPage({ isDark, onBack }) {
   const t = isDark
     ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
+
+  const toggle = (id) => setExpanded((cur) => (cur === id ? null : id));
 
   return (
     <PageLayout
@@ -112,20 +149,22 @@ export default function SubscriptionPage({ isDark, onBack }) {
         </div>
 
         {PLANS.map((p, i) => {
-          const isSel = selected === p.id;
+          const isOpen = expanded === p.id;
           const border = p.highlight ? "#9B6DFF" : t.border;
           return (
             <div
               key={p.id}
               className="reveal"
+              onClick={() => toggle(p.id)}
               style={{
                 background: t.card,
-                border: `${p.highlight ? 2 : 1}px solid ${isSel ? "#9B6DFF" : border}`,
+                border: `${p.highlight ? 2 : 1}px solid ${border}`,
                 borderRadius: 16,
                 padding: 16,
                 marginTop: 14,
                 transitionDelay: `${i * 0.1}s`,
                 position: "relative",
+                cursor: "pointer",
               }}
             >
               {p.highlight && (
@@ -137,7 +176,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
               {/* Encabezado del plan */}
               <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: p.tint + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                  {p.icon}
+                  {p.id === "free" ? <DonutIcon size={26} /> : p.icon}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
@@ -148,6 +187,12 @@ export default function SubscriptionPage({ isDark, onBack }) {
                   </div>
                   <div style={{ fontSize: 11.5, color: t.sub, lineHeight: 1.45, marginTop: 2 }}>{p.tagline}</div>
                 </div>
+                {/* Flechita para desplegar */}
+                <span style={{ flexShrink: 0, marginTop: 2, color: t.sub, transition: "transform 0.25s ease", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-flex" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </span>
               </div>
 
               {/* Precio */}
@@ -155,7 +200,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 {p.price === 0 ? (
                   <span style={{ fontSize: 24, fontWeight: 800, color: t.text }}>Gratis</span>
                 ) : (
-                  <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}>
+                  <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 24, fontWeight: 800, color: t.text }}>${p.price}</span>
                     <span style={{ fontSize: 12, color: t.sub, fontWeight: 600 }}>USD/mes</span>
                     <span style={{ fontSize: 10, color: t.sub, marginLeft: 6 }}>{cop(p.price)}</span>
@@ -163,24 +208,26 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 )}
               </div>
 
-              {/* Lista de beneficios */}
-              <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
-                {p.features.map((f, j) => (
-                  <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                    <span style={{ fontSize: 12, lineHeight: 1.4, flexShrink: 0, color: f.ok ? "#22C55E" : "#FCA5A5", fontWeight: 700 }}>
-                      {f.ok ? "✓" : "✕"}
-                    </span>
-                    <span style={{ fontSize: 12, lineHeight: 1.4, color: f.ok ? (f.muted ? t.sub : t.text) : t.sub, textDecoration: f.ok ? "none" : "none", opacity: f.ok ? 1 : 0.6 }}>
-                      {f.t}
-                      {f.note && <span style={{ color: t.sub, fontStyle: "italic" }}> — {f.note}</span>}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {/* Lista de beneficios (solo si está desplegada) */}
+              {isOpen && (
+                <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
+                  {p.features.map((f, j) => (
+                    <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <span style={{ fontSize: 12, lineHeight: 1.4, flexShrink: 0, color: f.ok ? "#22C55E" : "#FCA5A5", fontWeight: 700 }}>
+                        {f.ok ? "✓" : "✕"}
+                      </span>
+                      <span style={{ fontSize: 12, lineHeight: 1.4, color: f.ok ? (f.muted ? t.sub : t.text) : t.sub, opacity: f.ok ? 1 : 0.6 }}>
+                        {f.t}
+                        {f.note && <span style={{ color: t.sub, fontStyle: "italic" }}> — {f.note}</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              {/* Botón de acción */}
+              {/* Botón de acción (no expande la tarjeta) */}
               <button
-                onClick={() => setSelected(p.id)}
+                onClick={(e) => { e.stopPropagation(); if (!p.current) setSelected(p.id); }}
                 style={{
                   width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
                   border: p.current ? `1.5px solid ${t.border}` : "none",
@@ -197,7 +244,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
         {selected && selected !== "free" && (
           <div style={{ fontSize: 11, color: t.sub, textAlign: "center", marginTop: 12, lineHeight: 1.5 }}>
-            🔒 Los pagos se activarán próximamente. ¡Gracias por tu interés en <b style={{ color: "#9B6DFF" }}>ORUS {PLANS.find((x) => x.id === selected).name}</b>!
+            🔒 Los pagos se activarán próximamente. ¡Gracias por tu interés en <b style={{ color: "#9B6DFF" }}>{PLANS.find((x) => x.id === selected).name}</b>!
           </div>
         )}
 
