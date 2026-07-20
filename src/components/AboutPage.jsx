@@ -1,13 +1,11 @@
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
-import DonutChart from "./DonutChart";
 
 /**
  * AboutPage.jsx — "Acerca de ORUS Finanzas".
  * Presenta la app (historia + características) con ilustraciones vivas (SVG/estilos propios)
  * y animaciones sutiles. Mismo formato que las demás (PageLayout). Extraída — ruteo en ScreenRouter.
  */
-// Segmentos de ejemplo para el donut (mismo formato que el real)
 const DONUT_SEGMENTS = [
   { id: "fijos", color: "#93C5FD", pct: 30 },
   { id: "deuda", color: "#FCA5A5", pct: 20 },
@@ -24,6 +22,18 @@ const PILLARS_LEGEND = [
   ["Varios", "#FDE68A"],
 ];
 
+// Arco polar (mismo estilo del donut real: puntas redondeadas + gap entre segmentos)
+function polar(cx, cy, r, deg) {
+  const a = ((deg - 90) * Math.PI) / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
+function arcPath(cx, cy, r, startDeg, endDeg) {
+  const [x1, y1] = polar(cx, cy, r, startDeg);
+  const [x2, y2] = polar(cx, cy, r, endDeg);
+  const large = endDeg - startDeg > 180 ? 1 : 0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
 export default function AboutPage({ isDark, onBack }) {
   const pressBack = usePress();
   const t = isDark
@@ -37,14 +47,60 @@ export default function AboutPage({ isDark, onBack }) {
     </div>
   );
 
+  // Fila de movimiento con icono de pilar
+  const movRow = (icon, tint, title, sub, amount, amountColor) => (
+    <div style={{ background: tint + "14", border: `1px solid ${tint}33`, borderRadius: 10, padding: "8px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 30, height: 30, borderRadius: 9, background: tint + "33", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>{icon}</div>
+        <div><div style={{ fontSize: 11, fontWeight: 700, color: t.text }}>{title}</div><div style={{ fontSize: 9, color: t.sub }}>{sub}</div></div>
+      </div>
+      <div style={{ fontSize: 12, fontWeight: 800, color: amountColor }}>{amount}</div>
+    </div>
+  );
+
+  // Barra de presupuesto de pilar
+  const budRow = (icon, name, pct, color, mt) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: mt }}>
+      <span style={{ fontSize: 16 }}>{icon}</span><b style={{ fontSize: 11, color: t.text, minWidth: 44 }}>{name}</b>
+      <div style={{ flex: 1, height: 8, borderRadius: 6, background: t.border, overflow: "hidden" }}><div style={{ width: pct + "%", height: "100%", background: color }} /></div>
+      <span style={{ fontSize: 10, color: color, fontWeight: 700 }}>{pct}%</span>
+    </div>
+  );
+
+  // Arcos del donut
+  let cursor = 0;
+  const arcs = DONUT_SEGMENTS.map((seg) => {
+    const start = cursor;
+    cursor += seg.pct * 3.6;
+    return { ...seg, d: arcPath(90, 90, 70, start, cursor - 4) };
+  });
+
   return (
-    <PageLayout isDark={isDark} onBack={onBack} title="ACERCA DE ORUS" pressBack={pressBack}>
+    <PageLayout
+      isDark={isDark}
+      onBack={onBack}
+      pressBack={pressBack}
+      title={
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+          <svg width="20" height="20" viewBox="0 0 36 36" style={{ flexShrink: 0 }} aria-hidden="true">
+            <g fill="none" strokeWidth="7" transform="rotate(-90 18 18)">
+              <circle cx="18" cy="18" r="14" stroke="#93C5FD" strokeDasharray="26.4 87.9" strokeDashoffset="0" />
+              <circle cx="18" cy="18" r="14" stroke="#FCA5A5" strokeDasharray="17.6 87.9" strokeDashoffset="-26.4" />
+              <circle cx="18" cy="18" r="14" stroke="#86EFAC" strokeDasharray="13.2 87.9" strokeDashoffset="-44.0" />
+              <circle cx="18" cy="18" r="14" stroke="#C4B5FD" strokeDasharray="17.6 87.9" strokeDashoffset="-57.2" />
+              <circle cx="18" cy="18" r="14" stroke="#FDE68A" strokeDasharray="13.2 87.9" strokeDashoffset="-74.8" />
+            </g>
+          </svg>
+          ACERCA DE ORUS
+        </span>
+      }
+    >
       <style>{`
         @keyframes orusRise{to{opacity:1;transform:translateY(0)}}
-        @keyframes orusSeg{from{opacity:0;stroke-width:8}to{opacity:1;stroke-width:20}}
+        @keyframes orusSegColor{to{stroke:var(--c)}}
         @keyframes orusPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
         .orise{opacity:0;transform:translateY(14px);animation:orusRise .6s ease forwards;}
-        .oseg{opacity:0;animation:orusSeg .5s ease forwards;}
+        .osegc{stroke:#3A3A4A;animation:orusSegColor .55s ease forwards;}
         .opulse{animation:orusPulse 1.8s ease-in-out infinite;}
       `}</style>
 
@@ -58,17 +114,17 @@ export default function AboutPage({ isDark, onBack }) {
         </div>
       </div>
 
-      {/* Donut / pilares */}
+      {/* Donut / pilares (se colorea segmento por segmento) */}
       <div className="orise" style={{ marginTop: 26, display: "flex", flexDirection: "column", alignItems: "center", animationDelay: ".18s" }}>
-        <DonutChart
-          segments={DONUT_SEGMENTS}
-          cx={90} cy={90} outerR={72} innerR={44}
-          activeId={null} onSelect={() => {}}
-          isDark={isDark}
-          total={1688000} totalSpent={1688000}
-          pillarSpends={{}} hasSaldoAsignado={false} saldoValue={0}
-          selectedPeriod={null}
-        />
+        <svg width={180} height={180} viewBox="0 0 180 180" role="img" aria-label="Donut de pilares">
+          <g fill="none" strokeWidth={20} strokeLinecap="round">
+            {arcs.map((a, i) => (
+              <path key={a.id} className="osegc" d={a.d} style={{ "--c": a.color, animationDelay: `${0.3 + i * 0.12}s` }} />
+            ))}
+          </g>
+          <text x="90" y="84" textAnchor="middle" fill={t.sub} fontSize="12" fontWeight="600">Gastado</text>
+          <text x="90" y="106" textAnchor="middle" fill={t.text} fontSize="21" fontWeight="800">$1.688.000</text>
+        </svg>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 6 }}>
           {PILLARS_LEGEND.map(([l, c]) => (
             <span key={l} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: c + "22", color: c }}>● {l}</span>
@@ -82,31 +138,19 @@ export default function AboutPage({ isDark, onBack }) {
       {/* Movimientos */}
       <div className="orise" style={{ ...card, animationDelay: ".3s" }}>
         {h("📃", "Todo lo que entra y sale")}
-        <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>Cada gasto e ingreso, agrupado por día y clarito.</div>
-        <div style={{ background: "#FDE68A14", border: "1px solid #FDE68A33", borderRadius: 10, padding: "8px 10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: 9, background: "#FDE68A33", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>🛒</div><div><div style={{ fontSize: 11, fontWeight: 700, color: t.text }}>Carrefour</div><div style={{ fontSize: 9, color: t.sub }}>Tarjeta · Varios</div></div></div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#FCA5A5" }}>-$105.000</div>
-        </div>
-        <div style={{ background: "#22C55E14", border: "1px solid #22C55E33", borderRadius: 10, padding: "8px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}><div style={{ width: 30, height: 30, borderRadius: 9, background: "#22C55E33", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>💚</div><div><div style={{ fontSize: 11, fontWeight: 700, color: t.text }}>Sueldo Empresa ABC</div><div style={{ fontSize: 9, color: t.sub }}>Ingreso</div></div></div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: "#22C55E" }}>+$2.700.000</div>
-        </div>
+        <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 4 }}>Cada gasto e ingreso, agrupado por día y clarito.</div>
+        {movRow("🏠", "#93C5FD", "Arriendo Apto 301", "Banco · Fijos", "-$700.000", "#FCA5A5")}
+        {movRow("🛒", "#FDE68A", "Carrefour", "Tarjeta · Varios", "-$105.000", "#FCA5A5")}
+        {movRow("💚", "#22C55E", "Sueldo Empresa ABC", "Ingreso", "+$2.700.000", "#22C55E")}
       </div>
 
       {/* Categorías y presupuestos */}
       <div className="orise" style={{ ...card, animationDelay: ".42s" }}>
         {h("🏷️", "Categorías y presupuestos")}
         <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>Ponte límites por pilar y por categoría, y mira cómo vas mes a mes.</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 16 }}>🏠</span><b style={{ fontSize: 11, color: t.text, minWidth: 44 }}>Fijos</b>
-          <div style={{ flex: 1, height: 8, borderRadius: 6, background: t.border, overflow: "hidden" }}><div style={{ width: "68%", height: "100%", background: "#93C5FD" }} /></div>
-          <span style={{ fontSize: 10, color: "#93C5FD", fontWeight: 700 }}>68%</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-          <span style={{ fontSize: 16 }}>🐖</span><b style={{ fontSize: 11, color: t.text, minWidth: 44 }}>Ahorro</b>
-          <div style={{ flex: 1, height: 8, borderRadius: 6, background: t.border, overflow: "hidden" }}><div style={{ width: "82%", height: "100%", background: "#86EFAC" }} /></div>
-          <span style={{ fontSize: 10, color: "#86EFAC", fontWeight: 700 }}>82%</span>
-        </div>
+        {budRow("🏠", "Fijos", 68, "#93C5FD", 0)}
+        {budRow("💰", "Deuda", 70, "#FCA5A5", 8)}
+        {budRow("🐖", "Ahorro", 82, "#86EFAC", 8)}
       </div>
 
       {/* IA + automatización */}
@@ -139,7 +183,7 @@ export default function AboutPage({ isDark, onBack }) {
       {/* Cierre */}
       <div className="orise" style={{ textAlign: "center", marginTop: 22, paddingBottom: 10, animationDelay: ".78s" }}>
         <div style={{ fontSize: 13, fontWeight: 800, color: t.text }}>Menos esfuerzo. Más claridad.</div>
-        <div style={{ fontSize: 10.5, color: t.sub, marginTop: 6 }}>ORUS Finanzas · Hecho en Colombia 🇨🇴</div>
+        <div style={{ fontSize: 10.5, color: t.sub, marginTop: 6 }}>ORUS Finanzas · v1.0.0</div>
       </div>
     </PageLayout>
   );
