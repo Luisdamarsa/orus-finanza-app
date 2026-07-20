@@ -1,8 +1,10 @@
+import { useState } from "react";
 import PeriodSelector from "./PeriodSelectorService";
 import ErrorBoundary from "./ErrorBoundary";
 import FloatingActionButtons from "./FloatingActionButtons";
 import PillarBarsPopup from "./PillarBarsPopup";
 import UpdateBalanceModal from "./UpdateBalanceModal";
+import VoiceCapture from "./VoiceCapture";
 import { useDashboard } from "../contexts/DashboardContext";
 
 /**
@@ -21,15 +23,24 @@ export default function DashboardOverlays() {
     showPillarBars, selectedPillarDetail, categories, setShowPillarBars,
     setSelectedPillarForMovements, transactions,
     showUpdateBalance, saldo, setShowUpdateBalance, setIsMovementOpen,
-    setFilterType, setMovementOpenedFrom,
+    setFilterType, setMovementOpenedFrom, txnActions,
   } = useDashboard();
+
+  const [showVoice, setShowVoice] = useState(false);
 
   return (
     <>
       {/* FAB - Lápiz (left) + Micrófono (right) — boundary propio */}
       <ErrorBoundary fallback={null}>
-        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} />
+        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} />
       </ErrorBoundary>
+
+      {/* Captura por voz (sin IA — Web Speech API) */}
+      {showVoice && (
+        <ErrorBoundary fallback={null}>
+          <VoiceCapture isDark={isDark} onClose={() => setShowVoice(false)} onSave={(tx) => txnActions.createTransaction(tx)} />
+        </ErrorBoundary>
+      )}
 
       {/* Period Picker */}
       {showPeriodPicker && (

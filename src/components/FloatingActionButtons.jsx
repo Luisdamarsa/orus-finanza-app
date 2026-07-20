@@ -5,7 +5,7 @@
  * Botones flotantes de nueva transacción: lápiz (abre formulario) + micrófono (voz).
  * Extraído de DashboardOverlays para que tenga su propio ErrorBoundary (aislar fallos).
  */
-export default function FloatingActionButtons({ isDark, pressingFAB, setPressingFAB, setScreen }) {
+export default function FloatingActionButtons({ isDark, pressingFAB, setPressingFAB, setScreen, onMic }) {
   return (
     <div style={{
       position: "absolute", bottom: 24, right: 22, zIndex: 35,
@@ -34,6 +34,7 @@ export default function FloatingActionButtons({ isDark, pressingFAB, setPressing
       </button>
 
       <button
+        onClick={onMic}
         onPointerDown={() => setPressingFAB("mic")}
         onPointerUp={() => setPressingFAB(null)}
         onPointerLeave={() => setPressingFAB(null)}

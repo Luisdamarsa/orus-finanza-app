@@ -407,7 +407,7 @@ function Dashboard() {
     selectedPillarForMovements, setSelectedPillarForMovements,
     showPillarBars, setShowPillarBars, showUpdateBalance, setShowUpdateBalance,
     showPeriodPicker, setShowPeriodPicker, showIncomes, setShowIncomes,
-    handleSelectPillar, pressingFAB, setPressingFAB,
+    handleSelectPillar, pressingFAB, setPressingFAB, txnActions,
     pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts,
     transactions, categories, customBudgets, setCustomBudgets,
     isLoading, startLoading, stopLoading,
