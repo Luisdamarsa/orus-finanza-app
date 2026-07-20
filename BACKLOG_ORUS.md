@@ -57,8 +57,8 @@
 |---|------|------|-----|
 | 6.1 | 📄 | **Automation** | 🟡 |
 | 6.2 | 📄 | **Informes** | 🔴 |
-| 6.3 | 📄 | **Sobre la app** | 🟢 |
-| 6.4 | 📄 | **Sobre permisos** | 🟢 |
+| 6.3 | ✅ | ~~**Sobre la app** (Acerca de ORUS)~~ — **hecho** (`AboutPage.jsx`: donut animado gris→color con pilares, lista de movimientos, presupuestos, sección IA con mic real, reveal-on-scroll) | 🟢 |
+| 6.4 | ✅ | ~~**Sobre permisos**~~ — **hecho** (`PermissionsPage.jsx`: tarjetas con iconos + reveal escalonado, permisos web funcionales mic/notif, etiquetas Óptimo/Opcional, link a Privacidad) | 🟢 |
 | 6.5 | 📄 | **Suscripciones / plan** (modelo $10.000 COP/mes) | 🟡 |
 
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
