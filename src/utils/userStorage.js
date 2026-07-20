@@ -15,6 +15,8 @@
  *   currency: string,         // "COP" | "USD" | "EUR" (editable)
  *   language: string,         // "ES" | "EN" (editable)
  *   userId: string            // ID único del usuario (10 caracteres alfanuméricos) - generado al crear
+ *   role: string,             // "user" | "admin" - rol del usuario (por defecto "user")
+ *   subscription: string      // "FREE" | "PLUS" | "PRO" - plan activo (por defecto "FREE")
  * }
  */
 
@@ -86,7 +88,12 @@ const DEFAULT_USER = {
   currency: "COP", // demo colombiano fijo; detectCurrency() se usa en el onboarding real
   language: "ES",  // demo fijo; detectLanguage() se usa en el onboarding real
   userId: generateUserId(), // Genera un ID único
+  role: "user",        // rol del usuario
+  subscription: "FREE", // plan activo por defecto
 };
+
+// Planes válidos de suscripción
+export const SUBSCRIPTIONS = ["FREE", "PLUS", "PRO"];
 
 export const userStorage = {
   /**
@@ -100,7 +107,9 @@ export const userStorage = {
         userStorage.initUser();
         return DEFAULT_USER;
       }
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      // Backfill: usuarios guardados antes de tener role/subscription
+      return { role: "user", subscription: "FREE", ...parsed };
     } catch (error) {
       console.error("Error reading user from localStorage:", error);
       return DEFAULT_USER;
@@ -179,5 +188,27 @@ export const userStorage = {
    */
   setLanguage: (language) => {
     return userStorage.updateUser({ language });
+  },
+
+  /**
+   * Obtiene el rol del usuario
+   */
+  getRole: () => {
+    return userStorage.getUser().role || "user";
+  },
+
+  /**
+   * Obtiene la suscripción activa ("FREE" | "PLUS" | "PRO")
+   */
+  getSubscription: () => {
+    return userStorage.getUser().subscription || "FREE";
+  },
+
+  /**
+   * Cambia la suscripción activa. Valida contra SUBSCRIPTIONS.
+   */
+  setSubscription: (plan) => {
+    const value = SUBSCRIPTIONS.includes(plan) ? plan : "FREE";
+    return userStorage.updateUser({ subscription: value });
   },
 };

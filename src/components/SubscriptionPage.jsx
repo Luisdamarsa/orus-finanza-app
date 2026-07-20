@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
+import { userStorage } from "../utils/userStorage";
 
 /**
  * SubscriptionPage.jsx — "Mi Plan".
@@ -55,7 +56,6 @@ const PLANS = [
     tint: "#86EFAC",
     price: 0,
     tagline: "Empieza a tomar el control, sin pagar nada.",
-    current: true, // plan actual por defecto (sin BD todavía)
     features: [
       { t: "Registro manual y por voz", ok: true },
       { t: "Hasta 10 movimientos al día", ok: true, note: "desbloquea +5 viendo un anuncio" },
@@ -106,8 +106,10 @@ const PLANS = [
 export default function SubscriptionPage({ isDark, onBack }) {
   const pressBack = usePress();
   const containerRef = useRef(null);
+  // Plan activo del usuario (desde userStorage). Ej: "FREE" -> "free"
+  const [currentPlan, setCurrentPlan] = useState(() => userStorage.getSubscription().toLowerCase());
   const [selected, setSelected] = useState(null);
-  const [expanded, setExpanded] = useState(null); // id de la tarjeta desplegada
+  const [expanded, setExpanded] = useState(() => userStorage.getSubscription().toLowerCase()); // abre el plan activo
 
   // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
   useEffect(() => {
@@ -150,6 +152,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
         {PLANS.map((p, i) => {
           const isOpen = expanded === p.id;
+          const isCurrent = currentPlan === p.id;
           const border = p.highlight ? "#9B6DFF" : t.border;
           return (
             <div
@@ -181,7 +184,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                     <b style={{ fontSize: 16, color: t.text }}>{p.name}</b>
-                    {p.current && (
+                    {isCurrent && (
                       <span style={{ fontSize: 9, fontWeight: 700, color: "#22C55E", background: "#22C55E22", padding: "1px 7px", borderRadius: 8 }}>PLAN ACTUAL</span>
                     )}
                   </div>
@@ -227,24 +230,33 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
               {/* Botón de acción (no expande la tarjeta) */}
               <button
-                onClick={(e) => { e.stopPropagation(); if (!p.current) setSelected(p.id); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isCurrent) return;
+                  userStorage.setSubscription(p.id.toUpperCase()); // cambia la suscripción del usuario
+                  setCurrentPlan(p.id);
+                  setExpanded(p.id);
+                  setSelected(p.id);
+                }}
                 style={{
                   width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
-                  border: p.current ? `1.5px solid ${t.border}` : "none",
-                  background: p.current ? "transparent" : (p.highlight ? "#9B6DFF" : t.text),
-                  color: p.current ? t.sub : (p.highlight ? "#fff" : t.bg),
-                  fontSize: 13.5, fontWeight: 700, cursor: p.current ? "default" : "pointer",
+                  border: isCurrent ? `1.5px solid ${t.border}` : "none",
+                  background: isCurrent ? "transparent" : (p.highlight ? "#9B6DFF" : t.text),
+                  color: isCurrent ? t.sub : (p.highlight ? "#fff" : t.bg),
+                  fontSize: 13.5, fontWeight: 700, cursor: isCurrent ? "default" : "pointer",
                 }}
               >
-                {p.current ? "Tu plan actual" : `Elegir ${p.name}`}
+                {isCurrent ? "Tu plan actual" : `Elegir ${p.name}`}
               </button>
             </div>
           );
         })}
 
-        {selected && selected !== "free" && (
+        {selected && (
           <div style={{ fontSize: 11, color: t.sub, textAlign: "center", marginTop: 12, lineHeight: 1.5 }}>
-            🔒 Los pagos se activarán próximamente. ¡Gracias por tu interés en <b style={{ color: "#9B6DFF" }}>{PLANS.find((x) => x.id === selected).name}</b>!
+            {selected === "free"
+              ? <>Cambiaste tu plan a <b style={{ color: "#22C55E" }}>ORUS Free</b>.</>
+              : <>✅ Tu plan es ahora <b style={{ color: "#9B6DFF" }}>{PLANS.find((x) => x.id === selected).name}</b>. <span style={{ fontStyle: "italic" }}>El cobro real se activará próximamente.</span></>}
           </div>
         )}
 
