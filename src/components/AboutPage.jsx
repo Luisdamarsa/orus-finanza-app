@@ -122,8 +122,8 @@ export default function AboutPage({ isDark, onBack }) {
               <path key={a.id} className="osegc" d={a.d} style={{ "--c": a.color, animationDelay: `${0.3 + i * 0.12}s` }} />
             ))}
           </g>
-          <text x="90" y="84" textAnchor="middle" fill={t.sub} fontSize="12" fontWeight="600">Gastado</text>
-          <text x="90" y="106" textAnchor="middle" fill={t.text} fontSize="21" fontWeight="800">$1.688.000</text>
+          <text x="90" y="85" textAnchor="middle" fill={t.sub} fontSize="10.5" fontWeight="600">Gastado</text>
+          <text x="90" y="104" textAnchor="middle" fill={t.text} fontSize="17" fontWeight="800">$1.688.000</text>
         </svg>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 6 }}>
           {PILLARS_LEGEND.map(([l, c]) => (
