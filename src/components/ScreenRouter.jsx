@@ -9,6 +9,7 @@ import MovimientosScreen from "./MovimientosScreen";
 import CategoriesScreen from "./CategoriesScreen";
 import AddCategoryScreen from "./AddCategoryScreen";
 import DashboardScreen from "./DashboardScreen";
+import LegalPage from "./LegalPage";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -76,6 +77,22 @@ export default function ScreenRouter({
 
   if (screen === "add-category") {
     return <AddCategoryScreen isDark={isDark} t={t} categories={categories} editingCategoryName={editingCategoryName} editingPillarId={editingPillarId} editingCategoryId={editingCategoryId} editCategory={editCategory} createCategory={createCategory} deleteCategory={deleteCategory} resetCategoryEditing={resetCategoryEditing} setScreen={setScreen} />;
+  }
+
+  if (screen === "terms") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <LegalPage variant="terms" isDark={isDark} onBack={() => setScreen("settings")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "privacy") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <LegalPage variant="privacy" isDark={isDark} onBack={() => setScreen("settings")} />
+      </ScreenShell>
+    );
   }
 
   return <DashboardScreen />;

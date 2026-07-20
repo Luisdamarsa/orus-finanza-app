@@ -4,7 +4,7 @@ import PageLayout from "./PageLayout";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
 
-export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes }) {
+export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
@@ -161,6 +161,10 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
 
           {/* Footer Info */}
           <div style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 12, flexWrap: "wrap" }}>
+              <span onClick={onTerms} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos y Condiciones</span>
+              <span onClick={onPrivacy} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos de Privacidad</span>
+            </div>
             <div>ORUS Finanzas v1.0.0</div>
             <div style={{ marginTop: 4 }}>© 2026 ORUS. Todos los derechos reservados.</div>
           </div>
