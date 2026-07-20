@@ -67,7 +67,9 @@ export default function LegalPage({ isDark, onBack, variant }) {
 
   return (
     <PageLayout isDark={isDark} onBack={onBack} title={doc.title} pressBack={pressBack}>
-      {renderMarkdown(doc.md, t, isDark)}
+      <div style={{ textAlign: "left" }}>
+        {renderMarkdown(doc.md, t, isDark)}
+      </div>
     </PageLayout>
   );
 }
