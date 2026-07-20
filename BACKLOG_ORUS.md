@@ -64,8 +64,8 @@
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
-| 7.1 | 🔍 | Investigar **qué datos pide la app** en login Google/Apple (ref. TikTok) | 🟢 |
-| 7.2 | ⚖️ | **Términos y Condiciones + Aviso de Privacidad** (ref. TikTok; Ley 1581/2012 Habeas Data — ver `DECISION_ARQUITECTURA_DB.md`) | 🟡 |
+| 7.1 | ✅ | ~~Investigar qué datos/permisos pide la app~~ — **analizado** (inventario de datos + realidad de permisos iOS/Android + estrategia multi-fuente: notificaciones / Atajos+App Intents / correo) | 🟢 |
+| 7.2 | ✅ | ~~T&C + Privacidad~~ — **borrador en la app** (pantallas Términos/Privacidad enlazadas en Configuración; contenido editable en `src/legal/*.md`). **Pendiente: revisión de abogado + cumplimiento de tiendas antes de publicar.** | 🟡 |
 
 ## Hito 8 — Auth & Onboarding (grande, cierra el flujo de entrada)
 | # | Tipo | Item | Dif |
