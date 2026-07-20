@@ -59,7 +59,7 @@
 | 6.2 | 📄 | **Informes** | 🔴 |
 | 6.3 | ✅ | ~~**Sobre la app** (Acerca de ORUS)~~ — **hecho** (`AboutPage.jsx`: donut animado gris→color con pilares, lista de movimientos, presupuestos, sección IA con mic real, reveal-on-scroll) | 🟢 |
 | 6.4 | ✅ | ~~**Sobre permisos**~~ — **hecho** (`PermissionsPage.jsx`: tarjetas con iconos + reveal escalonado, permisos web funcionales mic/notif, etiquetas Óptimo/Opcional, link a Privacidad) | 🟢 |
-| 6.5 | 📄 | **Suscripciones / plan** (modelo $10.000 COP/mes) | 🟡 |
+| 6.5 | ✅ | ~~**Suscripciones / plan**~~ — **hecho** (`SubscriptionPage.jsx`: 3 planes USD Free/Plus $2.99/Pro $5.99, tarjetas colapsables reveal-on-scroll, Pro dorado "MÁS COMPLETO", Plus "MÁS POPULAR"; `role`+`subscription` en userStorage). **Pendiente fase BD: pasarela de pago real.** | 🟡 |
 
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |
