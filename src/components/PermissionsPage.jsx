@@ -10,10 +10,10 @@ import PageLayout from "./PageLayout";
  * Las tarjetas aparecen desde abajo al entrar en pantalla. Extraída — ruteo en ScreenRouter.
  */
 const PERMISSIONS = [
-  { id: "notif-push", icon: "📲", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte de tus finanzas y enviarte recordatorios.", kind: "notif", req: "Opcional" },
-  { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Micrófono", why: "Para registrar gastos por voz: “gasté 20 mil en el súper”.", kind: "mic", req: "Opcional" },
+  { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte de tus finanzas y enviarte recordatorios.", kind: "notif", req: "Óptimo" },
+  { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Micrófono", why: "Para registrar gastos por voz: “gasté 20 mil en el súper”.", kind: "mic", req: "Óptimo" },
   { id: "sms", icon: "💬", color: "#86EFAC", name: "Mensajes (SMS)", why: "Algunos bancos y Nequi/Daviplata avisan por SMS; los leemos solo para crear el movimiento.", kind: "native", req: "Opcional" },
-  { id: "notif-read", icon: "🔔", color: "#93C5FD", name: "Leer avisos del banco", why: "Para detectar tus movimientos automáticamente cuando el banco te notifica.", kind: "native", req: "Requerido" },
+  { id: "notif-read", icon: "🏦", color: "#93C5FD", name: "Leer avisos del banco", why: "Para detectar tus movimientos automáticamente cuando el banco te notifica.", kind: "native", req: "Opcional" },
   { id: "correo", icon: "✉️", color: "#C4B5FD", name: "Correo", why: "Algunas confirmaciones bancarias llegan por correo; con tu permiso las leemos para registrar el movimiento.", kind: "native", req: "Opcional" },
 ];
 
@@ -110,13 +110,13 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
           cuando quieras desde los ajustes de tu teléfono.
         </div>
 
-        {PERMISSIONS.map((p) => (
-          <div key={p.id} className="reveal" style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 14, padding: 12, marginTop: 12, display: "flex", alignItems: "center", gap: 12 }}>
+        {PERMISSIONS.map((p, i) => (
+          <div key={p.id} className="reveal" style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 14, padding: 12, marginTop: 12, display: "flex", alignItems: "center", gap: 12, transitionDelay: `${i * 0.09}s` }}>
             {iconEl(p)}
             <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <b style={{ fontSize: 13, color: t.text }}>{p.name}</b>
-                <span style={{ fontSize: 8.5, fontWeight: 700, color: p.req === "Requerido" ? "#FCA5A5" : t.sub, background: (p.req === "Requerido" ? "#FCA5A5" : t.sub) + "22", padding: "1px 6px", borderRadius: 8 }}>{p.req.toUpperCase()}</span>
+                <span style={{ fontSize: 8.5, fontWeight: 700, color: p.req === "Óptimo" ? "#9B6DFF" : t.sub, background: (p.req === "Óptimo" ? "#9B6DFF" : t.sub) + "22", padding: "1px 6px", borderRadius: 8 }}>{p.req.toUpperCase()}</span>
               </div>
               <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3, textAlign: "left" }}>{p.why}</div>
             </div>
