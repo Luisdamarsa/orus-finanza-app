@@ -89,9 +89,11 @@ const PLANS = [
     id: "pro",
     name: "ORUS Pro",
     icon: "👑",
-    tint: "#C4B5FD",
+    tint: "#F5C451",
     price: 5.99,
     tagline: "Tu asistente financiero con IA. Solo o en equipo.",
+    gold: true,
+    badge: "MÁS COMPLETO",
     features: [
       { t: "Todo lo del plan Plus", ok: true },
       { t: "Asistente de IA: pregúntale sobre tus finanzas", ok: true, note: "hasta 100 consultas/mes" },
@@ -184,6 +186,9 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
                     <b style={{ fontSize: 16, color: t.text }}>{p.name}</b>
+                    {p.badge && (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: "#5A3E00", background: "linear-gradient(135deg, #F5C451, #E0A93E)", padding: "2px 8px", borderRadius: 8, letterSpacing: 0.3, boxShadow: "0 1px 4px rgba(224,169,62,0.45)" }}>✦ {p.badge}</span>
+                    )}
                     {isCurrent && (
                       <span style={{ fontSize: 9, fontWeight: 700, color: "#22C55E", background: "#22C55E22", padding: "1px 7px", borderRadius: 8 }}>PLAN ACTUAL</span>
                     )}
@@ -241,9 +246,10 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 style={{
                   width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
                   border: isCurrent ? `1.5px solid ${t.border}` : "none",
-                  background: isCurrent ? "transparent" : (p.highlight ? "#9B6DFF" : t.text),
-                  color: isCurrent ? t.sub : (p.highlight ? "#fff" : t.bg),
-                  fontSize: 13.5, fontWeight: 700, cursor: isCurrent ? "default" : "pointer",
+                  background: isCurrent ? "transparent" : (p.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (p.highlight ? "#9B6DFF" : t.text)),
+                  color: isCurrent ? t.sub : (p.gold ? "#3D2B00" : (p.highlight ? "#fff" : t.bg)),
+                  fontSize: 13.5, fontWeight: p.gold ? 800 : 700, cursor: isCurrent ? "default" : "pointer",
+                  boxShadow: !isCurrent && p.gold ? "0 2px 10px rgba(224,169,62,0.4)" : "none",
                 }}
               >
                 {isCurrent ? "Tu plan actual" : `Elegir ${p.name}`}
