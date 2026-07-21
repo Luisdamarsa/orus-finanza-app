@@ -1,16 +1,19 @@
 import { useState, useCallback } from "react";
 import * as categoryService from "../services/categoryService";
+import * as catalog from "../services/categoryCatalogService";
 
 /**
- * useCategories.js - Hook de categorías del usuario.
+ * useCategories.js - Hook de categorías del usuario (única fuente de la lógica de categorías).
  *
- * Orquesta el estado React; el acceso a datos vive en categoryService.
- * Sigue el contrato de hooks de datos:
- *   { categories, isLoading, error, addCategory, deleteCategory, editCategory }
+ * Orquesta el estado React + el catálogo (categoryCatalogService). Antes las acciones de
+ * alto nivel (createCategory, getOrCreateCategory, editCategory, deleteCategory,
+ * ensureVariosCategory) vivían sueltas en App.jsx; ahora viven aquí, donde está el estado.
  *
- * - isLoading / error se exponen desde ya (hoy constantes). Cuando el servicio
- *   se vuelva async (API/Supabase), los componentes ya los manejan → gratis.
- * - Acciones verbo-based, async-tolerant (no exponen setCategories crudo).
+ * Contrato de la capa de datos:
+ * - `categories` = { pillarId: [categoryId, ...] } (lo que leen Categorías, Presupuestos, dropdown).
+ * - Acciones verbo-based; async-tolerant (no exponen setCategories crudo).
+ * - Cuando el servicio se vuelva async (API/Supabase), solo cambian catalog/service; los
+ *   componentes ya manejan isLoading/error → gratis.
  */
 export function useCategories() {
   const [categories, setCategories] = useState(() =>
@@ -20,24 +23,65 @@ export function useCategories() {
   const [isLoading] = useState(false);
   const [error] = useState(null);
 
-  const addCategory = useCallback((pillarId, categoryId) => {
+  // ── Sincronizadores del estado React (bajo nivel, internos) ────────────────
+  const syncAdd = useCallback((pillarId, categoryId) => {
     setCategories((prev) => categoryService.addCategory(prev, pillarId, categoryId));
   }, []);
-
-  const deleteCategory = useCallback((categoryId, pillarId) => {
+  const syncRemove = useCallback((categoryId, pillarId) => {
     setCategories((prev) => categoryService.removeCategory(prev, categoryId, pillarId));
   }, []);
-
-  const editCategory = useCallback((categoryId, newPillarId) => {
+  const syncMove = useCallback((categoryId, newPillarId) => {
     setCategories((prev) => categoryService.moveCategory(prev, categoryId, newPillarId));
   }, []);
+
+  // ── Acciones de alto nivel: catálogo (ALL_CATS) + sync del estado React ─────
+
+  /** Crea una categoría en el catálogo y la refleja en el estado. Devuelve el id nuevo. */
+  const createCategory = useCallback((pillarId, categoryName) => {
+    const newId = catalog.createCategoryEntry(pillarId, categoryName);
+    syncAdd(pillarId, newId);
+    return newId;
+  }, [syncAdd]);
+
+  /**
+   * Reutiliza una categoría existente (mismo nombre+pilar) o la crea. Devuelve el id real.
+   * Usado al crear categoría desde el dropdown de una transacción (evita duplicados).
+   */
+  const getOrCreateCategory = useCallback((pillarId, categoryName) => {
+    const existing = catalog.findCategoryByNameAndPillar(pillarId, categoryName);
+    if (existing) {
+      syncAdd(pillarId, existing.id); // idempotente si ya está en el mapa
+      return existing.id;
+    }
+    return createCategory(pillarId, categoryName);
+  }, [syncAdd, createCategory]);
+
+  /** Resuelve/crea la categoría "Varios" del pilar Varios (gastos sin categoría caen ahí). */
+  const ensureVariosCategory = useCallback(
+    () => getOrCreateCategory("varios", "Varios"),
+    [getOrCreateCategory]
+  );
+
+  /** Renombra y/o mueve de pilar una categoría (con historial en el catálogo). */
+  const editCategory = useCallback((categoryId, updates) => {
+    const res = catalog.renameOrMoveCategory(categoryId, updates);
+    if (res && res.pillarChanged) syncMove(categoryId, updates.pillar);
+  }, [syncMove]);
+
+  /** Borrado suave en el catálogo + lo quita del estado. */
+  const deleteCategory = useCallback((categoryId) => {
+    const pillarId = catalog.softDeleteCategory(categoryId);
+    if (pillarId) syncRemove(categoryId, pillarId);
+  }, [syncRemove]);
 
   return {
     categories,
     isLoading,
     error,
-    addCategory,
-    deleteCategory,
+    createCategory,
+    getOrCreateCategory,
+    ensureVariosCategory,
     editCategory,
+    deleteCategory,
   };
 }

@@ -23,7 +23,7 @@ import SubscriptionPage from "./SubscriptionPage";
 export default function ScreenRouter({
   screen, isDark, t,
   selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
-  categories, customConcepts, txnActions, addCategoryToHook,
+  categories, customConcepts, txnActions,
   editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
   showIncomes, setShowIncomes,
   selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
@@ -46,7 +46,7 @@ export default function ScreenRouter({
   }
 
   if (screen === "new-transaction") {
-    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} onBack={() => setScreen("dashboard")} onCreateCategory={(name, pillarId) => addCategoryToHook(pillarId, name)} />;
+    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} onBack={() => setScreen("dashboard")} />;
   }
 
   // Editar transacción

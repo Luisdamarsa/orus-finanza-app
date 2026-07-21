@@ -26,7 +26,6 @@ import { FormSkeleton } from "./LoadingSkeleton";
  *   onDelete - Callback(transactionId) para eliminar (modo editar)
  *   isDark - Tema oscuro
  *   categories - {pillarId: [cat1, cat2, ...]}
- *   onCreateCategory - Callback(name, pillarId) para crear categoría
  *   isEditing - Boolean si está editando
  *   editingTransaction - Transacción a editar (si isEditing=true)
  */
@@ -37,7 +36,6 @@ export default function TransactionPage({
   onDelete,
   isDark,
   categories = {},
-  onCreateCategory,
   isEditing = false,
   editingTransaction = null,
 }) {
