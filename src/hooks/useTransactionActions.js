@@ -17,12 +17,13 @@ export function useTransactionActions({
   setScreen,
   screen,
   ensureVariosCategory,
+  getOrCreateCategory,
 }) {
   // Al guardar/eliminar en modo edición: volver a la pantalla de origen.
   const backToOrigin = () =>
     setScreen(screen === "movimientos" ? "movimientos" : "dashboard");
 
-  const createTransaction = ({ desc, rawAmount, isIncome, method, concept, pillarId }) => {
+  const createTransaction = ({ desc, rawAmount, isIncome, method, concept, pillarId, isNewCategory }) => {
     const absAmount = parseInt((rawAmount || "").replace(/\D/g, "")) || 0;
     if (absAmount === 0 && !desc && !concept) {
       setScreen("dashboard");
@@ -31,6 +32,13 @@ export function useTransactionActions({
     const now = new Date();
     let categoryId = concept || null; // concept es el ID de la categoría (viene de TransactionPage)
     let pillar = isIncome ? "ingreso" : pillarId;
+
+    // 🆕 Categoría nueva escrita en el dropdown: `concept` es el NOMBRE, no un id.
+    // Se crea (o reutiliza si ya existe) al GUARDAR → persiste en el catálogo y aparece
+    // en Categorías, Presupuestos y el dropdown. Devuelve el id real para la transacción.
+    if (!isIncome && isNewCategory && concept && pillarId && getOrCreateCategory) {
+      categoryId = getOrCreateCategory(pillarId, concept);
+    }
 
     // 🆕 Gasto sin categoría → cae en la categoría "Varios" del pilar Varios (la crea si no existe)
     if (!isIncome && !categoryId) {

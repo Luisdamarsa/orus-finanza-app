@@ -14,6 +14,17 @@ import { addHistoryEntry } from "./attributeHistoryService";
  */
 
 /**
+ * Busca una categoría ACTIVA (no borrada) por nombre + pilar (case-insensitive).
+ * Devuelve la categoría o null. Se usa para reutilizar en vez de duplicar.
+ */
+export function findCategoryByNameAndPillar(pillarId, name) {
+  const norm = (s) => (s || "").toLowerCase().trim();
+  return ALL_CATS.find(
+    (cat) => cat.pillar === pillarId && !cat.deletedAt && norm(cat.name) === norm(name)
+  ) || null;
+}
+
+/**
  * Crea una categoría en el catálogo (genera id único, timestamps). Devuelve el id.
  */
 export function createCategoryEntry(pillarId, categoryName) {
@@ -23,14 +34,13 @@ export function createCategoryEntry(pillarId, categoryName) {
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
 
-  // Cuántas categorías con este nombre ya existen en el pilar (incluye borradas)
-  const count = ALL_CATS.filter(
-    (cat) =>
-      cat.pillar === pillarId &&
-      cat.name.toLowerCase() === categoryName.toLowerCase()
-  ).length;
-
-  const newId = count === 0 ? `cat_${baseName}` : `cat_${baseName}_${count}`;
+  // Id GLOBALMENTE único (antes solo evitaba duplicados dentro del mismo pilar, lo que
+  // hacía que "Transporte" en Varios y en Fijos colisionaran con el mismo id).
+  let newId = `cat_${baseName}`;
+  let n = 1;
+  while (ALL_CATS.some((cat) => cat.id === newId)) {
+    newId = `cat_${baseName}_${n++}`;
+  }
   const now = new Date().toISOString();
 
   ALL_CATS.push({

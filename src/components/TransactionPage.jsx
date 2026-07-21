@@ -163,6 +163,7 @@ export default function TransactionPage({
   function handleConceptPick(cat) {
     setConcept(cat.id);
     setPillarId(cat.pillar);
+    setIsNewCategory(false); // elegir existente → no es categoría nueva
     setConceptOpen(false);
     setNewConceptText("");
   }
@@ -190,8 +191,9 @@ export default function TransactionPage({
       rawAmount,
       isIncome,
       method,
-      concept,
-      pillarId
+      concept,      // si isNewCategory, aquí va el NOMBRE; si no, el id de la categoría
+      pillarId,
+      isNewCategory // la categoría se crea/reutiliza al guardar (en createTransaction)
     });
   }
 
@@ -537,7 +539,7 @@ export default function TransactionPage({
                     flex: 1,
                     textAlign: "left"
                   }}>
-                  {getCategoryDisplayName(concept) || "Selecciona la categoría"}
+                  {(isNewCategory ? concept : getCategoryDisplayName(concept)) || "Selecciona la categoría"}
                 </span>
                 <svg
                   width="12"
@@ -625,10 +627,14 @@ export default function TransactionPage({
                     )}
                   </div>
 
-                  {/* Lista de conceptos */}
+                  {/* Lista de conceptos — el input de arriba filtra (typeahead):
+                      al escribir muestra las categorías que coinciden; si no hay ninguna,
+                      la lista queda vacía y el usuario sabe que puede crear una nueva. */}
                   {PILLARS.map(p => {
+                    const q = newConceptText.trim().toLowerCase();
                     const allCats = getFormattedCategories();
-                    const cats = allCats.filter(cat => cat.pillar === p.id);
+                    const cats = allCats.filter(cat => cat.pillar === p.id && (!q || (cat.name || "").toLowerCase().includes(q)));
+                    if (cats.length === 0) return null; // oculta pilares sin coincidencias
 
                     return (
                       <div key={p.id} style={{ marginBottom: 4 }}>
@@ -739,11 +745,9 @@ export default function TransactionPage({
                     <button
                       key={p.id}
                       onClick={() => {
+                        // Solo seleccionar el pilar. La categoría nueva se crea al GUARDAR
+                        // (en createTransaction), así no quedan categorías huérfanas si cancelas.
                         setPillarId(p.id);
-                        if (isNewCategory && concept && onCreateCategory) {
-                          onCreateCategory(concept, p.id);
-                          setIsNewCategory(false);
-                        }
                       }}
                       onPointerDown={() => setPressingPillar(p.id)}
                       onPointerUp={() => setPressingPillar(null)}

@@ -173,6 +173,18 @@ function Dashboard() {
   const createCategory = (pillarId, categoryName) => {
     const newId = catalog.createCategoryEntry(pillarId, categoryName);
     addCategoryToHook(pillarId, newId);
+    return newId;
+  };
+
+  // 🆕 Reutiliza una categoría existente (mismo nombre+pilar) o la crea. Devuelve el id real.
+  // Usado al crear categoría desde el dropdown de una transacción (evita duplicados).
+  const getOrCreateCategory = (pillarId, categoryName) => {
+    const existing = catalog.findCategoryByNameAndPillar(pillarId, categoryName);
+    if (existing) {
+      addCategoryToHook(pillarId, existing.id); // idempotente si ya está en el mapa
+      return existing.id;
+    }
+    return createCategory(pillarId, categoryName);
   };
 
   const editCategory = (categoryId, updates) => {
@@ -395,6 +407,7 @@ function Dashboard() {
     setSelectedPeriod, setIsMovementOpen, setFilterType, setMovementOpenedFrom,
     setScreen, screen,
     ensureVariosCategory,
+    getOrCreateCategory,
   });
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
