@@ -19,4 +19,12 @@ PROD_V2.md
 PROD_V3.md
 
 # Editor directories and files
-.vsco
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
