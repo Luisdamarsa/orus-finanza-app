@@ -70,6 +70,14 @@
 | 9.3 | ✅ | ~~**Fix orden de paginación**~~ — **hecho** (`TransactionsListService` ordena por fecha+hora desc antes de paginar; las 15 iniciales son las más recientes) | 🟢 |
 | 9.4 | ✅ | ~~**Fix tags de pilares mostraban 1% sin datos**~~ — **hecho** (`dashboardCalculations`: con `donutTotal` 0 no se reparte el 100%; ahora muestran 0%) | 🟢 |
 
+## Hito 10 — Preferencias & Modo Día (prod-v10.6.7)
+| # | Tipo | Item | Dif |
+|---|------|------|-----|
+| 10.1 | ✅ | ~~**Página Preferencias**~~ — **hecho** (`PreferencesPage.jsx` debajo de Informes: tema día/noche como toggle sol/luna, idioma y moneda; reveal desde abajo; persiste en `userStorage`). Idioma/moneda salieron del Perfil. | 🟡 |
+| 10.2 | ✅ | ~~**Modo Día (isDark como estado)**~~ — **hecho** (`isDark` persistido en `userStorage.theme`, noche por defecto; toda la app reacciona). Colores de día: mapa saturado por pilar (varios amarillo→ámbar), saldo gris más oscuro. | 🟡 |
+| 10.3 | ✅ | ~~**Fix negros hardcodeados en día**~~ — **hecho** (centro donut, cabeceras de fecha, fondos de página transacción/categoría, bezel, barras de presupuesto, montos y nombres de barras, toast de transacción — todo tema-aware; noche idéntico). | 🟡 |
+| 10.4 | 🎨 | Afinar tonos de día pendientes (contraste fino, otras pantallas menos visibles). *Iterativo.* | 🟢 |
+
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
