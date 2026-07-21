@@ -76,7 +76,7 @@ const PLANS = [
     perks: ["Sin anuncios", "Lectura automática por correo", "IA que categoriza tus gastos"],
     reviews: [
       { name: "Camila R.", stars: 5, text: "Dejé de anotar todo a mano. Llegan mis gastos solos y ya no veo anuncios. Vale cada peso." },
-      { name: "Andrés M.", stars: 5, text: "Lo mejor: conecté mi correo y la app clasifica sola. Súper cómodo." },
+      { name: "Andrés M.", stars: 5, text: "Lo mejor: conecté la automatización y la app clasifica sola. Súper cómodo." },
       { name: "Valentina P.", stars: 4, text: "Muy bueno por el precio. La categorización automática me ahorra un montón de tiempo." },
     ],
     features: [
