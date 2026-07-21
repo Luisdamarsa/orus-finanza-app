@@ -114,7 +114,8 @@ export default function ProgressBar({
           overflow: "hidden",
           cursor: isDisabled ? "not-allowed" : (clickable ? "pointer" : "default"),
           transition: "all 0.2s",
-          background: isDark ? "#000000" : "#1A1830",
+          // Track (parte sin llenar): noche negro; día gris CLARO (antes era navy oscuro → se veía negro).
+          background: isDark ? "#000000" : "#E5E3F5",
           opacity: isDisabled ? 0.5 : 1,
         }}
         onMouseEnter={(e) => {
@@ -152,7 +153,8 @@ export default function ProgressBar({
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: isDark ? "#F0EEFF" : "#FFFFFF",
+              // Sobre el relleno (color saturado) → blanco. Deshabilitada (todo track claro) → oscuro.
+              color: isDark ? "#F0EEFF" : (isDisabled ? "#1A1830" : "#FFFFFF"),
               position: "relative",
               zIndex: 2,
               pointerEvents: "none",
@@ -179,7 +181,8 @@ export default function ProgressBar({
             left: 0,
             width: `calc(${Math.min(budgetLinePercentage, 100)}% - ${borderWidth * 2}px)`,
             height: 28,
-            border: `${borderWidth}px dashed #FFFFFF`,
+            // Línea punteada del presupuesto: blanca en noche, oscura en día (si no, invisible en claro).
+            border: `${borderWidth}px dashed ${isDark ? "#FFFFFF" : "#1A1830"}`,
             borderRadius: 8,
             pointerEvents: "none",
             zIndex: 3,
