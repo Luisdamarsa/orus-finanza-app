@@ -157,7 +157,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                   </div>
 
                   {/* Descripción y categoría */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
                     <div
                       style={{
                         fontSize: 13,
@@ -166,6 +166,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        textAlign: "left",
                       }}>
                       {tx.description}
                     </div>
