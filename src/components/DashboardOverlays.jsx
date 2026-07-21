@@ -24,7 +24,7 @@ export default function DashboardOverlays() {
     setSelectedPillarForMovements, transactions,
     showUpdateBalance, saldo, setShowUpdateBalance, setIsMovementOpen,
     setFilterType, setMovementOpenedFrom, txnActions,
-    setSearchOpen, setSearchQuery,
+    setSearchOpen, setSearchQuery, searchOpen, searchQuery,
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
@@ -39,11 +39,18 @@ export default function DashboardOverlays() {
     setIsMovementOpen(true);
   };
 
+  // Cerrar búsqueda: limpia y vuelve a Estado 1
+  const closeSearch = () => {
+    setSearchQuery("");
+    setSearchOpen(false);
+    setIsMovementOpen(false);
+  };
+
   return (
     <>
       {/* FAB - Lápiz (left) + Micrófono (right) — boundary propio */}
       <ErrorBoundary fallback={null}>
-        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} onSearch={openSearch} />
+        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} onSearch={openSearch} searchOpen={searchOpen} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onCloseSearch={closeSearch} />
       </ErrorBoundary>
 
       {/* Captura por voz (sin IA — Web Speech API) */}

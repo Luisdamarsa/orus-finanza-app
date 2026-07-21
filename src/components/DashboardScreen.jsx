@@ -27,7 +27,7 @@ export default function DashboardScreen() {
     setFilteredPillar, setIsMovementOpen, setMovementOpenedFrom, totalSpent, incomingTotal,
     setScrollY, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, filteredPillar,
     transactions, startTransactionEditing, newTxnToast,
-    searchOpen, searchQuery, setSearchQuery, setSearchOpen,
+    searchOpen, searchQuery,
   } = useDashboard();
 
   // 🆕 key que reinicia scroll + paginación al cambiar de periodo/filtro/búsqueda
@@ -109,31 +109,10 @@ export default function DashboardScreen() {
             <div style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
               <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-              {/* 🆕 Buscador (lupa del FAB): filtra por descripción, tipo, categoría y pilar */}
-              {searchOpen && (
-                <div style={{ position: "sticky", top: 0, zIndex: 6, background: t.bg, paddingTop: 6, paddingBottom: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, background: isDark ? "#1E1E2E" : "#FFFFFF", border: `1.5px solid ${isDark ? "#2D2D3A" : "#E5E3F5"}`, borderRadius: 12, padding: "8px 12px" }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                      <circle cx="11" cy="11" r="7" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <input
-                      autoFocus
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Buscar: arriendo, Varios, ingreso, llave…"
-                      style={{ flex: 1, minWidth: 0, border: "none", outline: "none", background: "transparent", color: t.text, fontSize: 13.5 }}
-                    />
-                    <button
-                      onClick={() => { setSearchQuery(""); setSearchOpen(false); setIsMovementOpen(false); }}
-                      style={{ flexShrink: 0, width: 22, height: 22, borderRadius: "50%", border: "none", background: isDark ? "#2D2D3A" : "#F0EFF8", color: t.sub, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                      aria-label="Cerrar búsqueda">✕</button>
-                  </div>
-                  {searchQuery.trim() !== "" && (
-                    <div style={{ fontSize: 11, color: t.sub, marginTop: 6, paddingLeft: 4 }}>
-                      {listedTransactions.length} resultado{listedTransactions.length === 1 ? "" : "s"} para “{searchQuery.trim()}”
-                    </div>
-                  )}
+              {/* 🆕 Contador de resultados (la barra de búsqueda vive abajo, en el FAB) */}
+              {searchOpen && searchQuery.trim() !== "" && (
+                <div style={{ fontSize: 11, color: t.sub, padding: "8px 4px 4px" }}>
+                  {listedTransactions.length} resultado{listedTransactions.length === 1 ? "" : "s"} para “{searchQuery.trim()}”
                 </div>
               )}
 
