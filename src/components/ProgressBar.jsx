@@ -153,8 +153,9 @@ export default function ProgressBar({
             style={{
               fontSize: 13,
               fontWeight: 600,
-              // Sobre el relleno (color saturado) → blanco. Deshabilitada (todo track claro) → oscuro.
-              color: isDark ? "#F0EEFF" : (isDisabled ? "#1A1830" : "#FFFFFF"),
+              // Día: oscuro siempre (como la punteada) — se lee sobre el relleno y sobre el fondo claro
+              // donde el relleno no llega. Noche: claro como antes.
+              color: isDark ? "#F0EEFF" : "#1A1830",
               position: "relative",
               zIndex: 2,
               pointerEvents: "none",
