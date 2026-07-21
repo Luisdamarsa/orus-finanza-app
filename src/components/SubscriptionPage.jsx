@@ -137,7 +137,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
     );
     root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [confirming]); // re-adjunta el observer al volver de la confirmación (si no, las tarjetas quedan invisibles)
 
   const t = isDark
     ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99" }
@@ -166,6 +166,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
     const accent = cp.gold ? "#E0A93E" : cp.highlight ? "#9B6DFF" : t.text;
     return (
       <PageLayout
+        key="confirm-plan"
         isDark={isDark}
         onBack={closeConfirm}
         pressBack={pressBack}
@@ -264,6 +265,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
   return (
     <PageLayout
+      key="plan-list"
       isDark={isDark}
       onBack={onBack}
       pressBack={pressBack}
