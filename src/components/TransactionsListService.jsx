@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { usePagination } from "../hooks/usePagination";
 import { groupByDate, fmt } from "../utils/formatters";
 import { PILLAR_MAP, METHOD_META, ALL_CATS } from "../constants";
@@ -22,8 +22,18 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
     ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" }
     : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
 
+  // 🆕 Ordenar por fecha+hora DESCENDENTE antes de paginar.
+  // Si no, slice(0,15) toma un trozo en el orden del array (no por fecha) y al cargar
+  // más entran transacciones más nuevas que saltan arriba. Ordenar aquí lo arregla.
+  const sortedTransactions = useMemo(() => {
+    return [...transactions].sort((a, b) => {
+      if (a.date !== b.date) return (b.date || "").localeCompare(a.date || "");
+      return (b.time || "").localeCompare(a.time || "");
+    });
+  }, [transactions]);
+
   // 🆕 Paginación: 15 a la vez, carga más al llegar al final (acumulativo)
-  const { visibleItems, hasMore, loading, loadMore } = usePagination(transactions, 15, 350);
+  const { visibleItems, hasMore, loading, loadMore } = usePagination(sortedTransactions, 15, 350);
   const sentinelRef = useRef(null);
   useEffect(() => {
     const el = sentinelRef.current;
