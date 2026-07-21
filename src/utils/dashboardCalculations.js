@@ -49,26 +49,31 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   // 🆕 Solo mostrar saldo si showIncomes === true
   const saldo = showIncomes ? (incomingTotal - totalSpent) : 0;
   const saldoForDonut = saldo > 0 ? saldo : 0;
-  const donutTotal = totalSpent + saldoForDonut;
+  // baseTotal = denominador para TODOS los porcentajes (el "100%").
+  // Es: gasto total + saldo no gastado (el saldo solo cuenta si "Mostrar ingresos" está activo).
+  // Antes se llamaba `donutTotal`, pero no es "del donut": la misma base la usan el donut (Estado 1)
+  // y los tags de pilares (Estado 2) para que un pilar muestre el MISMO % en ambos estados.
+  // Con "Mostrar ingresos" apagado (default), saldoForDonut = 0 → baseTotal = totalSpent (% del gasto).
+  const baseTotal = totalSpent + saldoForDonut;
   const hasSaldo = saldo > 0;
 
   // ============================================================
   // PASO 3: CALCULAR PORCENTAJES (La lógica CRÍTICA)
   // ============================================================
 
-  // Base común: siempre usar donutTotal
-  // Esto aplica a ESTADO 1 y ESTADO 2
+  // Base común: siempre usar baseTotal (mismo denominador para Estado 1 y Estado 2,
+  // así los % del donut y los % de los tags de pilares coinciden).
   const rawPcts = PILLARS.map(p =>
-    donutTotal > 0 ? (pillarSpends[p.id] / donutTotal) * 100 : 0
+    baseTotal > 0 ? (pillarSpends[p.id] / baseTotal) * 100 : 0
   );
 
-  const saldoPct = donutTotal > 0 ? (saldoForDonut / donutTotal) * 100 : 0;
+  const saldoPct = baseTotal > 0 ? (saldoForDonut / baseTotal) * 100 : 0;
   const allRawPcts = [...rawPcts, saldoPct];
 
   // Aplicar Largest Remainder Method para que sumen exactamente 100%
   const allFloorPcts = allRawPcts.map(Math.floor);
-  // 🆕 Sin datos (donutTotal 0) NO repartir: si no, el método suma 1% a cada bucket → mostraba 1%.
-  const toAdd = donutTotal > 0 ? 100 - allFloorPcts.reduce((a, b) => a + b, 0) : 0;
+  // 🆕 Sin datos (baseTotal 0) NO repartir: si no, el método suma 1% a cada bucket → mostraba 1%.
+  const toAdd = baseTotal > 0 ? 100 - allFloorPcts.reduce((a, b) => a + b, 0) : 0;
   const allByRem = allRawPcts.map((v, i) => ({ i, rem: v - Math.floor(v) })).sort((a, b) => b.rem - a.rem);
 
   const allChipPcts = [...allFloorPcts];
@@ -83,21 +88,21 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   // PASO 4: CALCULAR SEGMENTOS DEL DONUT
   // ============================================================
 
-  let segments = donutTotal === 0
+  let segments = baseTotal === 0
     ? [{ id: "_empty", label: "Sin gastos", color: isDark ? "#2D2D3A" : "#D5D3E8", pct: 100 }]
     : PILLARS.filter(p => pillarSpends[p.id] > 0).map(p => ({
         id: p.id,
         label: p.label,
         color: p.color,
-        pct: (pillarSpends[p.id] / donutTotal) * 100
+        pct: (pillarSpends[p.id] / baseTotal) * 100
       }));
 
-  if (saldoForDonut > 0 && donutTotal > 0) {
+  if (saldoForDonut > 0 && baseTotal > 0) {
     segments.push({
       id: "saldo",
       label: "Tu saldo",
       color: SALDO_COLOR,
-      pct: (saldoForDonut / donutTotal) * 100
+      pct: (saldoForDonut / baseTotal) * 100
     });
   }
 
@@ -114,7 +119,7 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
     // Saldo
     saldo,
     saldoForDonut,
-    donutTotal,
+    baseTotal,
     hasSaldo,
 
     // Porcentajes (para tarjetas sin presupuesto)
@@ -131,7 +136,7 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
  *
  * Lógica:
  * - Si tiene presupuesto: gasto / presupuesto * 100
- * - Si no tiene presupuesto: usa chipPct (porcentaje del donutTotal)
+ * - Si no tiene presupuesto: usa chipPct (porcentaje del baseTotal)
  *
  * @param {number} pillarSpend - Gasto del pilar
  * @param {number} pillarBudget - Presupuesto del pilar (null si no tiene)
@@ -153,7 +158,7 @@ export const getPillarPercentage = (pillarSpend, pillarBudget, chipPct) => {
  *
  * Lógica IGUAL al Estado 1:
  * - Si tiene presupuesto: gasto / presupuesto * 100
- * - Si no tiene presupuesto: usa chipPct (porcentaje del donutTotal)
+ * - Si no tiene presupuesto: usa chipPct (porcentaje del baseTotal)
  *
  * @param {number} pillarSpend - Gasto del pilar
  * @param {number} pillarBudget - Presupuesto del pilar (null si no tiene)
