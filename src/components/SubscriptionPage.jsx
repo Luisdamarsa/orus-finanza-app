@@ -124,6 +124,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
   const [currentPlan, setCurrentPlan] = useState(() => userStorage.getSubscription().toLowerCase());
   const [selected, setSelected] = useState(null);
   const [confirming, setConfirming] = useState(null); // id del plan en pantalla de confirmación
+  const [payHint, setPayHint] = useState(false); // aviso "aquí se abrirá el pago" (placeholder dev)
   const [expanded, setExpanded] = useState(() => userStorage.getSubscription().toLowerCase()); // abre el plan activo
 
   // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
@@ -161,11 +162,12 @@ export default function SubscriptionPage({ isDark, onBack }) {
   // Pantalla de CONFIRMACIÓN (antes de aplicar / pagar)
   const cp = confirming ? PLANS.find((x) => x.id === confirming) : null;
   if (cp) {
+    const closeConfirm = () => { setConfirming(null); setPayHint(false); };
     const accent = cp.gold ? "#E0A93E" : cp.highlight ? "#9B6DFF" : t.text;
     return (
       <PageLayout
         isDark={isDark}
-        onBack={() => setConfirming(null)}
+        onBack={closeConfirm}
         pressBack={pressBack}
         title={
           <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
@@ -228,7 +230,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
           {/* Botones */}
           <button
-            onClick={() => confirmChange(cp.id)}
+            onClick={() => { if (cp.price === 0) confirmChange(cp.id); else setPayHint(true); }}
             style={{
               width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "none",
               background: cp.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (cp.highlight ? "#9B6DFF" : (cp.id === "free" ? "#22C55E" : t.text)),
@@ -239,14 +241,20 @@ export default function SubscriptionPage({ isDark, onBack }) {
             {cp.price === 0 ? "Cambiar a ORUS Free" : `Continuar con ${cp.name}`}
           </button>
           <button
-            onClick={() => setConfirming(null)}
+            onClick={closeConfirm}
             style={{ width: "100%", marginTop: 10, padding: "11px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: "transparent", color: t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
           >
             Cancelar
           </button>
-          {cp.price !== 0 && (
+          {cp.price !== 0 && !payHint && (
             <div style={{ fontSize: 10, color: t.sub, textAlign: "center", marginTop: 10, paddingBottom: 10, lineHeight: 1.5 }}>
               🔒 El pago se procesará de forma segura por tu tienda (App Store / Google Play). Cancela cuando quieras.
+            </div>
+          )}
+          {cp.price !== 0 && payHint && (
+            <div style={{ fontSize: 11.5, color: t.text, textAlign: "center", marginTop: 12, paddingBottom: 10, lineHeight: 1.5, background: "#9B6DFF18", border: `1px solid #9B6DFF55`, borderRadius: 12, padding: 12 }}>
+              🔒 Aquí se abrirá el pago de tu tienda (App Store / Google Play).
+              <br /><b style={{ color: "#9B6DFF" }}>Próximamente.</b>
             </div>
           )}
         </div>
@@ -361,6 +369,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isCurrent) return;
+                  setPayHint(false);
                   setConfirming(p.id); // abre la pantalla de confirmación
                 }}
                 style={{
