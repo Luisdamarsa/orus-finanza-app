@@ -36,8 +36,11 @@ export function useTransactionActions({
     // 🆕 Categoría nueva escrita en el dropdown: `concept` es el NOMBRE, no un id.
     // Se crea (o reutiliza si ya existe) al GUARDAR → persiste en el catálogo y aparece
     // en Categorías, Presupuestos y el dropdown. Devuelve el id real para la transacción.
-    if (!isIncome && isNewCategory && concept && pillarId && getOrCreateCategory) {
-      categoryId = getOrCreateCategory(pillarId, concept);
+    // Si no se eligió pilar, se crea en "varios" (default), igual que un gasto sin categoría.
+    if (!isIncome && isNewCategory && concept && getOrCreateCategory) {
+      const targetPillar = pillarId || "varios";
+      categoryId = getOrCreateCategory(targetPillar, concept);
+      pillar = targetPillar;
     }
 
     // 🆕 Gasto sin categoría → cae en la categoría "Varios" del pilar Varios (la crea si no existe)
