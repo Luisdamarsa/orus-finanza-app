@@ -82,7 +82,7 @@ export default function FloatingActionButtons({
             autoFocus
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="arriendo, Varios, ingreso…"
+            placeholder="Fijos, Tarjeta, Cine…"
             style={{ flex: 1, minWidth: 0, border: "none", outline: "none", background: "transparent", color: t.text, fontSize: 13.5 }}
           />
           <button
