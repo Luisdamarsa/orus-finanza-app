@@ -82,7 +82,7 @@ export default function FloatingActionButtons({
             autoFocus
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar: arriendo, Varios…"
+            placeholder="arriendo, Varios, ingreso…"
             style={{ flex: 1, minWidth: 0, border: "none", outline: "none", background: "transparent", color: t.text, fontSize: 13.5 }}
           />
           <button
@@ -108,7 +108,9 @@ export default function FloatingActionButtons({
         onPointerUp={() => setPressingFAB(null)}
         onPointerLeave={() => setPressingFAB(null)}
         style={{
-          position: "absolute", bottom: 24, left: 22, zIndex: 35,
+          // bottom 34 (no 24): centra la lupa a la misma altura que el lápiz,
+          // que está centrado en la fila del micrófono (52px de alto).
+          position: "absolute", bottom: 34, left: 22, zIndex: 35,
           width: 32, height: 32, borderRadius: "50%", border: "none",
           background: isDark ? "#3A3A52" : "#94A3B8",
           cursor: "pointer",
