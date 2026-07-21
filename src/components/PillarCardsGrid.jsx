@@ -3,6 +3,7 @@ import { fmt } from "../utils/formatters";
 import { PILLARS } from "../constants";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 import { COLORS, withAlpha } from "../services/colorService";
+import { DAY_PILLAR_COLOR } from "../constants";
 
 /**
  * PillarCardsGrid.jsx
@@ -98,6 +99,7 @@ export default function PillarCardsGrid({
           // 🆕 Diferenciar entre exactamente 100% (no está pasado) y > 100% (pasado)
           const over = hasBudget && pc > 100;
           const isAct = activeId === p.id;
+          const dc = isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color); // 🆕 color día/noche
           // 🎨 CAMBIO: Emoji diferente si Ahorro (🎉) o si otro pilar pasado (⚠️)
           // 🆕 Usar Math.ceil para redondear hacia arriba el exceso (ej: +0.5% → +1%)
           // 🆕 Consistencia: usar "del total" en lugar de "total"
@@ -166,8 +168,8 @@ export default function PillarCardsGrid({
                     fontWeight: 700,
                     padding: "2px 4px",
                     borderRadius: 6,
-                    background: over ? (p.id === "ahorro" ? withAlpha(p.color, "33") : withAlpha(COLORS.overSoft, "22")) : withAlpha(p.color, "22"),
-                    color: over ? (p.id === "ahorro" ? p.color : COLORS.gasto) : (isDark ? p.color : p.darkColor),
+                    background: over ? (p.id === "ahorro" ? withAlpha(p.color, "33") : withAlpha(COLORS.overSoft, "22")) : withAlpha(dc, "22"),
+                    color: over ? (p.id === "ahorro" ? dc : COLORS.gasto) : dc,
                   }}
                 >
                   {badgeLabel}
@@ -183,7 +185,7 @@ export default function PillarCardsGrid({
                       height: "100%",
                       width: `${Math.min(pc, 100)}%`,
                       borderRadius: 2,
-                      background: over ? (p.id === "ahorro" ? p.color : "#FCA5A5") : p.color,
+                      background: over ? (p.id === "ahorro" ? dc : "#FCA5A5") : dc,
                     }}
                   />
                 </div>

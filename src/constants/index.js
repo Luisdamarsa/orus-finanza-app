@@ -93,6 +93,15 @@ export const PILLARS = [
 
 export const SALDO_COLOR = "#CBD5E1";
 
+// 🆕 MODO DÍA: colores saturados por pilar (los pasteles se lavan sobre fondo claro).
+// varios pasa de amarillo pastel (#FDE68A) a ámbar (#D97706) para que se aprecie en blanco.
+export const DAY_PILLAR_COLOR = {
+  fijos: "#3B82F6", deuda: "#EF4444", ahorro: "#16A34A", ocio: "#8B5CF6", varios: "#D97706", ingreso: "#16A34A",
+};
+export const DAY_SALDO_COLOR = "#94A3B8";
+// Devuelve el color del pilar según el tema (día = saturado, noche = pastel).
+export const pillarColor = (pillarId, pastel, isDark) => isDark ? pastel : (DAY_PILLAR_COLOR[pillarId] || pastel);
+
 export const MONTHS_SHORT = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 export const MONTHS_FULL = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 

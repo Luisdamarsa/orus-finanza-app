@@ -7,6 +7,7 @@
  * Entrada: transacciones filtradas, balance, pilares
  * Salida: todos los valores necesarios para el dashboard
  */
+import { DAY_PILLAR_COLOR, DAY_SALDO_COLOR } from "../constants";
 
 /**
  * Calcula TODOS los valores del dashboard de una sola vez
@@ -93,7 +94,8 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
     : PILLARS.filter(p => pillarSpends[p.id] > 0).map(p => ({
         id: p.id,
         label: p.label,
-        color: p.color,
+        // 🆕 Día: color saturado (los pasteles se lavan en blanco); Noche: pastel.
+        color: isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color),
         pct: (pillarSpends[p.id] / baseTotal) * 100
       }));
 
@@ -101,7 +103,7 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
     segments.push({
       id: "saldo",
       label: "Tu saldo",
-      color: SALDO_COLOR,
+      color: isDark ? SALDO_COLOR : DAY_SALDO_COLOR,
       pct: (saldoForDonut / baseTotal) * 100
     });
   }

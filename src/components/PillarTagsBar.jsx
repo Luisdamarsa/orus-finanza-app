@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DAY_PILLAR_COLOR } from "../constants";
 
 /**
  * PillarTagsBar.jsx
@@ -21,6 +22,7 @@ export default function PillarTagsBar({
   filteredPillar,
   setFilteredPillar,
   setFilterType,
+  isDark,
 }) {
   // 🆕 Estado para trackear qué tag está siendo presionado
   const [pressingId, setPressingId] = useState(null);
@@ -30,6 +32,7 @@ export default function PillarTagsBar({
       {/* Tags de pilares */}
       {PILLARS.map((p, i) => {
         const isFiltered = filteredPillar === p.id;
+        const c = isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color); // 🆕 color según tema
         const isPressing = pressingId === p.id; // 🆕 Verificar si este tag está siendo presionado
         if (isPressing) console.log("🎯 RENDERING TAG PRESSED:", p.id, "isPressing:", isPressing);
 
@@ -77,16 +80,16 @@ export default function PillarTagsBar({
               borderRadius: 9,
               border: "none",
               cursor: "pointer",
-              background: isFiltered ? p.color + "33" : p.color + "1A",
-              outline: isFiltered ? `1.5px solid ${p.color}BB` : `1px solid ${p.color}44`,
+              background: isFiltered ? c + "33" : c + "1A",
+              outline: isFiltered ? `1.5px solid ${c}BB` : `1px solid ${c}44`,
               transform: isPressing ? "scale(0.88) translateY(0.5px)" : "scale(1) translateY(0)", // 🆕 Se empequeñece más al presionar
               opacity: isPressing ? 0.5 : 1, // 🆕 Opacidad más baja al presionar
               boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Sombra inset al presionar
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
             }}
           >
-            <div style={{ fontSize: 10, fontWeight: 800, color: p.color }}>{p.label}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: p.color, opacity: 0.8 }}>{chipPcts[i]}%</div>
+            <div style={{ fontSize: 10, fontWeight: 800, color: c }}>{p.label}</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: c, opacity: 0.8 }}>{chipPcts[i]}%</div>
           </button>
         );
       })}
