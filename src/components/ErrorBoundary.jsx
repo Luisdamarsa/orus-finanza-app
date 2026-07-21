@@ -18,11 +18,13 @@ import { reportError } from "../services/reportError";
 function OopsScreen() {
   return (
     <div style={{
-      width: "100vw", height: "100vh",
+      // position: fixed + inset 0 → centra respecto al viewport, ignorando el layout
+      // de columna del #root (estilos sobrantes de la plantilla). Así queda centrado siempre.
+      position: "fixed", inset: 0, zIndex: 9999,
       background: "#0D0D1A",
       display: "flex", alignItems: "center", justifyContent: "center",
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      padding: 20,
+      padding: 20, boxSizing: "border-box",
     }}>
       <div style={{ maxWidth: "400px", textAlign: "center" }}>
         <div style={{ fontSize: 100, marginBottom: 24, lineHeight: 1 }}>⚠️</div>
