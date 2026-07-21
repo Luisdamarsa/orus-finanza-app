@@ -44,7 +44,7 @@
 |---|------|------|-----|
 | 4.1 | 🎨 | Formato del **popup de tarjetas de pilares** | 🟡 |
 | 4.2 | 🎨 | Formato de las **tarjetas de pilares** | 🟡 |
-| 4.3 | 🔍🎨 | **Barra de presupuesto de pilares** — *decisión con MJ*, luego implementar | 🟢 |
+| 4.3 | ✅ | ~~**Barra de presupuesto de pilares** (decisión con MJ)~~ — **resuelto** (sin presupuesto → sin barra; solo icono/nombre/valor. Ver 10.5). | 🟢 |
 | 4.4 | 🎨 | **Animación** en la página de "mostrar ingresos" | 🟢 |
 | 4.5 | 🎨 | **Iconos para categorías** (definir set + mapping) | 🟡 |
 
@@ -77,6 +77,7 @@
 | 10.2 | ✅ | ~~**Modo Día (isDark como estado)**~~ — **hecho** (`isDark` persistido en `userStorage.theme`, noche por defecto; toda la app reacciona). Colores de día: mapa saturado por pilar (varios amarillo→ámbar), saldo gris más oscuro. | 🟡 |
 | 10.3 | ✅ | ~~**Fix negros hardcodeados en día**~~ — **hecho** (centro donut, cabeceras de fecha, fondos de página transacción/categoría, bezel, barras de presupuesto, montos y nombres de barras, toast de transacción — todo tema-aware; noche idéntico). | 🟡 |
 | 10.4 | 🎨 | Afinar tonos de día pendientes (contraste fino, otras pantallas menos visibles). *Iterativo.* | 🟢 |
+| 10.5 | ✅ | ~~**Sin presupuesto → sin barra en Movimientos**~~ — **hecho** (pilar y categorías sin presupuesto muestran solo icono/nombre/valor; la barra solo aparece con presupuesto real, ya que sin él se llenaba al 100% sin informar). | 🟢 |
 
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |
