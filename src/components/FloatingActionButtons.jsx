@@ -5,12 +5,35 @@
  * Botones flotantes de nueva transacción: lápiz (abre formulario) + micrófono (voz).
  * Extraído de DashboardOverlays para que tenga su propio ErrorBoundary (aislar fallos).
  */
-export default function FloatingActionButtons({ isDark, pressingFAB, setPressingFAB, setScreen, onMic }) {
+export default function FloatingActionButtons({ isDark, pressingFAB, setPressingFAB, setScreen, onMic, onSearch }) {
   return (
     <div style={{
       position: "absolute", bottom: 24, right: 22, zIndex: 35,
       display: "flex", alignItems: "center", gap: 10,
     }}>
+      {/* Lupa (buscar movimientos) — mismo formato que el lápiz, a la izquierda */}
+      <button
+        onClick={onSearch}
+        onPointerDown={() => setPressingFAB("search")}
+        onPointerUp={() => setPressingFAB(null)}
+        onPointerLeave={() => setPressingFAB(null)}
+        style={{
+          width: 32, height: 32, borderRadius: "50%", border: "none",
+          background: isDark ? "#3A3A52" : "#94A3B8",
+          cursor: "pointer",
+          boxShadow: "0 3px 10px rgba(0,0,0,0.28)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0,
+          transform: pressingFAB === "search" ? "scale(0.90)" : "scale(1)",
+          opacity: pressingFAB === "search" ? 0.7 : 1,
+          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+
       <button
         onClick={() => setScreen("new-transaction")}
         onPointerDown={() => setPressingFAB("pencil")}

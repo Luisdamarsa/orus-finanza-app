@@ -24,15 +24,26 @@ export default function DashboardOverlays() {
     setSelectedPillarForMovements, transactions,
     showUpdateBalance, saldo, setShowUpdateBalance, setIsMovementOpen,
     setFilterType, setMovementOpenedFrom, txnActions,
+    setSearchOpen, setSearchQuery,
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
+
+  // Abrir búsqueda: entra a Estado 2, limpia filtros y muestra el buscador
+  const openSearch = () => {
+    setFilteredPillar(null);
+    setFilterType(null);
+    setMovementOpenedFrom("search");
+    setSearchQuery("");
+    setSearchOpen(true);
+    setIsMovementOpen(true);
+  };
 
   return (
     <>
       {/* FAB - Lápiz (left) + Micrófono (right) — boundary propio */}
       <ErrorBoundary fallback={null}>
-        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} />
+        <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} onSearch={openSearch} />
       </ErrorBoundary>
 
       {/* Captura por voz (sin IA — Web Speech API) */}

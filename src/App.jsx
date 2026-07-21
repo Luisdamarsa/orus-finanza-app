@@ -94,6 +94,9 @@ function Dashboard() {
   }, []);
   // 🆕 Estado para trackear qué botón FAB está siendo presionado
   const [pressingFAB, setPressingFAB] = useState(null);
+  // 🆕 Búsqueda de movimientos (lupa del FAB): abre Estado 2 y filtra por texto
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   // 🆕 Pilar seleccionado para la página de movimientos
   const [customConcepts, setCustomConcepts] = useState([]);
   const {
@@ -316,6 +319,8 @@ function Dashboard() {
     if (isMovementOpen === false) {
       setFilteredPillar(null);
       setFilterType(null);
+      setSearchOpen(false);
+      setSearchQuery("");
     }
   }, [isMovementOpen]);
 
@@ -408,6 +413,7 @@ function Dashboard() {
     showPillarBars, setShowPillarBars, showUpdateBalance, setShowUpdateBalance,
     showPeriodPicker, setShowPeriodPicker, showIncomes, setShowIncomes,
     handleSelectPillar, pressingFAB, setPressingFAB, txnActions,
+    searchOpen, setSearchOpen, searchQuery, setSearchQuery,
     pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts,
     transactions, categories, customBudgets, setCustomBudgets,
     isLoading, startLoading, stopLoading,
