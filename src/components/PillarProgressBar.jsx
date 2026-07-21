@@ -110,7 +110,8 @@ export default function PillarProgressBar({
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: "#FFFFFF",
+            // Va sobre el fondo de la página → día: oscuro; noche: blanco.
+            color: isDark ? "#FFFFFF" : "#1A1830",
           }}
         >
           ${spent.toLocaleString("es-CO")}

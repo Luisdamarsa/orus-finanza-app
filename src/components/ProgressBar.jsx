@@ -114,8 +114,8 @@ export default function ProgressBar({
           overflow: "hidden",
           cursor: isDisabled ? "not-allowed" : (clickable ? "pointer" : "default"),
           transition: "all 0.2s",
-          // Track (parte sin llenar): noche negro; día gris CLARO (antes era navy oscuro → se veía negro).
-          background: isDark ? "#000000" : "#E5E3F5",
+          // Track (parte sin llenar): noche negro; día SIN fondo (el usuario pidió quitar la "sombra gris").
+          background: isDark ? "#000000" : "transparent",
           opacity: isDisabled ? 0.5 : 1,
         }}
         onMouseEnter={(e) => {

@@ -93,32 +93,18 @@ export default function PreferencesPage({ isDark, onBack, setTheme }) {
           Ajusta cómo se ve y se comporta la app. Los cambios se guardan al instante.
         </div>
 
-        {/* Tema */}
-        <div className="reveal" style={card}>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: t.text, marginBottom: 10 }}>Tema</div>
-          <div style={{ display: "flex", gap: 10 }}>
-            {[
-              { dark: false, icon: "☀️", label: "Día" },
-              { dark: true, icon: "🌙", label: "Noche" },
-            ].map((opt) => {
-              const active = isDark === opt.dark;
-              return (
-                <button
-                  key={opt.label}
-                  onClick={() => setTheme(opt.dark)}
-                  style={{
-                    flex: 1, padding: "14px 0", borderRadius: 12, cursor: "pointer",
-                    border: `2px solid ${active ? "#9B6DFF" : t.border}`,
-                    background: active ? "#9B6DFF18" : t.inputBg,
-                    color: t.text, fontSize: 13, fontWeight: 700,
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                  }}>
-                  <span style={{ fontSize: 22 }}>{opt.icon}</span>
-                  {opt.label}
-                  {active && <span style={{ fontSize: 9, color: "#9B6DFF", fontWeight: 800 }}>ACTIVO</span>}
-                </button>
-              );
-            })}
+        {/* Tema — toggle sol/luna (estilo "Mostrar Ingresos") */}
+        <div className="reveal" style={{ ...card, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: t.text }}>Tema</div>
+            <div style={{ fontSize: 11.5, color: t.sub, marginTop: 2 }}>{isDark ? "Modo noche 🌙" : "Modo día ☀️"}</div>
+          </div>
+          <div
+            onClick={() => setTheme(!isDark)}
+            style={{ position: "relative", width: 64, height: 30, borderRadius: 15, background: t.inputBg, border: `1px solid ${t.border}`, cursor: "pointer", flexShrink: 0 }}>
+            <div style={{ position: "absolute", top: 2, left: isDark ? 34 : 2, width: 27, height: 25, borderRadius: 13, background: "#9B6DFF", transition: "left 0.2s cubic-bezier(0.4,0,0.2,1)" }} />
+            <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, zIndex: 2, opacity: isDark ? 0.5 : 1 }}>☀️</span>
+            <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 13, zIndex: 2, opacity: isDark ? 1 : 0.5 }}>🌙</span>
           </div>
         </div>
 
