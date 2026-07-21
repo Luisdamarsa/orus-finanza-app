@@ -5,8 +5,8 @@
  * Controles flotantes del dashboard (Estado 1 y 2):
  *  - Lupa (buscar): esquina inferior IZQUIERDA (opuesta al micrófono).
  *  - Lápiz (nueva transacción a mano) + Micrófono (voz): esquina inferior DERECHA.
- * Al activar la búsqueda, la barra aparece ABAJO: reemplaza al micrófono y va desde
- * la esquina izquierda hasta el lápiz (el mic se oculta mientras se busca).
+ * Al activar la búsqueda, la barra aparece ABAJO en la misma línea que el lápiz y el
+ * micrófono: va desde la esquina izquierda hasta el lápiz, y el mic sigue visible a la derecha.
  * Extraído de DashboardOverlays para tener su propio ErrorBoundary.
  */
 export default function FloatingActionButtons({
@@ -42,7 +42,34 @@ export default function FloatingActionButtons({
     </button>
   );
 
-  // MODO BÚSQUEDA: barra abajo desde la esquina izquierda hasta el lápiz (a la derecha)
+  // Botón micrófono (voz) — se reutiliza en ambos modos
+  const micButton = (
+    <button
+      onClick={onMic}
+      onPointerDown={() => setPressingFAB("mic")}
+      onPointerUp={() => setPressingFAB(null)}
+      onPointerLeave={() => setPressingFAB(null)}
+      style={{
+        width: 52, height: 52, borderRadius: "50%", border: "none",
+        background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+        cursor: "pointer",
+        boxShadow: "0 6px 24px rgba(155,109,255,0.45)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+        transform: pressingFAB === "mic" ? "scale(0.93)" : "scale(1)",
+        opacity: pressingFAB === "mic" ? 0.8 : 1,
+        transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
+        <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+      </svg>
+    </button>
+  );
+
+  // MODO BÚSQUEDA: barra + lápiz + micrófono en la misma línea (la barra va de la izquierda al lápiz)
   if (searchOpen) {
     return (
       <div style={{ position: "absolute", bottom: 24, left: 22, right: 22, zIndex: 35, display: "flex", alignItems: "center", gap: 10 }}>
@@ -55,7 +82,7 @@ export default function FloatingActionButtons({
             autoFocus
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar: arriendo, Varios, ingreso, llave…"
+            placeholder="Buscar: arriendo, Varios…"
             style={{ flex: 1, minWidth: 0, border: "none", outline: "none", background: "transparent", color: t.text, fontSize: 13.5 }}
           />
           <button
@@ -66,6 +93,7 @@ export default function FloatingActionButtons({
           </button>
         </div>
         {pencilButton}
+        {micButton}
       </div>
     );
   }
@@ -99,29 +127,7 @@ export default function FloatingActionButtons({
       {/* Lápiz + Micrófono — esquina inferior derecha */}
       <div style={{ position: "absolute", bottom: 24, right: 22, zIndex: 35, display: "flex", alignItems: "center", gap: 10 }}>
         {pencilButton}
-        <button
-          onClick={onMic}
-          onPointerDown={() => setPressingFAB("mic")}
-          onPointerUp={() => setPressingFAB(null)}
-          onPointerLeave={() => setPressingFAB(null)}
-          style={{
-            width: 52, height: 52, borderRadius: "50%", border: "none",
-            background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-            cursor: "pointer",
-            boxShadow: "0 6px 24px rgba(155,109,255,0.45)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-            transform: pressingFAB === "mic" ? "scale(0.93)" : "scale(1)",
-            opacity: pressingFAB === "mic" ? 0.8 : 1,
-            transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
-            <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-          </svg>
-        </button>
+        {micButton}
       </div>
     </>
   );
