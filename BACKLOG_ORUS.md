@@ -14,6 +14,7 @@
 | 1.1 | ✅ | ~~Nombre de categoría en periodos anteriores al editar~~ — **analizado; diferido a fase BD** (ver Decisión 1.1) | 🟡 |
 | 1.2 | ✅ | ~~Página de Movimientos cuando el periodo es anual~~ — **resuelto junto con 1.1** (nombre = actual/Opción 1; sin presupuesto en agregados) | 🟡 |
 | 1.3 | ✅ | ~~Sesión que no carga → colapsar y ocultar~~ — **hecho** (boundaries por sección que ocultan + Oops a nivel página + toast rojo en acciones) | 🟢 |
+| 1.4 | 🐛 | **Crear categoría desde el dropdown de categoría al hacer una transacción no la crea.** Debería crearse la categoría nueva. *(Pendiente — a trabajar próxima sesión.)* | 🟡 |
 
 > **Decisión 1.1 (17 jul 2026) — diferido a fase BD.**
 > Hoy el nombre en el desglose usa un `queryDate` fijo al día 15, lo que hace que el mes del cambio dependa arbitrariamente de si editaste antes/después del 15.
@@ -59,7 +60,15 @@
 | 6.2 | 📄 | **Informes** | 🔴 |
 | 6.3 | ✅ | ~~**Sobre la app** (Acerca de ORUS)~~ — **hecho** (`AboutPage.jsx`: donut animado gris→color con pilares, lista de movimientos, presupuestos, sección IA con mic real, reveal-on-scroll) | 🟢 |
 | 6.4 | ✅ | ~~**Sobre permisos**~~ — **hecho** (`PermissionsPage.jsx`: tarjetas con iconos + reveal escalonado, permisos web funcionales mic/notif, etiquetas Óptimo/Opcional, link a Privacidad) | 🟢 |
-| 6.5 | ✅ | ~~**Suscripciones / plan**~~ — **hecho** (`SubscriptionPage.jsx`: 3 planes USD Free/Plus $2.99/Pro $5.99, tarjetas colapsables reveal-on-scroll, Pro dorado "MÁS COMPLETO", Plus "MÁS POPULAR"; `role`+`subscription` en userStorage). **Pendiente fase BD: pasarela de pago real.** | 🟡 |
+| 6.5 | ✅ | ~~**Suscripciones / plan**~~ — **hecho** (`SubscriptionPage.jsx`: 3 planes USD Free/Plus $2.99/Pro $5.99, tarjetas colapsables reveal-on-scroll, Pro dorado "MÁS COMPLETO", Plus "MÁS POPULAR"; `role`+`subscription` en userStorage; **pantalla de confirmación** con ventajas + reseñas y aviso de pago por tienda). **Pendiente fase BD: pasarela de pago real (RevenueCat/IAP).** | 🟡 |
+
+## Hito 9 — Registro rápido de movimientos (prod-v10.6.5)
+| # | Tipo | Item | Dif |
+|---|------|------|-----|
+| 9.1 | ✅ | ~~**Registro por voz** (sin IA)~~ — **hecho** (`VoiceCapture.jsx` + `voiceParser.js`: Web Speech API, parser ES dígitos+palabras, pantalla de revisión antes de guardar; mic del FAB en Estado 1 y 2) | 🟡 |
+| 9.2 | ✅ | ~~**Búsqueda de movimientos**~~ — **hecho** (lupa en FAB abajo-izquierda; barra abajo junto a lápiz+mic; `searchTransactions.js` filtra por descripción/tipo/categoría/pilar; salta al inicio al buscar; vuelve al estado donde se abrió) | 🟡 |
+| 9.3 | ✅ | ~~**Fix orden de paginación**~~ — **hecho** (`TransactionsListService` ordena por fecha+hora desc antes de paginar; las 15 iniciales son las más recientes) | 🟢 |
+| 9.4 | ✅ | ~~**Fix tags de pilares mostraban 1% sin datos**~~ — **hecho** (`dashboardCalculations`: con `donutTotal` 0 no se reparte el 100%; ahora muestran 0%) | 🟢 |
 
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |

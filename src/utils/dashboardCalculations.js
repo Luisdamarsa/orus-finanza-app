@@ -67,7 +67,8 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
 
   // Aplicar Largest Remainder Method para que sumen exactamente 100%
   const allFloorPcts = allRawPcts.map(Math.floor);
-  const toAdd = 100 - allFloorPcts.reduce((a, b) => a + b, 0);
+  // 🆕 Sin datos (donutTotal 0) NO repartir: si no, el método suma 1% a cada bucket → mostraba 1%.
+  const toAdd = donutTotal > 0 ? 100 - allFloorPcts.reduce((a, b) => a + b, 0) : 0;
   const allByRem = allRawPcts.map((v, i) => ({ i, rem: v - Math.floor(v) })).sort((a, b) => b.rem - a.rem);
 
   const allChipPcts = [...allFloorPcts];
