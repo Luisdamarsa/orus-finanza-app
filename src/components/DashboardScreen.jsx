@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import HeaderService from "./HeaderService";
 import Periodo from "./Periodo";
 import ErrorBoundary from "./ErrorBoundary";
@@ -38,6 +39,12 @@ export default function DashboardScreen() {
     filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType }),
     searchOpen ? searchQuery : ""
   );
+
+  // 🆕 Al cambiar la búsqueda, mostrar el inicio de la lista (no dejar el scroll donde estaba)
+  const listScrollRef = useRef(null);
+  useEffect(() => {
+    if (searchOpen && listScrollRef.current) listScrollRef.current.scrollTop = 0;
+  }, [searchQuery, searchOpen]);
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
@@ -106,7 +113,7 @@ export default function DashboardScreen() {
 
           {/* Transacciones - position absolute si está abierto */}
           {isMovementOpen && (
-            <div style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
+            <div ref={listScrollRef} style={{ position: "absolute", top: `calc(${stickyH}px - 6px)`, left: 0, right: 0, bottom: 0, overflowY: "auto", overflowX: "hidden", overscrollBehavior: "contain", scrollbarWidth: "none", padding: "0 22px 120px 22px" }}>
               <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
               {/* 🆕 Contador de resultados (la barra de búsqueda vive abajo, en el FAB) */}
