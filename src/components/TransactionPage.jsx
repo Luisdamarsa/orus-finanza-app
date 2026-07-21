@@ -224,7 +224,8 @@ export default function TransactionPage({
         position: "absolute",
         inset: 0,
         zIndex: 40,
-        background: "#000000",
+        // Día: fondo claro (antes fijo negro); Noche: negro igual que antes.
+        background: isDark ? "#000000" : t.bg,
         display: "flex",
         flexDirection: "column",
         padding: "56px 22px 24px",

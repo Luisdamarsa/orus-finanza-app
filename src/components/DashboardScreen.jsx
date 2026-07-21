@@ -47,7 +47,7 @@ export default function DashboardScreen() {
   }, [searchQuery, searchOpen]);
 
   return (
-    <div style={{ width: "100vw", height: "100vh", background: "#0D0D1A", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
+    <div style={{ width: "100vw", height: "100vh", background: isDark ? "#0D0D1A" : "#E9E7F5", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
       <div style={{ width: "100%", height: "100%", maxWidth: "500px", background: t.bg, position: "relative", overflow: "hidden" }}>
 
 

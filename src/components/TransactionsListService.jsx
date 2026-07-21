@@ -68,7 +68,8 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
               position: "sticky",
               top: stickyTop,
               zIndex: 20,
-              background: "#000000",
+              // Día: fondo claro (antes fijo negro → banda negra); Noche: negro igual que antes.
+              background: isDark ? "#000000" : t.bg,
               marginBottom: 6,
               marginTop: 0,
             }}>

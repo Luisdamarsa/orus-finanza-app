@@ -204,8 +204,8 @@ export default function DonutChart({
         );
       })}
 
-      {/* Centro negro del donut */}
-      <circle cx={cx} cy={cy} r={innerR} fill="#000000" />
+      {/* Centro del donut (día: claro para que el texto oscuro se lea; noche: negro igual que antes) */}
+      <circle cx={cx} cy={cy} r={innerR} fill={isDark ? "#000000" : "#F8F7FF"} />
 
       {/* Texto dinámico en el centro */}
       {displayValue !== undefined && (
