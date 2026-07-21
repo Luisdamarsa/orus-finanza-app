@@ -105,10 +105,12 @@ export default function PillarCardsGrid({
 
           // 🆕 ¿Este pilar está siendo presionado?
           const isPressingThisPillar = pressingId === p.id;
+          // 🆕 Entrada escalonada por FILA (grid de 2 columnas): fila 0, 1, 2...
+          const row = Math.floor(i / 2);
 
           return (
+            <div key={p.id} className="orus-rise" style={{ animationDelay: `${0.12 + row * 0.08}s` }}>
             <div
-              key={p.id}
               onClick={(e) => {
                 e.stopPropagation(); // Detener click que resetea activeId
                 handlePillarSelect(p.id, p); // 🆕 Ejecutar acción al hacer click (soltar)
@@ -187,11 +189,13 @@ export default function PillarCardsGrid({
                 </div>
               )}
             </div>
+            </div>
           );
         })}
 
         {/* Tarjeta de Saldo */}
         {hasSaldo && (
+          <div className="orus-rise" style={{ animationDelay: `${0.12 + Math.floor(PILLARS.length / 2) * 0.08}s` }}>
           <div
             onClick={(e) => e.stopPropagation()} // Detener click que resetea activeId
             onPointerDown={(e) => {
@@ -252,6 +256,7 @@ export default function PillarCardsGrid({
             <div style={{ fontSize: 12, color: saldo < 0 ? COLORS.gasto : t.sub, marginBottom: 0 }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
+          </div>
           </div>
         )}
       </div>

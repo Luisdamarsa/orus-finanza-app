@@ -42,7 +42,8 @@ export default function DashboardExpandedState() {
 </ErrorBoundary>
         </div>
 
-        {/* Botones/Tags del donut - Componente separado */}
+        {/* Botones/Tags del donut - Componente separado (entra desde abajo) */}
+        <div className="orus-rise" style={{ animationDelay: "0.04s" }}>
         <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
 <DonutTagsBar
           segments={segments}
@@ -55,6 +56,7 @@ export default function DashboardExpandedState() {
           t={t}
         />
 </ErrorBoundary>
+        </div>
       </div>
 
       {/* 🆕 Ocultar barra de categorías cuando filterType es "ingresos" - con ref para medir altura */}

@@ -42,8 +42,8 @@ export default function DashboardCollapsedState() {
 </ErrorBoundary>
       </div>
 
-      {/* Botones de pilares */}
-      <div ref={pillarButtonsRef}>
+      {/* Botones de pilares (entran desde abajo) */}
+      <div ref={pillarButtonsRef} className="orus-rise" style={{ animationDelay: "0.04s" }}>
         <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
 <LoadingWrapper
           isLoading={isLoading("tagsBar")}

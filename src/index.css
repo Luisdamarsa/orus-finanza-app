@@ -54,6 +54,14 @@ body {
   margin: 0;
 }
 
+/* 🆕 Entrada "desde abajo" (carga escalonada del dashboard). Se aplica con className
+   "orus-rise" + inline animationDelay para el stagger. Corre al montar el elemento. */
+@keyframes orusRise {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+.orus-rise { opacity: 0; animation: orusRise 0.5s ease forwards; }
+
 #root {
   width: 1126px;
   max-width: 100%;

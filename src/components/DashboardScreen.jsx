@@ -104,8 +104,9 @@ export default function DashboardScreen() {
               <DashboardCollapsedState />
               )}
 
-              {/* Movimientos - SIEMPRE visible */}
-              <div style={{ marginTop: 0 }}>
+              {/* Movimientos - SIEMPRE visible. Entra desde abajo; en Estado 1 después de
+                  las tarjetas, en Estado 2 justo tras los tags. La key re-anima al cambiar de estado. */}
+              <div key={isMovementOpen ? "mov-e2" : "mov-e1"} className="orus-rise" style={{ marginTop: 0, animationDelay: isMovementOpen ? "0.12s" : "0.36s" }}>
                 <Movimientos isDark={isDark} transactions={transactions} filteredPillar={filteredPillar} setFilteredPillar={setFilteredPillar} stickyTop={stickyH} selectedPeriod={selectedPeriod} onOpen={setIsMovementOpen} isOpen={isMovementOpen} filterType={filterType} setFilterType={setFilterType} movementOpenedFrom={movementOpenedFrom} setMovementOpenedFrom={setMovementOpenedFrom} setFilterTypeExternal={setFilterType} />
               </div>
             </div>
@@ -123,6 +124,10 @@ export default function DashboardScreen() {
                 </div>
               )}
 
+              {/* orus-rise en el wrapper externo → las 15 primeras entran TODAS a la vez al
+                  abrir Estado 2. El div interno (key=listKey) resetea paginación al buscar/cambiar
+                  período sin re-disparar la animación. */}
+              <div className="orus-rise" style={{ animationDelay: "0.18s" }}>
               <div key={listKey}>
               <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
               <TransactionsListService
@@ -133,6 +138,7 @@ export default function DashboardScreen() {
                 }}
               />
               </ErrorBoundary>
+              </div>
               </div>
             </div>
           )}
