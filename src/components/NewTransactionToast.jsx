@@ -13,15 +13,17 @@ import { getCategoryName } from "../utils/categoryUtils";
  * Recibe `toast = { isIncome, pillarId, categoryId, amount }` o null.
  * Va posicionado absoluto y centrado dentro de la fila "Saldo y Mes" (que es position:relative).
  */
-export default function NewTransactionToast({ toast }) {
+export default function NewTransactionToast({ toast, isDark = true }) {
   if (!toast) return null;
 
   const { isIncome, pillarId, categoryId, amount } = toast;
   const pillar = PILLAR_MAP[pillarId];
   const amountAbs = Math.abs(amount);
 
-  const bg = isIncome ? "#22C55E22" : "#0D0D1A";
+  // Día: fondo claro + texto oscuro (antes el gasto tenía fondo oscuro fijo).
+  const bg = isIncome ? "#22C55E22" : (isDark ? "#0D0D1A" : "#FFFFFF");
   const border = isIncome ? "#7B7A99" : (pillar?.color || "#9B6DFF");
+  const catColor = isDark ? "#C4C2E0" : "#1A1830";
 
   return (
     <>
@@ -50,7 +52,7 @@ export default function NewTransactionToast({ toast }) {
         ) : (
           <>
             <span style={{ fontSize: 13 }}>{pillar?.icon}</span>
-            <span style={{ color: "#C4C2E0" }}>{getCategoryName(categoryId)}</span>
+            <span style={{ color: catColor }}>{getCategoryName(categoryId)}</span>
             <span style={{ color: pillarId === "ahorro" ? "#86EFAC" : "#FCA5A5" }}>-{fmt(amountAbs)}</span>
           </>
         )}

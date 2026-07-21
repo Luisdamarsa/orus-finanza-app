@@ -19,7 +19,7 @@ export default function Periodo({ isDark, selectedPeriod, setShowUpdateBalance, 
         <span style={{ fontSize: 13 }}>📅</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: selectedPeriod ? "#9B6DFF" : (isDark ? "#C4C2E0" : "#6B7280") }}>{getPeriodLabel(selectedPeriod)}</span>
       </button>
-      <NewTransactionToast toast={newTxnToast} />
+      <NewTransactionToast toast={newTxnToast} isDark={isDark} />
     </div>
   );
 }
