@@ -215,20 +215,28 @@ export default function MovimientosPage({
             alignItems: "center",
             gap: 12,
           }}>
-          <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
-          <ProgressBar
-            spent={totalSpent}
-            budget={budget}
-            maxSpent={Math.max(totalSpent, budget || 0)}
-            pillarColor={pilar.darkColor}
-            isDark={isDark}
-            isSelected={false}
-            categoryName={pilar.label}
-            icon={pilar.icon}
-            onClickBar={undefined}
-            alwaysShowDashedBorder={true}
-          />
-          </ErrorBoundary>
+          {budget ? (
+            <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+            <ProgressBar
+              spent={totalSpent}
+              budget={budget}
+              maxSpent={Math.max(totalSpent, budget || 0)}
+              pillarColor={pilar.darkColor}
+              isDark={isDark}
+              isSelected={false}
+              categoryName={pilar.label}
+              icon={pilar.icon}
+              onClickBar={undefined}
+              alwaysShowDashedBorder={true}
+            />
+            </ErrorBoundary>
+          ) : (
+            // Pilar sin presupuesto → sin barra: solo icono + nombre (el valor va a la derecha).
+            <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 15 }}>{pilar.icon}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: t.text }}>{pilar.label}</span>
+            </div>
+          )}
           <div
             style={{
               fontSize: 12,
@@ -302,29 +310,36 @@ export default function MovimientosPage({
                     categoryBudget = getAttributeAtDate(category, "budget", budgetQueryDate) || null;
                   }
 
+                  const toggleCat = () => setSelectedCategories(prev =>
+                    prev.includes(categoryId) ? prev.filter(c => c !== categoryId) : [...prev, categoryId]
+                  );
+                  const isSel = selectedCategories.includes(categoryId);
                   return (
                     <ErrorBoundary key={categoryId} fallback={null} resetKey={selectedPeriod}>
-                    <CategoryProgressBar
-                      key={categoryId}
-                      categoryId={categoryId}
-                      categoryName={categoryName}
-                      spent={spent}
-                      budget={categoryBudget}
-                      maxSpent={maxSpent}
-                      pillarColor={pilar.darkColor}
-                      pillarId={pilar.id}
-                      isDark={isDark}
-                      textColor={t.sub}
-                      onClickBar={() => {
-                        // Toggle: si ya está seleccionada, remover; si no, agregar
-                        setSelectedCategories(prev =>
-                          prev.includes(categoryId)
-                            ? prev.filter(c => c !== categoryId)
-                            : [...prev, categoryId]
-                        );
-                      }}
-                      isSelected={selectedCategories.includes(categoryId)}
-                    />
+                    {categoryBudget ? (
+                      <CategoryProgressBar
+                        key={categoryId}
+                        categoryId={categoryId}
+                        categoryName={categoryName}
+                        spent={spent}
+                        budget={categoryBudget}
+                        maxSpent={maxSpent}
+                        pillarColor={pilar.darkColor}
+                        pillarId={pilar.id}
+                        isDark={isDark}
+                        textColor={t.sub}
+                        onClickBar={toggleCat}
+                        isSelected={isSel}
+                      />
+                    ) : (
+                      // Sin presupuesto → sin barra (no informa nada): solo nombre + valor.
+                      <div
+                        onClick={toggleCat}
+                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "9px 12px", borderRadius: 10, cursor: "pointer", background: isSel ? (isDark ? "#252535" : "#F0EFF8") : "transparent", outline: isSel ? `1.5px solid ${pilar.darkColor}88` : "none", transition: "background 0.15s" }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{categoryName}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: t.text }}>${spent.toLocaleString("es-CO")}</span>
+                      </div>
+                    )}
                     </ErrorBoundary>
                   );
                 });
