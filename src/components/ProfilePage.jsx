@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { userStorage } from "../utils/userStorage";
-import { CURRENCIES, LANGUAGES } from "../constants";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
@@ -29,12 +28,7 @@ export default function ProfilePage({
 
   // Estado local para los campos editables
   const [displayName, setDisplayName] = useState("");
-  const [currency, setCurrency] = useState("COP");
-  const [language, setLanguage] = useState("ES");
-
-  // Popups para dropdowns
-  const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [languageOpen, setLanguageOpen] = useState(false);
+  // (Idioma y moneda se movieron a la página Preferencias.)
 
   // Modal de eliminación de cuenta
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
@@ -62,8 +56,6 @@ export default function ProfilePage({
     const userData = userStorage.getUser();
     setUser(userData);
     setDisplayName(userData.displayName);
-    setCurrency(userData.currency);
-    setLanguage(userData.language);
     setHasChanged(false); // Reset cambios al montar
     setIsLoading(false); // 🆕 Terminar loading
   }, []);
@@ -71,33 +63,18 @@ export default function ProfilePage({
   // 🆕 Detectar cambios en tiempo real
   const checkForChanges = () => {
     if (!user) return;
-    const changed =
-      displayName !== user.displayName ||
-      currency !== user.currency ||
-      language !== user.language;
+    const changed = displayName !== user.displayName;
     setHasChanged(changed);
   };
 
   // Ejecutar checkForChanges cuando cualquier campo cambia
   useEffect(() => {
     checkForChanges();
-  }, [displayName, currency, language, user]);
+  }, [displayName, user]);
 
   // Manejar cambios en displayName
   const handleDisplayNameChange = (value) => {
     setDisplayName(value);
-  };
-
-  // Manejar cambios en moneda
-  const handleCurrencyChange = (value) => {
-    setCurrency(value);
-    setCurrencyOpen(false);
-  };
-
-  // Manejar cambios en idioma
-  const handleLanguageChange = (value) => {
-    setLanguage(value);
-    setLanguageOpen(false);
   };
 
   // 🆕 Función para copiar User ID al portapapeles
@@ -121,8 +98,6 @@ export default function ProfilePage({
     try {
       userStorage.updateUser({
         displayName,
-        currency,
-        language,
       });
 
       setHasChanged(false);
@@ -142,15 +117,6 @@ export default function ProfilePage({
       onBack();
     }
   };
-
-  // Opciones de moneda
-  const currencyOptions = CURRENCIES;
-
-  // Opciones de idioma
-  const languageOptions = LANGUAGES;
-
-  const getCurrencyLabel = () => currencyOptions.find(o => o.value === currency)?.label || "Peso Colombiano (COP) - $";
-  const getLanguageLabel = () => languageOptions.find(o => o.value === language)?.label || "Español (ES)";
 
   if (!user) return null; // Esperar a que carguen los datos
 
@@ -444,204 +410,6 @@ export default function ProfilePage({
           </div>
         </div>
 
-        {/* SECCIÓN 3: Preferencias (SIEMPRE Editable) */}
-        <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${t.border}`, marginBottom: 28 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: t.sub,
-              marginBottom: 12,
-              textTransform: "uppercase",
-              textAlign: "left",
-            }}>
-            Preferencias
-          </div>
-
-          {/* Moneda - Popup */}
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <label
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: t.sub,
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                  flex: "0 0 auto",
-                  paddingTop: 6,
-                }}>
-                Moneda
-              </label>
-              <div style={{ flex: 1 }}>
-                <button
-                  onClick={() => setCurrencyOpen(!currencyOpen)}
-                  style={{
-                    width: "100%",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    border: `1px solid ${t.border}`,
-                    background: t.inputBg,
-                    color: t.inputText,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    boxSizing: "border-box",
-                    cursor: "pointer",
-                    outline: "none",
-                    transition: "all 0.2s",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    textAlign: "left",
-                  }}>
-                  {getCurrencyLabel()}
-                  <span style={{ transform: currencyOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                    ▼
-                  </span>
-                </button>
-
-                {/* Popup de opciones de moneda */}
-                {currencyOpen && (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      borderRadius: 12,
-                      border: `1px solid ${t.border}`,
-                      background: t.card,
-                      overflow: "hidden",
-                      animation: "fadeInUp 0.2s ease",
-                    }}>
-                {currencyOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleCurrencyChange(option.value)}
-                    style={{
-                      width: "100%",
-                      padding: "6px 14px",
-                      border: "none",
-                      borderBottom: option !== currencyOptions[currencyOptions.length - 1] ? `1px solid ${t.border}` : "none",
-                      background: currency === option.value ? (isDark ? "#2D2D3A" : "#F0EFF8") : "transparent",
-                      color: currency === option.value ? "#7C3AED" : t.text,
-                      fontSize: 14,
-                      fontWeight: currency === option.value ? 700 : 600,
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                      textAlign: "left",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (currency !== option.value) {
-                        e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (currency !== option.value) {
-                        e.target.style.background = "transparent";
-                      }
-                    }}>
-                    {option.label}
-                    {currency === option.value && (
-                      <span style={{ marginLeft: 8, color: "#7C3AED" }}>✓</span>
-                    )}
-                  </button>
-                ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Idioma - Popup */}
-          <div>
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-              <label
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: t.sub,
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                  flex: "0 0 auto",
-                  paddingTop: 6,
-                }}>
-                Idioma
-              </label>
-              <div style={{ flex: 1 }}>
-                <button
-                  onClick={() => setLanguageOpen(!languageOpen)}
-                  style={{
-                    width: "100%",
-                    padding: "6px 14px",
-                    borderRadius: 8,
-                    border: `1px solid ${t.border}`,
-                    background: t.inputBg,
-                    color: t.inputText,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    boxSizing: "border-box",
-                    cursor: "pointer",
-                    outline: "none",
-                    transition: "all 0.2s",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    textAlign: "left",
-                  }}>
-                  {getLanguageLabel()}
-                  <span style={{ transform: languageOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                    ▼
-                  </span>
-                </button>
-
-                {/* Popup de opciones de idioma */}
-                {languageOpen && (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      borderRadius: 12,
-                      border: `1px solid ${t.border}`,
-                      background: t.card,
-                      overflow: "hidden",
-                      animation: "fadeInUp 0.2s ease",
-                    }}>
-                {languageOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => handleLanguageChange(option.value)}
-                    style={{
-                      width: "100%",
-                      padding: "6px 14px",
-                      border: "none",
-                      borderBottom: option !== languageOptions[languageOptions.length - 1] ? `1px solid ${t.border}` : "none",
-                      background: language === option.value ? (isDark ? "#2D2D3A" : "#F0EFF8") : "transparent",
-                      color: language === option.value ? "#7C3AED" : t.text,
-                      fontSize: 14,
-                      fontWeight: language === option.value ? 700 : 600,
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                      textAlign: "left",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (language !== option.value) {
-                        e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (language !== option.value) {
-                        e.target.style.background = "transparent";
-                      }
-                    }}>
-                    {option.label}
-                    {language === option.value && (
-                      <span style={{ marginLeft: 8, color: "#7C3AED" }}>✓</span>
-                    )}
-                  </button>
-                ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* SECCIÓN 4: Zona de Peligro - Eliminar Cuenta */}
         <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${t.border}` }}>

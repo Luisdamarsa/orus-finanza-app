@@ -30,6 +30,7 @@ import { useMultipleLoading } from "./hooks/useLoading";
 import { useTransactionActions } from "./hooks/useTransactionActions";
 
 // 🆕 Importar userStorage para datos del usuario
+import { userStorage } from "./utils/userStorage";
 
 
 
@@ -68,7 +69,9 @@ function getBudgetForMonth(pillarId, month, year, customBudgets) {
 }
 
 function Dashboard() {
-  const isDark = true; // Solo modo oscuro
+  // 🆕 Tema persistido (Preferencias). Default: noche. setTheme guarda + re-renderiza toda la app.
+  const [isDark, setIsDark] = useState(() => userStorage.getTheme() !== "light");
+  const setTheme = (dark) => { setIsDark(dark); userStorage.setTheme(dark ? "dark" : "light"); };
   const [scrollY, setScrollY] = useState(0);
   const {
     selectedPeriod, setSelectedPeriod,
@@ -399,7 +402,7 @@ function Dashboard() {
   };
 
   const routerProps = {
-    screen, isDark, t,
+    screen, isDark, t, setTheme,
     selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
     categories, customConcepts, txnActions,
     editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,

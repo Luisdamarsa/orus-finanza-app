@@ -20,6 +20,7 @@ export default function SettingsScreen({ isDark, t, setScreen, showIncomes, setS
         onAbout={() => setScreen("about")}
         onPermissions={() => setScreen("permissions")}
         onSubscription={() => setScreen("subscription")}
+        onPreferences={() => setScreen("preferences")}
         showIncomes={showIncomes}
         setShowIncomes={setShowIncomes}
       />

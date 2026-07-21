@@ -13,6 +13,7 @@ import LegalPage from "./LegalPage";
 import AboutPage from "./AboutPage";
 import PermissionsPage from "./PermissionsPage";
 import SubscriptionPage from "./SubscriptionPage";
+import PreferencesPage from "./PreferencesPage";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -21,7 +22,7 @@ import SubscriptionPage from "./SubscriptionPage";
  * Fallback: <DashboardScreen /> (consume DashboardContext).
  */
 export default function ScreenRouter({
-  screen, isDark, t,
+  screen, isDark, t, setTheme,
   selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
   categories, customConcepts, txnActions,
   editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
@@ -118,6 +119,14 @@ export default function ScreenRouter({
     return (
       <ScreenShell bg={t.bg}>
         <SubscriptionPage isDark={isDark} onBack={() => setScreen("settings")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "preferences") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <PreferencesPage isDark={isDark} onBack={() => setScreen("settings")} setTheme={setTheme} />
       </ScreenShell>
     );
   }

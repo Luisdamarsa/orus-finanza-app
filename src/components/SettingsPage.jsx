@@ -4,7 +4,7 @@ import PageLayout from "./PageLayout";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
 
-export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout, onPermissions, onSubscription }) {
+export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onCategories, onShowIncomes, showIncomes, setShowIncomes, onTerms, onPrivacy, onAbout, onPermissions, onSubscription, onPreferences }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Estado para trackear qué botón está siendo presionado (para menú e items)
@@ -25,6 +25,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
     { id: "automatizacion", icon: "⚙️", label: "Automatización", type: "menu" },
     { id: "permisos", icon: "🔐", label: "Permisos", type: "menu" },
     { id: "informes", icon: "📊", label: "Informes", type: "menu" },
+    { id: "preferencias", icon: "🎛️", label: "Preferencias", type: "menu" },
     { id: "acerca", icon: "ℹ️", label: "Acerca de ORUS Finanzas", type: "menu" },
   ];
 
@@ -127,6 +128,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     else if (item.id === "acerca" && onAbout) onAbout();
                     else if (item.id === "permisos" && onPermissions) onPermissions();
                     else if (item.id === "plan" && onSubscription) onSubscription();
+                    else if (item.id === "preferencias" && onPreferences) onPreferences();
                   }}
                   onPointerDown={() => setPressingButton(item.id)}
                   onPointerUp={() => setPressingButton(null)}

@@ -90,6 +90,7 @@ const DEFAULT_USER = {
   userId: generateUserId(), // Genera un ID único
   role: "user",        // rol del usuario
   subscription: "FREE", // plan activo por defecto
+  theme: "dark",       // "dark" | "light" (preferencia de tema)
 };
 
 // Planes válidos de suscripción
@@ -108,8 +109,8 @@ export const userStorage = {
         return DEFAULT_USER;
       }
       const parsed = JSON.parse(stored);
-      // Backfill: usuarios guardados antes de tener role/subscription
-      return { role: "user", subscription: "FREE", ...parsed };
+      // Backfill: usuarios guardados antes de tener role/subscription/theme
+      return { role: "user", subscription: "FREE", theme: "dark", ...parsed };
     } catch (error) {
       console.error("Error reading user from localStorage:", error);
       return DEFAULT_USER;
@@ -210,5 +211,20 @@ export const userStorage = {
   setSubscription: (plan) => {
     const value = SUBSCRIPTIONS.includes(plan) ? plan : "FREE";
     return userStorage.updateUser({ subscription: value });
+  },
+
+  /**
+   * Obtiene el tema ("dark" | "light"). Default "dark".
+   */
+  getTheme: () => {
+    return userStorage.getUser().theme || "dark";
+  },
+
+  /**
+   * Cambia el tema. Solo acepta "dark" | "light".
+   */
+  setTheme: (theme) => {
+    const value = theme === "light" ? "light" : "dark";
+    return userStorage.updateUser({ theme: value });
   },
 };
