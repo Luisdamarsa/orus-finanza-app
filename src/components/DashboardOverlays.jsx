@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import PeriodSelector from "./PeriodSelectorService";
 import ErrorBoundary from "./ErrorBoundary";
 import FloatingActionButtons from "./FloatingActionButtons";
@@ -22,28 +22,34 @@ export default function DashboardOverlays() {
     setActiveId, setShowPeriodPicker, monthHasData,
     showPillarBars, selectedPillarDetail, categories, setShowPillarBars,
     setSelectedPillarForMovements, transactions,
-    showUpdateBalance, saldo, setShowUpdateBalance, setIsMovementOpen,
+    showUpdateBalance, saldo, setShowUpdateBalance, isMovementOpen, setIsMovementOpen,
     setFilterType, setMovementOpenedFrom, txnActions,
     setSearchOpen, setSearchQuery, searchOpen, searchQuery,
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
+  // Recuerda si al abrir la lupa ya estábamos en Estado 2 (movimientos abiertos)
+  const wasMovementOpenRef = useRef(false);
 
-  // Abrir búsqueda: entra a Estado 2, limpia filtros y muestra el buscador
+  // Abrir búsqueda: recuerda el estado actual. Si venía de Estado 1, entra a Estado 2
+  // (con filtros limpios). Si ya estaba en Estado 2, respeta su vista/filtros.
   const openSearch = () => {
-    setFilteredPillar(null);
-    setFilterType(null);
-    setMovementOpenedFrom("search");
+    wasMovementOpenRef.current = isMovementOpen;
     setSearchQuery("");
     setSearchOpen(true);
-    setIsMovementOpen(true);
+    if (!isMovementOpen) {
+      setFilteredPillar(null);
+      setFilterType(null);
+      setMovementOpenedFrom("search");
+      setIsMovementOpen(true);
+    }
   };
 
-  // Cerrar búsqueda: limpia y vuelve a Estado 1
+  // Cerrar búsqueda: vuelve al estado en que se abrió (Estado 1 o Estado 2)
   const closeSearch = () => {
     setSearchQuery("");
     setSearchOpen(false);
-    setIsMovementOpen(false);
+    if (!wasMovementOpenRef.current) setIsMovementOpen(false);
   };
 
   return (
