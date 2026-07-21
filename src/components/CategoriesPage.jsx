@@ -33,6 +33,7 @@ export default function CategoriesPage({
 
   // 🆕 Ref para medir altura de descripción dinámicamente
   const descriptionRef = useRef(null);
+  const containerRef = useRef(null); // reveal por scroll de los pilares
   const [contentTop, setContentTop] = useState(220);
   // 🆕 Hooks para animación de press
   const pressBack = usePress();
@@ -51,6 +52,18 @@ export default function CategoriesPage({
       const newContentTop = 164 + descriptionHeight + 6;
       setContentTop(newContentTop);
     }
+  }, []);
+
+  // 🆕 Reveal por scroll: cada pilar aparece desde abajo, uno tras otro
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
+      { rootMargin: "0px 0px -40px 0px", threshold: 0.05 }
+    );
+    root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
 
   return (
@@ -95,13 +108,17 @@ export default function CategoriesPage({
         skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
         isDark={isDark}
       >
-          <>
+          <div ref={containerRef}>
+            <style>{`
+              .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
+              .reveal.in{opacity:1;transform:none;}
+            `}</style>
             {/* Pilares y sus categorías */}
-            {PILLARS.map((pillar) => {
+            {PILLARS.map((pillar, pillarIdx) => {
           const pillarCategories = categories[pillar.id] || [];
 
           return (
-            <div key={pillar.id} style={{ marginBottom: 16 }}>
+            <div key={pillar.id} className="reveal" style={{ marginBottom: 16, transitionDelay: `${pillarIdx * 0.12}s` }}>
               {/* Título del Pilar - Con tag/badge (icono + nombre dentro) */}
               <div
                 style={{
@@ -201,7 +218,7 @@ export default function CategoriesPage({
             </div>
           );
             })}
-        </>
+          </div>
       </LoadingWrapper>
     </PageLayout>
 

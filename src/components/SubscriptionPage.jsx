@@ -176,9 +176,13 @@ export default function SubscriptionPage({ isDark, onBack }) {
           </span>
         }
       >
-        <div style={{ textAlign: "left" }}>
+        <style>{`
+          .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
+          .reveal.in{opacity:1;transform:none;}
+        `}</style>
+        <div ref={containerRef} style={{ textAlign: "left" }}>
           {/* Resumen del plan */}
-          <div style={{ background: t.card, border: `2px solid ${accent}`, borderRadius: 16, padding: 16 }}>
+          <div className="reveal" style={{ background: t.card, border: `2px solid ${accent}`, borderRadius: 16, padding: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 42, height: 42, borderRadius: 12, background: cp.tint + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>
                 {cp.id === "free" ? <DonutIcon size={28} /> : cp.icon}
@@ -201,7 +205,7 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
           {/* Ventajas destacadas */}
           {cp.perks && (
-            <div style={{ marginTop: 16 }}>
+            <div className="reveal" style={{ marginTop: 16, transitionDelay: "0.08s" }}>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8 }}>Lo que obtienes</div>
               {cp.perks.map((perk, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
@@ -215,9 +219,9 @@ export default function SubscriptionPage({ isDark, onBack }) {
           {/* Reseñas */}
           {cp.reviews && (
             <div style={{ marginTop: 18 }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8 }}>Lo que dicen quienes lo usan</div>
+              <div className="reveal" style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8, transitionDelay: "0.16s" }}>Lo que dicen quienes lo usan</div>
               {cp.reviews.map((r, i) => (
-                <div key={i} style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 12, padding: 12, marginBottom: 8 }}>
+                <div key={i} className="reveal" style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 12, padding: 12, marginBottom: 8, transitionDelay: `${0.22 + i * 0.1}s` }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                     <b style={{ fontSize: 12, color: t.text }}>{r.name}</b>
                     <Stars n={r.stars} />
@@ -231,9 +235,10 @@ export default function SubscriptionPage({ isDark, onBack }) {
 
           {/* Botones */}
           <button
+            className="reveal"
             onClick={() => { if (cp.price === 0) confirmChange(cp.id); else setPayHint(true); }}
             style={{
-              width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "none",
+              width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "none", transitionDelay: "0.5s",
               background: cp.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (cp.highlight ? "#9B6DFF" : (cp.id === "free" ? "#22C55E" : t.text)),
               color: cp.gold ? "#3D2B00" : (cp.id === "free" || cp.highlight ? "#fff" : t.bg),
               fontSize: 14, fontWeight: 800, cursor: "pointer",
@@ -242,8 +247,9 @@ export default function SubscriptionPage({ isDark, onBack }) {
             {cp.price === 0 ? "Cambiar a ORUS Free" : `Continuar con ${cp.name}`}
           </button>
           <button
+            className="reveal"
             onClick={closeConfirm}
-            style={{ width: "100%", marginTop: 10, padding: "11px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: "transparent", color: t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+            style={{ width: "100%", marginTop: 10, padding: "11px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: "transparent", color: t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer", transitionDelay: "0.56s" }}
           >
             Cancelar
           </button>
