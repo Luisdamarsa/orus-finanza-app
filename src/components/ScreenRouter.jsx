@@ -34,6 +34,7 @@ export default function ScreenRouter({
   editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
   categoriesTab, setCategoriesTab,
   microphoneEnabled, setMicrophoneEnabled, notificationListenerEnabled, setNotificationListenerEnabled,
+  iosShortcutsEnabled, setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
   previousScreen,
   setScreen,
@@ -148,6 +149,8 @@ export default function ScreenRouter({
         setMicrophoneEnabled={setMicrophoneEnabled}
         notificationListenerEnabled={notificationListenerEnabled}
         setNotificationListenerEnabled={setNotificationListenerEnabled}
+        iosShortcutsEnabled={iosShortcutsEnabled}
+        setIosShortcutsEnabled={setIosShortcutsEnabled}
         onOpenAccessibilitySettings={onOpenAccessibilitySettings}
       />
     );

@@ -10,6 +10,8 @@ export default function AutomatizacionesScreen({
   setMicrophoneEnabled,
   notificationListenerEnabled,
   setNotificationListenerEnabled,
+  iosShortcutsEnabled,
+  setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
 }) {
   return (
@@ -22,6 +24,8 @@ export default function AutomatizacionesScreen({
         setMicrophoneEnabled={setMicrophoneEnabled}
         notificationListenerEnabled={notificationListenerEnabled}
         setNotificationListenerEnabled={setNotificationListenerEnabled}
+        iosShortcutsEnabled={iosShortcutsEnabled}
+        setIosShortcutsEnabled={setIosShortcutsEnabled}
         onOpenAccessibilitySettings={onOpenAccessibilitySettings}
       />
     </ScreenShell>

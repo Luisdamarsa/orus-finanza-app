@@ -112,6 +112,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                           borderRadius: "50%",
                           background: "#FFFFFF",
                           transform: item.value ? "translateX(20px)" : "translateX(0)",
+                          transition: item.id === "ingresos" ? "none" : "transform 0.2s",
                         }}
                       />
                     </button>

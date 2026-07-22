@@ -117,6 +117,7 @@ function Dashboard() {
   // 🆕 Estados de Automatizaciones (persistidos en userStorage)
   const [microphoneEnabled, setMicrophoneEnabled] = useState(() => userStorage.get("microphoneEnabled") !== false);
   const [notificationListenerEnabled, setNotificationListenerEnabled] = useState(() => userStorage.get("notificationListenerEnabled") === true);
+  const [iosShortcutsEnabled, setIosShortcutsEnabled] = useState(() => userStorage.get("iosShortcutsEnabled") === true);
   // Guardar cambios en userStorage
   const handleSetMicrophoneEnabled = (value) => {
     setMicrophoneEnabled(value);
@@ -125,6 +126,10 @@ function Dashboard() {
   const handleSetNotificationListenerEnabled = (value) => {
     setNotificationListenerEnabled(value);
     userStorage.set("notificationListenerEnabled", value);
+  };
+  const handleSetIosShortcutsEnabled = (value) => {
+    setIosShortcutsEnabled(value);
+    userStorage.set("iosShortcutsEnabled", value);
   };
   // Función para abrir Configuración → Accesibilidad
   const onOpenAccessibilitySettings = () => {
@@ -455,6 +460,7 @@ function Dashboard() {
     categoriesTab, setCategoriesTab,
     microphoneEnabled, setMicrophoneEnabled: handleSetMicrophoneEnabled,
     notificationListenerEnabled, setNotificationListenerEnabled: handleSetNotificationListenerEnabled,
+    iosShortcutsEnabled, setIosShortcutsEnabled: handleSetIosShortcutsEnabled,
     onOpenAccessibilitySettings,
     previousScreen,
     setScreen,

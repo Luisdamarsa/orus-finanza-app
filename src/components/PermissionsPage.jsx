@@ -2,17 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
 
-/**
- * PermissionsPage.jsx — "Permisos".
- * Explica los permisos que ORUS necesita (con iconos) y permite gestionarlos:
- *  - micrófono y notificaciones → se piden con las APIs web (funcional en el navegador).
- *  - leer notificaciones / SMS / correo → nativos: se conceden en los ajustes del teléfono.
- * Las tarjetas aparecen desde abajo al entrar en pantalla. Extraída — ruteo en ScreenRouter.
- */
 const PERMISSIONS = [
-  { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "Óptimo" },
-  { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Micrófono", why: "Para registrar gastos por voz: “gasté 20 mil en el súper”.", kind: "mic", req: "Óptimo" },
-  { id: "notif-read", icon: "🏦", color: "#93C5FD", name: "Accesibilidad para leer notificaciones", why: "Solo en Android: leemos las notificaciones de tu tarjeta (Google Pay) para detectar pagos automáticamente. Nunca leemos otras notificaciones.", kind: "native", req: "Opcional", only: "Android" },
+  { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "Optimo" },
+  { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Microfono", why: "Para registrar gastos por voz: gasté 20 mil en el súper.", kind: "mic", req: "Optimo" },
 ];
 
 export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
@@ -21,7 +13,6 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
   const [hint, setHint] = useState(false);
   const containerRef = useRef(null);
 
-  // Reveal por scroll: cada .reveal aparece desde abajo al entrar en pantalla
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
@@ -55,7 +46,7 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
   const action = (p) => {
     const v = status[p.id];
     if (p.kind === "native") {
-      return <span style={{ fontSize: 10, fontWeight: 700, color: t.sub, background: t.border, padding: "4px 9px", borderRadius: 20, whiteSpace: "nowrap" }}>En el teléfono</span>;
+      return <span style={{ fontSize: 10, fontWeight: 700, color: t.sub, background: t.border, padding: "4px 9px", borderRadius: 20, whiteSpace: "nowrap" }}>En el telefono</span>;
     }
     if (v && v !== "Bloqueado") {
       return <span style={{ fontSize: 10, fontWeight: 700, color: statusColor(v), whiteSpace: "nowrap" }}>{v}</span>;
@@ -69,7 +60,6 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
     );
   };
 
-  // Icono de la tarjeta (mic usa el icono real de la app)
   const iconEl = (p) => {
     if (p.id === "mic") {
       return (
@@ -97,24 +87,21 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
         </span>
       }
     >
-      <style>{`
-        .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
-        .reveal.in{opacity:1;transform:none;}
-      `}</style>
+      <style>{`.reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;} .reveal.in{opacity:1;transform:none;}`}</style>
 
       <div ref={containerRef} style={{ textAlign: "left" }}>
         <div style={{ fontSize: 12.5, color: t.sub, lineHeight: 1.6, marginBottom: 6 }}>
-          ORUS pide estos permisos para funcionar mejor. Tú decides cuáles conceder — puedes cambiarlos
-          cuando quieras desde los ajustes de tu teléfono.
+          ORUS pide estos permisos para funcionar mejor. Tu decides cuales conceder puedes cambiarlos
+          cuando quieras desde los ajustes de tu telefono.
         </div>
 
         {PERMISSIONS.map((p, i) => (
-          <div key={p.id} className="reveal" style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 14, padding: 12, marginTop: 12, display: "flex", alignItems: "center", gap: 12, transitionDelay: `${i * 0.09}s` }}>
+          <div key={p.id} className="reveal" style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: 12, marginTop: 12, display: "flex", alignItems: "center", gap: 12, transitionDelay: (i * 0.09) + "s" }}>
             {iconEl(p)}
             <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 <b style={{ fontSize: 13, color: t.text }}>{p.name}</b>
-                <span style={{ fontSize: 8.5, fontWeight: 700, color: p.req === "Óptimo" ? "#9B6DFF" : t.sub, background: (p.req === "Óptimo" ? "#9B6DFF" : t.sub) + "22", padding: "1px 6px", borderRadius: 8 }}>{p.req.toUpperCase()}</span>
+                <span style={{ fontSize: 8.5, fontWeight: 700, color: p.req === "Optimo" ? "#9B6DFF" : t.sub, background: (p.req === "Optimo" ? "#9B6DFF" : t.sub) + "22", padding: "1px 6px", borderRadius: 8 }}>{p.req.toUpperCase()}</span>
                 {p.only && <span style={{ fontSize: 8.5, fontWeight: 700, color: "#4F8EF7", background: "#4F8EF722", padding: "1px 6px", borderRadius: 8 }}>SOLO {p.only.toUpperCase()}</span>}
               </div>
               <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3, textAlign: "left" }}>{p.why}</div>
@@ -123,27 +110,27 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
           </div>
         ))}
 
-        <div className="reveal" style={{ background: t.card, border: `1px dashed ${t.border}`, borderRadius: 14, padding: 12, marginTop: 12, fontSize: 11, color: t.sub, lineHeight: 1.5 }}>
-          ✉️ <b style={{ color: t.text }}>¿Recibes tus movimientos por correo?</b> La conexión de correo bancario
-          se configura en <b style={{ color: "#9B6DFF" }}>Automatización</b> — ahí no se pide ningún permiso del teléfono.
+        <div className="reveal" style={{ background: t.card, border: "1px dashed " + t.border, borderRadius: 14, padding: 12, marginTop: 12, fontSize: 11, color: t.sub, lineHeight: 1.5 }}>
+          Recibes tus movimientos por correo? La conexion de correo bancario
+          se configura en Automatizacion ahí no se pide ningún permiso del telefono.
         </div>
 
         <button
           className="reveal"
           onClick={() => setHint(true)}
-          style={{ width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: t.card, color: t.text, fontSize: 13.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          🔧 Abrir ajustes del teléfono →
+          style={{ width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "1.5px solid " + t.border, background: t.card, color: t.text, fontSize: 13.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          Abrir ajustes del telefono
         </button>
         {hint && (
           <div style={{ fontSize: 11, color: t.sub, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>
-            En la app instalada, esto abre los <b>Ajustes → ORUS</b> de tu teléfono, donde puedes conceder o
+            En la app instalada, esto abre los Ajustes ORUS de tu telefono, donde puedes conceder o
             revocar cada permiso.
           </div>
         )}
 
         <div style={{ fontSize: 10.5, color: t.sub, textAlign: "center", marginTop: 20, paddingBottom: 10, lineHeight: 1.5 }}>
           ORUS solo usa estos datos para registrar y organizar tus finanzas. Ver la{" "}
-          <span onClick={onOpenPrivacy} style={{ color: "#9B6DFF", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Política de Privacidad</span>.
+          <span onClick={onOpenPrivacy} style={{ color: "#9B6DFF", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Politica de Privacidad</span>.
         </div>
       </div>
     </PageLayout>
