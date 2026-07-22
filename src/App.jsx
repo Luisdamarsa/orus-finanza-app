@@ -92,9 +92,11 @@ function Dashboard() {
   } = useDashboardNavigation();
 
   // 🆕 Rastrear pantalla anterior para navegación correcta (ej. Permisos → volver a Automatizaciones, no a Configuración)
+  // Solo registra pantallas "principales", no pantallas hijas/modales (permissions, privacy-perms, terms, etc.)
   const [previousScreen, setPreviousScreen] = useState(null);
+  const mainScreens = ["dashboard", "settings", "automatizaciones", "profile", "categories", "budgets", "movimientos", "add-category", "show-incomes"];
   useEffect(() => {
-    if (screen && screen !== previousScreen) {
+    if (screen && mainScreens.includes(screen) && screen !== previousScreen) {
       setPreviousScreen(screen);
     }
   }, [screen, previousScreen]);
