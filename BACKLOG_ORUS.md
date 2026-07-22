@@ -43,7 +43,8 @@
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
 | 4.1 | 🎨 | Formato del **popup de tarjetas de pilares** | 🟡 |
-| 4.2 | 🎨 | Formato de las **tarjetas de pilares** | 🟡 |
+| 4.2 | ✅ | ~~Formato de las **tarjetas de pilares**~~ — **hecho** (rediseño: % del total arriba, barra con 3 bolitas auto-escalable —inicio/gastado color pilar, fin-presupuesto gris; en sobregiro fin va del color del pilar y exceso rojo/verde—, gastado, % presupuesto; espaciados afinados). | 🟡 |
+| 4.6 | ✅ | ~~**Página de Movimientos**~~ — **hecho** (barra de contexto tipo Estado 2 con el pilar iluminado + % del total; pilar sin barra si no hay presupuesto; categorías con barra proporcional —como el popup— cuando no hay presupuesto; efecto de carga desde abajo por bloques). | 🟡 |
 | 4.3 | ✅ | ~~**Barra de presupuesto de pilares** (decisión con MJ)~~ — **resuelto** (sin presupuesto → sin barra; solo icono/nombre/valor. Ver 10.5). | 🟢 |
 | 4.4 | 🎨 | **Animación** en la página de "mostrar ingresos" | 🟢 |
 | 4.5 | 🎨 | **Iconos para categorías** (definir set + mapping) | 🟡 |
