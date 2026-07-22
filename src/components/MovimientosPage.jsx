@@ -363,9 +363,10 @@ export default function MovimientosPage({
                     prev.includes(categoryId) ? prev.filter(c => c !== categoryId) : [...prev, categoryId]
                   );
                   const isSel = selectedCategories.includes(categoryId);
+                  // Con presupuesto → barra vs. presupuesto; sin presupuesto → barra PROPORCIONAL
+                  // (relativa a la categoría más grande), igual que en el popup del pilar.
                   return (
                     <ErrorBoundary key={categoryId} fallback={null} resetKey={selectedPeriod}>
-                    {categoryBudget ? (
                       <CategoryProgressBar
                         key={categoryId}
                         categoryId={categoryId}
@@ -380,15 +381,6 @@ export default function MovimientosPage({
                         onClickBar={toggleCat}
                         isSelected={isSel}
                       />
-                    ) : (
-                      // Sin presupuesto → sin barra (no informa nada): solo nombre + valor.
-                      <div
-                        onClick={toggleCat}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "9px 12px", borderRadius: 10, cursor: "pointer", background: isSel ? (isDark ? "#252535" : "#F0EFF8") : "transparent", outline: isSel ? `1.5px solid ${pilar.darkColor}88` : "none", transition: "background 0.15s" }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: t.text }}>{categoryName}</span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: t.text }}>${spent.toLocaleString("es-CO")}</span>
-                      </div>
-                    )}
                     </ErrorBoundary>
                   );
                 });
