@@ -103,7 +103,7 @@ export default function PillarCardsGrid({
           // 🆕 Rediseño: % del total arriba (color pilar), barra auto-escalable, gastado, % presupuesto abajo.
           const pctTotal = chipPcts[i];
           const grayTrack = isDark ? "#2D2D3A" : "#E5E3F5"; // "no gastado"
-          const overColor = p.id === "ahorro" ? dc : "#EF4444"; // exceso: verde en Ahorro, rojo en el resto
+          const overColor = p.id === "ahorro" ? "#22C55E" : "#EF4444"; // exceso: verde FUERTE en Ahorro (distinto del pastel), rojo en el resto
           // Barra que se escala sola: dentro del presupuesto → color + gris; pasado → color(presupuesto) + rojo(exceso).
           let coloredPct = 0, overSegPct = 0;
           if (hasBudget && historicalBudget > 0) {
