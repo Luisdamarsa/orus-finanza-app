@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
 import { groupByDate, fmt } from "../utils/formatters";
-import { METHOD_META, ALL_CATS } from "../constants";
+import { METHOD_META, ALL_CATS, PILLARS, DAY_PILLAR_COLOR } from "../constants";
+import ColorBar from "./ColorBar";
 import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
@@ -92,6 +93,30 @@ export default function MovimientosPage({
   const isAhorrosPillar = pilar.id === "ahorro";
   const getOverBudgetColor = () =>
     getOverBudgetColorSvc({ isOver: isOverBudget, isAhorros: isAhorrosPillar, fallback: t.sub });
+
+  // 🆕 Barra de contexto (misma del Estado 2): distribución de TODOS los pilares en el período,
+  // con este pilar iluminado (los demás se atenúan) + su % del total. Informativa (no clickeable), estática.
+  const inPeriod = (tx) => {
+    if (!selectedPeriod) return true;
+    const [y, m] = tx.date.split("-").map(Number);
+    if (selectedPeriod.month === null) return y === selectedPeriod.year;
+    return y === selectedPeriod.year && m === selectedPeriod.month;
+  };
+  const allSpends = {};
+  PILLARS.forEach((p) => { allSpends[p.id] = 0; });
+  transactions.forEach((tx) => {
+    if (tx.amount < 0 && tx.pillar !== "ingreso" && allSpends[tx.pillar] !== undefined && inPeriod(tx)) {
+      allSpends[tx.pillar] += Math.abs(tx.amount);
+    }
+  });
+  const grandTotal = Object.values(allSpends).reduce((a, b) => a + b, 0);
+  const contextSegments = PILLARS.filter((p) => allSpends[p.id] > 0).map((p) => ({
+    id: p.id,
+    color: isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color),
+    pct: grandTotal > 0 ? (allSpends[p.id] / grandTotal) * 100 : 0,
+  }));
+  const pctTotal = grandTotal > 0 ? Math.round((allSpends[pilar.id] / grandTotal) * 100) : 0;
+  const pillarDisplayColor = isDark ? pilar.color : (DAY_PILLAR_COLOR[pilar.id] || pilar.color);
 
   // 🆕 Obtener el color oscuro del pilar CON OPACIDAD (15%) para la barra de categorías
 
@@ -258,6 +283,26 @@ export default function MovimientosPage({
               color: getOverBudgetColor(),
             }}>
             {percentage.toFixed(0)}% del presupuesto
+          </div>
+        )}
+
+        {/* 🆕 Barra de contexto (misma del Estado 2): este pilar iluminado + % del total. Informativa. */}
+        {contextSegments.length > 0 && (
+          <div style={{ marginTop: 4 }}>
+            <div style={{ pointerEvents: "none" }}>
+              <ColorBar
+                segments={contextSegments}
+                filteredPillar={pilar.id}
+                setFilteredPillar={() => {}}
+                setFilterType={() => {}}
+                isActive={false}
+                staticColors
+                selectedPeriod={selectedPeriod}
+              />
+            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: pillarDisplayColor, marginTop: 6, textAlign: "left" }}>
+              {pctTotal}% del total
+            </div>
           </div>
         )}
       </div>

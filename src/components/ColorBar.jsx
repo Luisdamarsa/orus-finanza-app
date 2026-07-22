@@ -30,6 +30,7 @@ export default function ColorBar({
   setFilterType,
   isActive,
   selectedPeriod,
+  staticColors = false, // 🆕 muestra los colores de una (sin animación), para uso informativo
 }) {
   // 🆕 Estado para track de animación
   const [animatingSegments, setAnimatingSegments] = useState(new Set());
@@ -93,7 +94,7 @@ export default function ColorBar({
     }}>
       {segments.map((seg) => {
         const isAnimated = animatingSegments.has(seg.id);
-        const displayColor = isAnimated ? seg.color : SALDO_GRAY;
+        const displayColor = staticColors ? seg.color : (isAnimated ? seg.color : SALDO_GRAY);
 
         // 🆕 ¿Este segmento está siendo presionado?
         const isPressingThisSegment = pressingSegmentId === seg.id;
