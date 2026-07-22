@@ -43,8 +43,8 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
         isDark={isDark}
       >
         <>
-          {/* Menu Items + Toggles */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
+          {/* Menu Items + Toggles — efecto de carga desde abajo */}
+          <div className="orus-rise" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40, animationDelay: "0.04s" }}>
             {allItems.map((item) => {
               // Si es un toggle, renderizar con switch clickeable
               if (item.type === "toggle") {
@@ -165,8 +165,8 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
             })}
           </div>
 
-          {/* Footer Info */}
-          <div style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20 }}>
+          {/* Footer Info — efecto de carga desde abajo */}
+          <div className="orus-rise" style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20, animationDelay: "0.14s" }}>
             <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 12, flexWrap: "wrap" }}>
               <span onClick={onTerms} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos y Condiciones</span>
               <span onClick={onPrivacy} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos de Privacidad</span>
