@@ -14,6 +14,7 @@ import AboutPage from "./AboutPage";
 import PermissionsPage from "./PermissionsPage";
 import SubscriptionPage from "./SubscriptionPage";
 import PreferencesPage from "./PreferencesPage";
+import AutomatizacionesScreen from "./AutomatizacionesScreen";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -32,6 +33,8 @@ export default function ScreenRouter({
   resetCategoryEditing, startCategoryEditing,
   editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
   categoriesTab, setCategoriesTab,
+  microphoneEnabled, setMicrophoneEnabled, notificationListenerEnabled, setNotificationListenerEnabled,
+  onOpenAccessibilitySettings,
   setScreen,
 }) {
   if (screen === "pillar-detail" && selectedPillarDetail) {
@@ -129,6 +132,22 @@ export default function ScreenRouter({
       <ScreenShell bg={t.bg}>
         <PreferencesPage isDark={isDark} onBack={() => setScreen("settings")} setTheme={setTheme} />
       </ScreenShell>
+    );
+  }
+
+  if (screen === "automatizaciones") {
+    return (
+      <AutomatizacionesScreen
+        isDark={isDark}
+        t={t}
+        setScreen={setScreen}
+        onPermissions={() => setScreen("permissions")}
+        microphoneEnabled={microphoneEnabled}
+        setMicrophoneEnabled={setMicrophoneEnabled}
+        notificationListenerEnabled={notificationListenerEnabled}
+        setNotificationListenerEnabled={setNotificationListenerEnabled}
+        onOpenAccessibilitySettings={onOpenAccessibilitySettings}
+      />
     );
   }
 
