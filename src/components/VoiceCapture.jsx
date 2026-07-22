@@ -18,6 +18,8 @@ export default function VoiceCapture({ isDark, onClose, onResult }) {
   const [errorMsg, setErrorMsg] = useState("");
   const recognitionRef = useRef(null);
   const doneRef = useRef(false);
+  const finalRef = useRef("");       // texto final acumulado
+  const silenceRef = useRef(null);   // temporizador de silencio
 
   const supported = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
 
@@ -45,18 +47,29 @@ export default function VoiceCapture({ isDark, onClose, onResult }) {
     const rec = new SR();
     rec.lang = "es-CO";
     rec.interimResults = true;
-    rec.continuous = false;
+    rec.continuous = true; // sigue escuchando; procesamos al detectar silencio
     recognitionRef.current = rec;
     doneRef.current = false;
+    finalRef.current = "";
     setTranscript("");
     setErrorMsg("");
     setPhase("listening");
 
+    // Reinicia el temporizador de silencio; al vencer, corta y procesa lo dicho hasta ahí.
+    const armSilence = (ms) => {
+      if (silenceRef.current) clearTimeout(silenceRef.current);
+      silenceRef.current = setTimeout(() => { try { rec.stop(); } catch { /* noop */ } }, ms);
+    };
+
     rec.onresult = (e) => {
-      let txt = "";
-      for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
-      setTranscript(txt);
-      if (e.results[e.results.length - 1].isFinal) finish(txt);
+      let finalTxt = "", interim = "";
+      for (let i = 0; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalTxt += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      finalRef.current = finalTxt;
+      setTranscript((finalTxt + " " + interim).trim());
+      armSilence(1500); // 1.5s sin hablar → procesar
     };
     rec.onerror = (e) => {
       setErrorMsg(e.error === "not-allowed"
@@ -65,17 +78,22 @@ export default function VoiceCapture({ isDark, onClose, onResult }) {
       setPhase("error");
     };
     rec.onend = () => {
-      // Si terminó con texto pero sin "final", igual procesamos.
-      if (!doneRef.current && transcript.trim()) finish(transcript);
+      if (silenceRef.current) clearTimeout(silenceRef.current);
+      const full = (finalRef.current || transcript).trim();
+      if (!doneRef.current && full) finish(full);
     };
     rec.start();
+    armSilence(6000); // si no hablas en 6s, corta
   };
 
   const stop = () => { try { recognitionRef.current?.stop(); } catch { /* noop */ } };
 
   useEffect(() => {
     start();
-    return () => { try { recognitionRef.current?.abort(); } catch { /* noop */ } };
+    return () => {
+      if (silenceRef.current) clearTimeout(silenceRef.current);
+      try { recognitionRef.current?.abort(); } catch { /* noop */ }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -129,7 +147,9 @@ export default function VoiceCapture({ isDark, onClose, onResult }) {
           <line x1="8" y1="21" x2="16" y2="21" />
         </svg>
       </div>
-      <div style={{ color: "#7B7A99", fontSize: 11, marginTop: 12 }}>Toca la pantalla para cancelar</div>
+      <div style={{ color: "#7B7A99", fontSize: 11, marginTop: 12, textAlign: "center", lineHeight: 1.5 }}>
+        Toca el <b style={{ color: "#B9B7D6" }}>micrófono</b> para terminar · la <b style={{ color: "#B9B7D6" }}>pantalla</b> para cancelar
+      </div>
     </div>
   );
 }
