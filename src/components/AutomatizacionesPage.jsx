@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
 import PageLayout from "./PageLayout";
 
@@ -14,6 +14,17 @@ export default function AutomatizacionesPage({
 }) {
   const pressBack = usePress();
   const [pressingButton, setPressingButton] = useState(null);
+  const descriptionRef = useRef(null);
+  const [contentTop, setContentTop] = useState(220);
+
+  // Medir altura dinámicamente de la descripción
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const descriptionHeight = descriptionRef.current.offsetHeight;
+      const newContentTop = 164 + descriptionHeight + 6;
+      setContentTop(newContentTop);
+    }
+  }, []);
 
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
@@ -52,11 +63,14 @@ export default function AutomatizacionesPage({
     <PageLayout
       isDark={isDark}
       onBack={onBack}
-      title="⚙️ Automatizaciones"
+      title="⚡ Automatizaciones"
+      descriptionRef={descriptionRef}
+      contentTopOffset={contentTop}
       pressBack={pressBack}
       description={
         <>
           <div
+            ref={descriptionRef}
             style={{
               fontSize: 13,
               color: t.sub,
