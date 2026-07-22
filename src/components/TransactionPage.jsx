@@ -492,15 +492,16 @@ export default function TransactionPage({
                 animation: "fadeInUp 0.2s ease"
               }}>
               <span style={{ fontSize: 16 }}>💰</span>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#22C55E" }}>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#22C55E", textAlign: "left" }}>
                   → Tu saldo
                 </div>
                 <div
                   style={{
                     fontSize: 10,
                     color: isDark ? "#5ebd8a" : "#4ade80",
-                    marginTop: 1
+                    marginTop: 1,
+                    textAlign: "left"
                   }}>
                   El ingreso se suma directamente a tu saldo
                 </div>
