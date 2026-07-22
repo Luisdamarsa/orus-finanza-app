@@ -301,16 +301,19 @@ export default function AutomatizacionesPage({
                     width: 48,
                     height: 48,
                     borderRadius: 10,
-                    background: "#9B6DFF22",
-                    border: "1px solid #9B6DFF44",
+                    background: "linear-gradient(135deg, #9B6DFF, #6D28D9)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 24,
                     flexShrink: 0,
                   }}
                 >
-                  🎤
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v12a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
                 </div>
                 <span style={{ flex: 1 }}>Micrófono</span>
                 <span style={{ color: microphoneEnabled ? "#22C55E" : "#999", fontSize: 12, fontWeight: 700 }}>
