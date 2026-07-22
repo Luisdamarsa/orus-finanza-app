@@ -475,38 +475,6 @@ export default function TransactionPage({
             <div style={{ height: 1, background: t.divider, marginBottom: 12 }} />
           )}
 
-          {/* Info de ingreso */}
-          {isIncome && hasAmount && (
-            <div
-              style={{
-                marginTop: 12,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "9px 14px",
-                borderRadius: 14,
-                background: isDark ? "#0d2118" : "#F0FDF4",
-                border: "1px solid #86EFAC44",
-                animation: "fadeInUp 0.2s ease"
-              }}>
-              <span style={{ fontSize: 16 }}>💰</span>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: 14, fontWeight: 800, color: "#22C55E", textAlign: "left" }}>
-                  → Tu saldo
-                </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: isDark ? "#5ebd8a" : "#4ade80",
-                    marginTop: 1,
-                    textAlign: "left"
-                  }}>
-                  El ingreso se suma directamente a tu saldo
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Selector de categoría de INGRESO (opcional) — mismo dropdown, solo categorías de ingreso */}
           {isIncome && (
             <div style={{ position: "relative", marginTop: 12 }}>
@@ -551,6 +519,38 @@ export default function TransactionPage({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+            {/* Card "Tu saldo" (solo para ingreso + con monto) */}
+            {isIncome && hasAmount && (
+            <div
+              style={{
+                marginTop: 12,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "9px 14px",
+                borderRadius: 14,
+                background: isDark ? "#0d2118" : "#F0FDF4",
+                border: "1px solid #86EFAC44",
+                animation: "fadeInUp 0.2s ease"
+              }}>
+              <span style={{ fontSize: 16 }}>💰</span>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#22C55E", textAlign: "left" }}>
+                  → Tu saldo
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: isDark ? "#5ebd8a" : "#4ade80",
+                    marginTop: 1,
+                    textAlign: "left"
+                  }}>
+                  El ingreso se suma directamente a tu saldo
+                </div>
+              </div>
             </div>
           )}
 

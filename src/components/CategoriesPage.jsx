@@ -120,26 +120,26 @@ export default function CategoriesPage({
 
           return (
             <div key={pillar.id} className="orus-rise" style={{ marginBottom: 16, animationDelay: `${pillarIdx * 0.1}s` }}>
-              {/* Título del Pilar - Con tag/badge (icono + nombre dentro) */}
+              {/* Título del Pilar - Con tag/badge (icono + nombre dentro) — ancho completo */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
                   marginBottom: 12,
-                  padding: "0 12px",
+                  padding: "0",
                 }}
               >
                 <div
                   style={{
-                    display: "inline-flex",
+                    display: "flex",
                     alignItems: "center",
                     gap: 8,
                     padding: "8px 14px",
                     borderRadius: 8,
                     background: pillar.color + "22",
                     border: `1px solid ${pillar.color}44`,
-                    marginLeft: "-12px",
+                    width: "100%",
                   }}
                 >
                   <span style={{ fontSize: 20.7 }}>{pillar.icon}</span>
