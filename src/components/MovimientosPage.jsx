@@ -235,7 +235,9 @@ export default function MovimientosPage({
         }}>
         {/* 🆕 Barra del pilar usando ProgressBar */}
         <div
+          className="orus-rise"
           style={{
+            animationDelay: "0.04s",
             display: "flex",
             alignItems: "center",
             gap: 12,
@@ -277,7 +279,9 @@ export default function MovimientosPage({
         {/* Porcentaje */}
         {percentage !== null && (
           <div
+            className="orus-rise"
             style={{
+              animationDelay: "0.04s",
               fontSize: 11,
               fontWeight: 700,
               color: getOverBudgetColor(),
@@ -288,7 +292,7 @@ export default function MovimientosPage({
 
         {/* 🆕 Barra de contexto (misma del Estado 2): este pilar iluminado + % del total. Informativa. */}
         {contextSegments.length > 0 && (
-          <div style={{ marginTop: 4 }}>
+          <div className="orus-rise" style={{ marginTop: 4, animationDelay: "0.14s" }}>
             <div style={{ pointerEvents: "none" }}>
               <ColorBar
                 segments={contextSegments}
@@ -324,7 +328,7 @@ export default function MovimientosPage({
 
         {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
         {Object.keys(categorySpent).length > 0 && (
-          <div style={{ marginBottom: 32, paddingTop: 0 }}>
+          <div className="orus-rise" style={{ marginBottom: 32, paddingTop: 0, animationDelay: "0.24s" }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: t.sub, marginBottom: 16, textAlign: "left" }}>
               Categorías
             </div>
