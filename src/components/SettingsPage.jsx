@@ -43,15 +43,16 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
         isDark={isDark}
       >
         <>
-          {/* Menu Items + Toggles — efecto de carga desde abajo */}
-          <div className="orus-rise" style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40, animationDelay: "0.04s" }}>
-            {allItems.map((item) => {
+          {/* Menu Items + Toggles — cada item sube uno por uno */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 40 }}>
+            {allItems.map((item, idx) => {
               // Si es un toggle, renderizar con switch clickeable
               if (item.type === "toggle") {
                 const isPressingToggleRow = pressingButton === "toggle-row-" + item.id;
                 return (
                   <div
                     key={item.id}
+                    className="orus-rise"
                     onClick={() => {
                       // Si es el item de ingresos, navegar a la página
                       if (item.id === "ingresos" && onShowIncomes) {
@@ -74,6 +75,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                       transform: isPressingToggleRow ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
                       boxShadow: isPressingToggleRow ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
                       transition: item.id === "ingresos" ? "none" : "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                      animationDelay: `${idx * 0.05}s`,
                     }}>
                     <span style={{ fontSize: 18 }}>{item.icon}</span>
                     <span style={{ fontSize: 14, fontWeight: 600, color: t.text, flex: 1, textAlign: "left" }}>
@@ -121,6 +123,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
               return (
                 <button
                   key={item.id}
+                  className="orus-rise"
                   onClick={() => {
                     if (item.id === "perfil" && onProfile) onProfile();
                     else if (item.id === "presupuestos" && onBudgets) onBudgets();
@@ -142,6 +145,7 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
                     width: "100%",
                     transform: isPressingThisButton ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
                     boxShadow: isPressingThisButton ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
+                    animationDelay: `${idx * 0.05}s`,
                   }}
                   onMouseEnter={(e) => {
                     if (pressingButton !== item.id) {
@@ -165,8 +169,8 @@ export default function SettingsPage({ isDark, onBack, onBudgets, onProfile, onC
             })}
           </div>
 
-          {/* Footer Info — efecto de carga desde abajo */}
-          <div className="orus-rise" style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20, animationDelay: "0.14s" }}>
+          {/* Footer Info — efecto de carga desde abajo, después del último item */}
+          <div className="orus-rise" style={{ textAlign: "center", color: t.sub, fontSize: 11, paddingBottom: 20, animationDelay: `${allItems.length * 0.05}s` }}>
             <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 12, flexWrap: "wrap" }}>
               <span onClick={onTerms} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos y Condiciones</span>
               <span onClick={onPrivacy} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>Términos de Privacidad</span>
