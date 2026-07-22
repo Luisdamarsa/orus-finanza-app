@@ -43,6 +43,11 @@ export function useTransactionActions({
       pillar = targetPillar;
     }
 
+    // 🆕 Categoría nueva de INGRESO (concept es el nombre) → se crea/reutiliza en el grupo "ingreso".
+    if (isIncome && isNewCategory && concept && getOrCreateCategory) {
+      categoryId = getOrCreateCategory("ingreso", concept);
+    }
+
     // 🆕 Gasto sin categoría → cae en la categoría "Varios" del pilar Varios (la crea si no existe)
     if (!isIncome && !categoryId) {
       categoryId = ensureVariosCategory();

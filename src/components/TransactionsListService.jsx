@@ -192,16 +192,27 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         {tx.method}
                       </span>
                       {isIngreso ? (
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            padding: "1px 6px",
-                            borderRadius: 5,
-                            background: isDark ? "#0d2118" : "#dcfce7",
-                            color: "#22C55E",
-                          }}>
-                          Ingreso
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: "1px 6px",
+                              borderRadius: 5,
+                              background: isDark ? "#0d2118" : "#dcfce7",
+                              color: "#22C55E",
+                            }}>
+                            Ingreso
+                          </span>
+                          {tx.category ? (
+                            <span style={{ fontSize: 10, color: "#22C55E", fontWeight: 600 }}>
+                              {(() => {
+                                const category = ALL_CATS.find((cat) => cat.id === tx.category);
+                                if (!category) return tx.category;
+                                return getAttributeAtDate(category, "name", tx.date);
+                              })()}
+                            </span>
+                          ) : null}
                         </span>
                       ) : (
                         <span style={{ fontSize: 10, color: t.sub }}>

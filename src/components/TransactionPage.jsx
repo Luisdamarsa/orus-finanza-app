@@ -115,14 +115,12 @@ export default function TransactionPage({
     return formatted;
   };
 
-  // 🆕 Obtener nombre de categoría por ID
-  const getCategoryDisplayName = (categoryId) => {
-    if (!categoryId) return null;
-    // Buscar en las categorías formateadas
-    const formatted = getFormattedCategories();
-    const found = formatted.find(cat => cat.id === categoryId);
-    return found ? found.name : null;
-  };
+  // 🆕 Obtener nombre de categoría por ID (resuelve cualquier categoría, incl. ingresos)
+  const getCategoryDisplayName = (categoryId) => (categoryId ? getCategoryName(categoryId) : null);
+
+  // 🆕 Categorías de INGRESO (pillar "ingreso"), lista plana
+  const getIncomeCategories = () =>
+    (categories["ingreso"] || []).map((catId) => ({ id: catId, name: getCategoryName(catId), pillar: "ingreso" }));
 
   // Cálculos derivados
   const numericAmount = parseInt(rawAmount.replace(/\D/g, "")) || 0;
@@ -174,7 +172,7 @@ export default function TransactionPage({
     const name = newConceptText.trim();
     if (!name) return;
     setConcept(name);
-    setPillarId(null);
+    setPillarId(isIncome ? "ingreso" : null); // ingreso no elige pilar
     setIsNewCategory(true);
     setConceptOpen(false);
     setNewConceptText("");
@@ -506,6 +504,53 @@ export default function TransactionPage({
                   El ingreso se suma directamente a tu saldo
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Selector de categoría de INGRESO (opcional) — mismo dropdown, solo categorías de ingreso */}
+          {isIncome && (
+            <div style={{ position: "relative", marginTop: 12 }}>
+              <button
+                onClick={() => setConceptOpen((o) => !o)}
+                onPointerDown={() => setPressingCategory(true)}
+                onPointerUp={() => setPressingCategory(false)}
+                onPointerLeave={() => setPressingCategory(false)}
+                style={{ width: "100%", padding: "8px 14px", borderRadius: 20, cursor: "pointer", border: `1.5px dashed ${concept ? "#22C55E99" : "#22C55E66"}`, background: pressingCategory ? "#22C55E22" : "transparent", display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 13 }}>🏷</span>
+                <span style={{ fontSize: 12, color: concept ? t.text : "#22C55E", fontWeight: concept ? 700 : 500, flex: 1, textAlign: "left" }}>
+                  {(isNewCategory ? concept : getCategoryDisplayName(concept)) || "Categoría del ingreso (opcional)"}
+                </span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: conceptOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {conceptOpen && (
+                <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, right: 0, zIndex: 50, background: isDark ? "#1C1C2E" : "#FAFAFE", border: `1px solid ${isDark ? "#2D2D4A" : "#E5E3F5"}`, borderRadius: 20, boxShadow: isDark ? "0 12px 40px rgba(0,0,0,0.5)" : "0 12px 40px rgba(100,80,200,0.14)", maxHeight: 230, overflowY: "auto", scrollbarWidth: "none", padding: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: isDark ? "#12291c" : "#EAFBF0", borderRadius: 14, marginBottom: 6 }}>
+                    <span style={{ fontSize: 14 }}>✦</span>
+                    <input type="text" placeholder="Nueva categoría de ingreso..." value={newConceptText} onChange={(e) => setNewConceptText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()} style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 12, color: t.text, fontStyle: "italic" }} />
+                    {newConceptText.trim() && (
+                      <button onClick={handleCreateCategory} style={{ padding: "4px 11px", borderRadius: 20, border: "none", background: "linear-gradient(135deg,#22C55E,#16A34A)", color: "white", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0 }}>Crear</button>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 1, padding: "0 2px" }}>
+                    {(() => {
+                      const q = newConceptText.trim().toLowerCase();
+                      const list = getIncomeCategories().filter((c) => !q || (c.name || "").toLowerCase().includes(q));
+                      return list.map((cat) => {
+                        const isActive = concept === cat.id;
+                        return (
+                          <button key={cat.id} onClick={() => handleConceptPick(cat)} onPointerDown={() => setPressingConcept(cat.id)} onPointerUp={() => setPressingConcept(null)} onPointerLeave={() => setPressingConcept(null)}
+                            style={{ width: "100%", padding: "7px 12px", border: "none", cursor: "pointer", borderRadius: 12, background: pressingConcept === cat.id ? "#22C55E44" : isActive ? (isDark ? "#22C55E30" : "#22C55E18") : "transparent", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 400, color: isActive ? "#22C55E" : t.text }}>{cat.name}</span>
+                            {isActive && <span style={{ fontSize: 12, color: "#22C55E", fontWeight: 700 }}>✓</span>}
+                          </button>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
