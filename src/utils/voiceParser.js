@@ -86,7 +86,7 @@ export function parseVoiceTransaction(text) {
   let desc = descTokens.join(" ").trim();
   // Capitalizar primera letra
   if (desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-  if (!desc) desc = isIncome ? "Ingreso por voz" : "Gasto por voz";
+  if (!desc) desc = "Varios";
 
   return { amount, desc, isIncome, raw };
 }
