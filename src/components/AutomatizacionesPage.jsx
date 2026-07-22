@@ -267,154 +267,206 @@ export default function AutomatizacionesPage({
           </div>
         </div>
 
-        {/* ===== SECCIÓN 4: PERMISOS ===== */}
+        {/* ===== SECCIÓN 4: PERMISOS (igual a PermissionsPage) ===== */}
         <div className="orus-rise" style={{ animationDelay: "0.22s" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: t.text, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+            🔐 Permisos necesarios
+          </div>
+
+          {/* Micrófono */}
           <div
             style={{
-              border: `1.5px solid ${t.border}`,
-              borderRadius: 14,
-              padding: "14px",
               background: t.card,
+              border: `1px solid ${t.border}`,
+              borderRadius: 14,
+              padding: "12px",
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 700, color: t.text, marginBottom: 10 }}>
-              🔐 Permisos necesarios
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {/* Micrófono (con fondo coloreado como PermissionsPage) */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                  padding: "14px 16px",
-                  borderRadius: 14,
-                  background: isDark ? "#2D1E4A" : "#F5F3FF",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: t.text,
-                }}
-              >
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 10,
-                    background: "linear-gradient(135deg, #9B6DFF, #6D28D9)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v12a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                  </svg>
-                </div>
-                <span style={{ flex: 1 }}>Micrófono</span>
-                <span style={{ color: microphoneEnabled ? "#22C55E" : "#999", fontSize: 12, fontWeight: 700 }}>
-                  {microphoneEnabled ? "✓" : "○"}
-                </span>
-              </div>
-
-              {/* Notificaciones de ORUS (con fondo coloreado) */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                  padding: "14px 16px",
-                  borderRadius: 14,
-                  background: isDark ? "#3D2600" : "#FFFAEB",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: t.text,
-                }}
-              >
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 10,
-                    background: "#FDE68A33",
-                    border: "1px solid #FDE68A66",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 24,
-                    flexShrink: 0,
-                  }}
-                >
-                  🔔
-                </div>
-                <span style={{ flex: 1 }}>Notificaciones de ORUS</span>
-                <span style={{ color: "#22C55E", fontSize: 12, fontWeight: 700 }}>✓</span>
-              </div>
-
-              {/* Accesibilidad para leer notificaciones (con fondo coloreado) */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                  padding: "14px 16px",
-                  borderRadius: 14,
-                  background: isDark ? "#1A2E4A" : "#EBF8FF",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: t.text,
-                }}
-              >
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 10,
-                    background: "#93C5FD33",
-                    border: "1px solid #93C5FD66",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 24,
-                    flexShrink: 0,
-                  }}
-                >
-                  🏦
-                </div>
-                <span style={{ flex: 1 }}>Accesibilidad para leer notificaciones</span>
-                <span style={{ color: notificationListenerEnabled ? "#22C55E" : "#999", fontSize: 12, fontWeight: 700 }}>
-                  {notificationListenerEnabled ? "✓" : "○"}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={onPermissions}
-              onPointerDown={() => setPressingButton("permisos-btn")}
-              onPointerUp={() => setPressingButton(null)}
-              onPointerLeave={() => setPressingButton(null)}
+            <div
               style={{
-                marginTop: 12,
-                width: "100%",
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "none",
-                background: "#9B6DFF22",
-                color: "#9B6DFF",
-                fontSize: 11,
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.1s",
-                transform: pressingButton === "permisos-btn" ? "scale(0.98)" : "scale(1)",
+                width: 38,
+                height: 38,
+                borderRadius: 11,
+                background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
               }}
             >
-              Ver todos los permisos →
-            </button>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
+                <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <b style={{ fontSize: 13, color: t.text }}>Micrófono</b>
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 700,
+                    color: "#9B6DFF",
+                    background: "#9B6DFF22",
+                    padding: "1px 6px",
+                    borderRadius: 8,
+                  }}
+                >
+                  ÓPTIMO
+                </span>
+              </div>
+              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3 }}>
+                Para registrar gastos por voz sin abrir la app.
+              </div>
+            </div>
+            <span style={{ color: microphoneEnabled ? "#22C55E" : t.sub, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+              {microphoneEnabled ? "✓" : "○"}
+            </span>
           </div>
+
+          {/* Notificaciones de ORUS */}
+          <div
+            style={{
+              background: t.card,
+              border: `1px solid ${t.border}`,
+              borderRadius: 14,
+              padding: "12px",
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 11,
+                background: "#FDE68A22",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 19,
+                flexShrink: 0,
+              }}
+            >
+              🔔
+            </div>
+            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <b style={{ fontSize: 13, color: t.text }}>Notificaciones de ORUS</b>
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 700,
+                    color: "#9B6DFF",
+                    background: "#9B6DFF22",
+                    padding: "1px 6px",
+                    borderRadius: 8,
+                  }}
+                >
+                  ÓPTIMO
+                </span>
+              </div>
+              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3 }}>
+                Para avisarte cuando registramos un movimiento y enviarte recordatorios.
+              </div>
+            </div>
+            <span style={{ color: "#22C55E", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>✓</span>
+          </div>
+
+          {/* Accesibilidad para leer notificaciones */}
+          <div
+            style={{
+              background: t.card,
+              border: `1px solid ${t.border}`,
+              borderRadius: 14,
+              padding: "12px",
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 11,
+                background: "#93C5FD22",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 19,
+                flexShrink: 0,
+              }}
+            >
+              🏦
+            </div>
+            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <b style={{ fontSize: 13, color: t.text }}>Accesibilidad para leer notificaciones</b>
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 700,
+                    color: t.sub,
+                    background: t.sub + "22",
+                    padding: "1px 6px",
+                    borderRadius: 8,
+                  }}
+                >
+                  OPCIONAL
+                </span>
+                <span style={{ fontSize: 8.5, fontWeight: 700, color: "#4F8EF7", background: "#4F8EF722", padding: "1px 6px", borderRadius: 8 }}>
+                  SOLO ANDROID
+                </span>
+              </div>
+              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3 }}>
+                Solo en Android: leemos las notificaciones de tu tarjeta (Google Pay) para detectar pagos automáticamente.
+              </div>
+            </div>
+            <span style={{ color: notificationListenerEnabled ? "#22C55E" : t.sub, fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+              {notificationListenerEnabled ? "✓" : "○"}
+            </span>
+          </div>
+
+          <button
+            onClick={onPermissions}
+            onPointerDown={() => setPressingButton("permisos-btn")}
+            onPointerUp={() => setPressingButton(null)}
+            onPointerLeave={() => setPressingButton(null)}
+            style={{
+              width: "100%",
+              padding: "11px 0",
+              borderRadius: 12,
+              border: `1.5px solid ${t.border}`,
+              background: t.card,
+              color: t.text,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.1s",
+              transform: pressingButton === "permisos-btn" ? "scale(0.98)" : "scale(1)",
+            }}
+          >
+            Ver todos los permisos →
+          </button>
         </div>
 
         {/* ===== INFO GENERAL ===== */}
