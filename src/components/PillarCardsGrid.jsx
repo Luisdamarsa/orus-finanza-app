@@ -185,7 +185,7 @@ export default function PillarCardsGrid({
 
               {/* % del presupuesto (solo con presupuesto) */}
               {hasBudget && (
-                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 0, textAlign: "left" }}>
+                <div style={{ fontSize: 11, fontWeight: 600, lineHeight: 1.15, color: over ? overColor : dc, marginTop: 0, textAlign: "left" }}>
                   {over ? `+${Math.ceil(pc - 100)}% sobre presupuesto` : `${pc}% del presupuesto`}
                 </div>
               )}
