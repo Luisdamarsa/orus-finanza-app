@@ -174,7 +174,7 @@ export default function PillarCardsGrid({
 
               {/* Barra auto-escalable (solo con presupuesto) */}
               {hasBudget && (
-                <div style={{ height: 8, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 5, marginBottom: 1 }}>
+                <div style={{ height: 7, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 5, marginBottom: 1 }}>
                   <div style={{ width: `${coloredPct}%`, background: dc }} />
                   {over && <div style={{ width: `${overSegPct}%`, background: overColor }} />}
                 </div>
