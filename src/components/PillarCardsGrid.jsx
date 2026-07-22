@@ -181,11 +181,11 @@ export default function PillarCardsGrid({
               )}
 
               {/* Gastado */}
-              <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9 }}>{fmt(filteredSpent)}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
 
               {/* % del presupuesto (solo con presupuesto) */}
               {hasBudget && (
-                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 1 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 1, textAlign: "left" }}>
                   {over ? `+${Math.ceil(pc - 100)}% sobre presupuesto` : `${pc}% del presupuesto`}
                 </div>
               )}
@@ -244,7 +244,7 @@ export default function PillarCardsGrid({
                 {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
               </span>
             </div>
-            <div style={{ fontSize: 15, fontWeight: 800, marginTop: 9, color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
+            <div style={{ fontSize: 15, fontWeight: 800, marginTop: 9, textAlign: "left", color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
           </div>
