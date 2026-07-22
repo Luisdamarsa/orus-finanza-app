@@ -105,7 +105,7 @@ export default function AutomatizacionesPage({
                   Di un gasto: <span style={{ fontStyle: "italic" }}>"Pagué 50 mil en cine con tarjeta"</span>
                 </div>
                 <div style={{ fontSize: 11, color: t.sub, opacity: 0.75, lineHeight: 1.4 }}>
-                  ORUS extrae: monto, método y categoría. Tú confirmas y listo.
+                  Para registrar movimientos por voz sin abrir la app.
                 </div>
               </div>
               <Toggle value={microphoneEnabled} onChange={setMicrophoneEnabled} />
@@ -141,7 +141,7 @@ export default function AutomatizacionesPage({
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 6 }}>
-                  💳 Google Pay (Android)
+                  🏦 Google Pay (Android)
                 </div>
                 <div style={{ fontSize: 12, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>
                   Cuando pagas con NFC, ORUS lee la notificación y te pregunta si registrarla.

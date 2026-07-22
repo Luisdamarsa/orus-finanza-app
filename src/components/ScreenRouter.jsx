@@ -35,6 +35,7 @@ export default function ScreenRouter({
   categoriesTab, setCategoriesTab,
   microphoneEnabled, setMicrophoneEnabled, notificationListenerEnabled, setNotificationListenerEnabled,
   onOpenAccessibilitySettings,
+  previousScreen,
   setScreen,
 }) {
   if (screen === "pillar-detail" && selectedPillarDetail) {
@@ -112,9 +113,10 @@ export default function ScreenRouter({
   }
 
   if (screen === "permissions") {
+    const backTarget = previousScreen === "automatizaciones" ? "automatizaciones" : "settings";
     return (
       <ScreenShell bg={t.bg}>
-        <PermissionsPage isDark={isDark} onBack={() => setScreen("settings")} onOpenPrivacy={() => setScreen("privacy-perms")} />
+        <PermissionsPage isDark={isDark} onBack={() => setScreen(backTarget)} onOpenPrivacy={() => setScreen("privacy-perms")} />
       </ScreenShell>
     );
   }

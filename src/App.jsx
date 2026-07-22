@@ -91,6 +91,14 @@ function Dashboard() {
     showIncomes, setShowIncomes,
   } = useDashboardNavigation();
 
+  // 🆕 Rastrear pantalla anterior para navegación correcta (ej. Permisos → volver a Automatizaciones, no a Configuración)
+  const [previousScreen, setPreviousScreen] = useState(null);
+  useEffect(() => {
+    if (screen && screen !== previousScreen) {
+      setPreviousScreen(screen);
+    }
+  }, [screen, previousScreen]);
+
   // 🆕 Memoizar función de toggle para el donut
   const handleSelectPillar = useCallback((id) => {
     setActiveId(prevActiveId => prevActiveId === id ? null : id);
@@ -446,6 +454,7 @@ function Dashboard() {
     microphoneEnabled, setMicrophoneEnabled: handleSetMicrophoneEnabled,
     notificationListenerEnabled, setNotificationListenerEnabled: handleSetNotificationListenerEnabled,
     onOpenAccessibilitySettings,
+    previousScreen,
     setScreen,
   };
 
