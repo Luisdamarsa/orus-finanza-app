@@ -181,7 +181,7 @@ export default function PillarCardsGrid({
               )}
 
               {/* Gastado */}
-              <div style={{ fontSize: 14, fontWeight: 800, lineHeight: 1.1, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, lineHeight: 1.0, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 7 : 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
 
               {/* % del presupuesto (solo con presupuesto) */}
               {hasBudget && (
