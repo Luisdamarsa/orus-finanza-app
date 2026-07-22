@@ -149,8 +149,11 @@ export default function AutomatizacionesPage({
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 6, display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: isDark ? "#2D3E50" : "#E8EAED", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 18, fontWeight: "bold", color: "#4285F4" }}>
-                    G
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #4285F4, #34A853)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <path d="M1 10h22"></path>
+                    </svg>
                   </div>
                   Google Pay (Android)
                 </div>
