@@ -11,8 +11,10 @@ export default function CategoriesScreen({ isDark, t, categories, setScreen, res
       <CategoriesPage
         isDark={isDark}
         onBack={() => setScreen("settings")}
-        onAddCategory={() => {
-          resetCategoryEditing();
+        onAddCategory={(isIncome) => {
+          // income → marca el contexto con editingPillarId "ingreso" (sigue siendo "crear", sin nombre)
+          if (isIncome) startCategoryEditing(null, null, "ingreso");
+          else resetCategoryEditing();
           setScreen("add-category");
         }}
         onEditCategory={(categoryId, pillarId) => {

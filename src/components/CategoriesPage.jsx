@@ -40,6 +40,9 @@ export default function CategoriesPage({
   const pressAdd = usePress();
   // 🆕 Estado para rastrear qué categoría está siendo presionada
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
+  // 🆕 Tab activa: "gastos" (por pilar) o "ingresos" (planas)
+  const [tab, setTab] = useState("gastos");
+  const incomeCategories = categories["ingreso"] || [];
 
   // 🆕 Estado de loading para skeleton
   const [isLoading] = useState(false);
@@ -64,7 +67,7 @@ export default function CategoriesPage({
     );
     root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [tab]); // re-adjunta al volver al tab Gastos (si no, los pilares quedan invisibles)
 
   return (
     <>
@@ -84,7 +87,7 @@ export default function CategoriesPage({
             fontWeight: 400,
             textAlign: "left",
           }}>
-            Organiza tus gastos en categorías personalizadas dentro de cada pilar financiero.
+            Organiza tus movimientos en categorías. Los gastos van por pilar; los ingresos, por fuente.
           </div>
 
           {/* Descripción 2 (Ejemplos) */}
@@ -95,7 +98,7 @@ export default function CategoriesPage({
             fontStyle: "italic",
             textAlign: "left",
           }}>
-            Ejemplos: Edita "Arriendo" en Fijos o Cine en Ocio
+            Ej.: "Arriendo" en Fijos (gasto) · "Sueldo" en Ingresos.
           </div>
         </>
       }
@@ -108,7 +111,21 @@ export default function CategoriesPage({
         skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
         isDark={isDark}
       >
-          <div ref={containerRef}>
+          <>
+            {/* Tabs: Gastos / Ingresos */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              {[["gastos", "Gastos"], ["ingresos", "Ingresos"]].map(([id, label]) => (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: `1.5px solid ${tab === id ? "#9B6DFF" : t.border}`, background: tab === id ? "#9B6DFF22" : "transparent", color: tab === id ? "#9B6DFF" : t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {tab === "gastos" && (
+            <div ref={containerRef}>
             <style>{`
               .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
               .reveal.in{opacity:1;transform:none;}
@@ -218,14 +235,41 @@ export default function CategoriesPage({
             </div>
           );
             })}
-          </div>
+            </div>
+            )}
+
+            {tab === "ingresos" && (
+              <div>
+                <div style={{ border: `1px solid ${t.border}`, borderRadius: 12, overflow: "hidden" }}>
+                  {incomeCategories.length > 0 ? (
+                    incomeCategories.map((catId, idx) => (
+                      <button
+                        key={catId}
+                        onClick={() => onEditCategory(catId, "ingreso")}
+                        onPointerDown={() => setPressingCategoryId(catId)}
+                        onPointerUp={() => setPressingCategoryId(null)}
+                        onPointerLeave={() => setPressingCategoryId(null)}
+                        style={{ width: "100%", padding: "12px 16px", borderBottom: idx < incomeCategories.length - 1 ? `1px solid ${t.border}` : "none", display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: t.text, background: pressingCategoryId === catId ? (isDark ? "#252538" : "#F0EFF8") : "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
+                        <span style={{ fontSize: 15 }}>💵</span>
+                        <span>{getCategoryName(catId)}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <div style={{ padding: "18px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
+                      Aún no tienes categorías de ingreso. Toca “+ Añadir categoría”.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
       </LoadingWrapper>
     </PageLayout>
 
     {/* Botón Flotante Añadir Categoría */}
     <div style={{ position: "fixed", bottom: 24, right: 22 }}>
       <button
-        onClick={onAddCategory}
+        onClick={() => onAddCategory(tab === "ingresos")}
         {...pressAdd.handlers}
         style={{
           padding: "12px 18px",

@@ -47,6 +47,8 @@ export default function AddCategoryPage({
   const [hasChanged, setHasChanged] = useState(false);
   // 🆕 Estado para trackear qué botón de pilar está siendo presionado
   const [pressingPillar, setPressingPillar] = useState(null);
+  // 🆕 Categoría de INGRESO (marcada con editingPillarId "ingreso"): no lleva pilar.
+  const isIncome = editingPillarId === "ingreso";
 
   // Pre-llenar datos en modo edición
   useEffect(() => {
@@ -119,7 +121,8 @@ export default function AddCategoryPage({
     if (!canSave) return;
 
     const finalName = isEditing ? description.trim() : getDeduplicatedName(description);
-    const pillarToSave = selectedPillar || "varios";
+    // Ingreso → siempre "ingreso"; gasto → el pilar elegido o Varios por defecto.
+    const pillarToSave = isIncome ? "ingreso" : (selectedPillar || "varios");
 
     try {
       onSave(pillarToSave, finalName);
@@ -269,9 +272,10 @@ export default function AddCategoryPage({
           />
 
           {/* Separador */}
+          {!isIncome && (<>
           <div style={{ height: 1, background: t.border, marginBottom: 12 }} />
 
-          {/* ===== SECCIÓN 2: Selector de Pilar ===== */}
+          {/* ===== SECCIÓN 2: Selector de Pilar (solo GASTOS) ===== */}
 
           {/* Label Pilar */}
           <div
@@ -354,6 +358,7 @@ export default function AddCategoryPage({
               );
             })}
           </div>
+          </>)}
         </div>
       </div>
 
