@@ -148,19 +148,10 @@ export default function AutomatizacionesPage({
           >
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
-                    <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="20" fontWeight="bold" fill="url(#googleGradient)" dy=".3em">G</text>
-                    <defs>
-                      <linearGradient id="googleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#4285F4" />
-                        <stop offset="25%" stopColor="#34A853" />
-                        <stop offset="50%" stopColor="#FBBC04" />
-                        <stop offset="75%" stopColor="#EA4335" />
-                        <stop offset="100%" stopColor="#EA4335" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
+                <div style={{ fontSize: 14, fontWeight: 700, color: t.text, marginBottom: 6, display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: isDark ? "#2D3E50" : "#E8EAED", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 18, fontWeight: "bold", color: "#4285F4" }}>
+                    G
+                  </div>
                   Google Pay (Android)
                 </div>
                 <div style={{ fontSize: 12, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>
