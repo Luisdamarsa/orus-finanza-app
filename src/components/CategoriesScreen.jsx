@@ -5,12 +5,14 @@ import { getCategoryName } from "../utils/categoryUtils";
 /**
  * CategoriesScreen.jsx — pantalla de Categorías (RS-5). Extraída de App.jsx.
  */
-export default function CategoriesScreen({ isDark, t, categories, setScreen, resetCategoryEditing, startCategoryEditing }) {
+export default function CategoriesScreen({ isDark, t, categories, setScreen, resetCategoryEditing, startCategoryEditing, categoriesTab, setCategoriesTab }) {
   return (
     <ScreenShell bg={t.bg}>
       <CategoriesPage
         isDark={isDark}
         onBack={() => setScreen("settings")}
+        tab={categoriesTab}
+        setTab={setCategoriesTab}
         onAddCategory={(isIncome) => {
           // income → marca el contexto con editingPillarId "ingreso" (sigue siendo "crear", sin nombre)
           if (isIncome) startCategoryEditing(null, null, "ingreso");

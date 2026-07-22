@@ -102,6 +102,8 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   // 🆕 Datos por voz para pre-llenar la pantalla de nueva transacción (se consume al abrirla)
   const [voicePrefill, setVoicePrefill] = useState(null);
+  // 🆕 Tab de la página de Categorías ("gastos" | "ingresos"); persiste al ir/volver de crear categoría
+  const [categoriesTab, setCategoriesTab] = useState("gastos");
   // Limpia el prefill al salir de "nueva transacción" (para que el lápiz manual no herede datos de voz)
   useEffect(() => {
     if (screen !== "new-transaction") setVoicePrefill(null);
@@ -418,6 +420,7 @@ function Dashboard() {
     selectedPillarForMovements, startTransactionEditing,
     resetCategoryEditing, startCategoryEditing,
     editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
+    categoriesTab, setCategoriesTab,
     setScreen,
   };
 

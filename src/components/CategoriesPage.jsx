@@ -26,6 +26,8 @@ export default function CategoriesPage({
   onAddCategory,
   onEditCategory,
   categories = {},
+  tab = "gastos",
+  setTab,
 }) {
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
@@ -39,8 +41,7 @@ export default function CategoriesPage({
   const pressAdd = usePress();
   // 🆕 Estado para rastrear qué categoría está siendo presionada
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
-  // 🆕 Tab activa: "gastos" (por pilar) o "ingresos" (planas)
-  const [tab, setTab] = useState("gastos");
+  // 🆕 Tab activa ("gastos"/"ingresos") viene de props (persiste al ir/volver de crear categoría)
   const incomeCategories = categories["ingreso"] || [];
 
   // 🆕 Estado de loading para skeleton

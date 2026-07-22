@@ -31,6 +31,7 @@ export default function ScreenRouter({
   selectedPillarForMovements, startTransactionEditing,
   resetCategoryEditing, startCategoryEditing,
   editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
+  categoriesTab, setCategoriesTab,
   setScreen,
 }) {
   if (screen === "pillar-detail" && selectedPillarDetail) {
@@ -76,7 +77,7 @@ export default function ScreenRouter({
   }
 
   if (screen === "categories") {
-    return <CategoriesScreen isDark={isDark} t={t} categories={categories} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} />;
+    return <CategoriesScreen isDark={isDark} t={t} categories={categories} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} categoriesTab={categoriesTab} setCategoriesTab={setCategoriesTab} />;
   }
 
   if (screen === "add-category") {
