@@ -118,21 +118,6 @@ export default function AutomatizacionesPage({
               </div>
               <Toggle value={microphoneEnabled} onChange={setMicrophoneEnabled} />
             </div>
-            {microphoneEnabled && (
-              <div
-                style={{
-                  marginTop: 10,
-                  padding: "8px 10px",
-                  borderRadius: 8,
-                  background: isDark ? "#12291c" : "#EAFBF0",
-                  fontSize: 11,
-                  color: "#22C55E",
-                  fontWeight: 500,
-                }}
-              >
-                ✅ Activo · Acceso al micrófono confirmado
-              </div>
-            )}
           </div>
         </div>
 
@@ -167,21 +152,7 @@ export default function AutomatizacionesPage({
               <Toggle value={notificationListenerEnabled} onChange={setNotificationListenerEnabled} />
             </div>
 
-            {notificationListenerEnabled ? (
-              <div
-                style={{
-                  marginTop: 10,
-                  padding: "8px 10px",
-                  borderRadius: 8,
-                  background: isDark ? "#12291c" : "#EAFBF0",
-                  fontSize: 11,
-                  color: "#22C55E",
-                  fontWeight: 500,
-                }}
-              >
-                ✅ Activo · Leyendo notificaciones de Google Pay
-              </div>
-            ) : (
+            {!notificationListenerEnabled && (
               <button
                 onClick={onOpenAccessibilitySettings}
                 onPointerDown={() => setPressingButton("google-pay-btn")}
