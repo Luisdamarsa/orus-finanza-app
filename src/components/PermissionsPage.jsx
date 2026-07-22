@@ -12,7 +12,7 @@ import PageLayout from "./PageLayout";
 const PERMISSIONS = [
   { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "Óptimo" },
   { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Micrófono", why: "Para registrar gastos por voz: “gasté 20 mil en el súper”.", kind: "mic", req: "Óptimo" },
-  { id: "notif-read", icon: "🏦", color: "#93C5FD", name: "Leer avisos del banco", why: "Solo en Android: leemos la notificación del banco para detectar tu movimiento automáticamente. Nunca leemos otras notificaciones.", kind: "native", req: "Opcional", only: "Android" },
+  { id: "notif-read", icon: "🏦", color: "#93C5FD", name: "Accesibilidad para leer notificaciones", why: "Solo en Android: leemos las notificaciones de tu tarjeta (Google Pay) para detectar pagos automáticamente. Nunca leemos otras notificaciones.", kind: "native", req: "Opcional", only: "Android" },
 ];
 
 export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
