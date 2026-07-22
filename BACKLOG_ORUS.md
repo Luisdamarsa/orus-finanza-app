@@ -80,6 +80,11 @@
 | 10.4 | 🎨 | Afinar tonos de día pendientes (contraste fino, otras pantallas menos visibles). *Iterativo.* | 🟢 |
 | 10.5 | ✅ | ~~**Sin presupuesto → sin barra en Movimientos**~~ — **hecho** (pilar y categorías sin presupuesto muestran solo icono/nombre/valor; la barra solo aparece con presupuesto real, ya que sin él se llenaba al 100% sin informar). | 🟢 |
 
+## Hito 11 — Workspaces / Espacios compartidos ⭐ (FUNDAMENTAL — antes de la BD)
+| # | Tipo | Item | Dif |
+|---|------|------|-----|
+| 11.1 | 🔔 | **Espacios compartidos** (parejas / amigos / negocio) — el diferencial del producto. Nacho: **hacerlo antes de la fase BD** (diseño + modelo de datos + UI/flujo local; la sincronización real entre usuarios sí requiere backend). Ligado al plan **Pro** y al campo `subscription`. | 🔴 |
+
 ## Hito 7 — Legal & Privacidad (bloquea publicación)
 | # | Tipo | Item | Dif |
 |---|------|------|-----|
