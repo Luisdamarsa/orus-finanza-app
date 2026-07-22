@@ -172,13 +172,25 @@ export default function PillarCardsGrid({
                 <span style={{ fontSize: 11, fontWeight: 700, color: dc, whiteSpace: "nowrap", flexShrink: 0 }}>{pctTotal}% del total</span>
               </div>
 
-              {/* Barra auto-escalable (solo con presupuesto) */}
-              {hasBudget && (
-                <div style={{ height: 7, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 5, marginBottom: 1 }}>
-                  <div style={{ width: `${coloredPct}%`, background: dc }} />
-                  {over && <div style={{ width: `${overSegPct}%`, background: overColor }} />}
-                </div>
-              )}
+              {/* Barra auto-escalable con 3 bolitas (inicio · gastado · fin de presupuesto).
+                  Track 4px; bolitas 7px del color de su tramo (unidas, sin cortar la barra). */}
+              {hasBudget && (() => {
+                const gastadoPos = over ? 100 : coloredPct;       // dónde va lo gastado
+                const budgetPos = over ? coloredPct : 100;         // dónde va el fin del presupuesto
+                const gastadoColor = over ? overColor : dc;
+                const dotL = (pos) => pos <= 0 ? "0px" : pos >= 100 ? "calc(100% - 7px)" : `calc(${pos}% - 3.5px)`;
+                return (
+                  <div style={{ position: "relative", height: 7, marginTop: 5, marginBottom: 1 }}>
+                    <div style={{ position: "absolute", top: 1.5, left: 0, right: 0, height: 4, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex" }}>
+                      <div style={{ width: `${coloredPct}%`, background: dc }} />
+                      {over && <div style={{ width: `${overSegPct}%`, background: overColor }} />}
+                    </div>
+                    <div style={{ position: "absolute", top: 0, left: 0, width: 7, height: 7, borderRadius: "50%", background: dc }} />
+                    <div style={{ position: "absolute", top: 0, left: dotL(budgetPos), width: 7, height: 7, borderRadius: "50%", background: grayTrack }} />
+                    <div style={{ position: "absolute", top: 0, left: dotL(gastadoPos), width: 7, height: 7, borderRadius: "50%", background: gastadoColor }} />
+                  </div>
+                );
+              })()}
 
               {/* Gastado */}
               <div style={{ fontSize: 14, fontWeight: 800, lineHeight: 1.0, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
