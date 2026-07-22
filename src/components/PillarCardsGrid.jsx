@@ -100,10 +100,16 @@ export default function PillarCardsGrid({
           const over = hasBudget && pc > 100;
           const isAct = activeId === p.id;
           const dc = isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color); // 🆕 color día/noche
-          // 🎨 CAMBIO: Emoji diferente si Ahorro (🎉) o si otro pilar pasado (⚠️)
-          // 🆕 Usar Math.ceil para redondear hacia arriba el exceso (ej: +0.5% → +1%)
-          // 🆕 Consistencia: usar "del total" en lugar de "total"
-          const badgeLabel = filteredSpent > 0 ? (!hasBudget ? `${pc}% del total` : over ? `+${Math.ceil(pc - 100)}% ${p.id === "ahorro" ? "🎉" : "⚠️"}` : `${pc}%`) : "0%";
+          // 🆕 Rediseño: % del total arriba (color pilar), barra auto-escalable, gastado, % presupuesto abajo.
+          const pctTotal = chipPcts[i];
+          const grayTrack = isDark ? "#2D2D3A" : "#E5E3F5"; // "no gastado"
+          const overColor = p.id === "ahorro" ? dc : "#EF4444"; // exceso: verde en Ahorro, rojo en el resto
+          // Barra que se escala sola: dentro del presupuesto → color + gris; pasado → color(presupuesto) + rojo(exceso).
+          let coloredPct = 0, overSegPct = 0;
+          if (hasBudget && historicalBudget > 0) {
+            if (over) { coloredPct = (historicalBudget / filteredSpent) * 100; overSegPct = 100 - coloredPct; }
+            else { coloredPct = Math.min((filteredSpent / historicalBudget) * 100, 100); }
+          }
 
           // 🆕 ¿Este pilar está siendo presionado?
           const isPressingThisPillar = pressingId === p.id;
@@ -140,7 +146,7 @@ export default function PillarCardsGrid({
                     : t.border  // Gris cuando no está activo
                 }`,
                 borderRadius: 11,
-                padding: "1px 8px",
+                padding: "8px 10px",
                 cursor: "pointer",
                 outline: "none", // Quitar el outline del navegador al hacer click
                 transform: isPressingThisPillar
@@ -157,37 +163,30 @@ export default function PillarCardsGrid({
                 transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 1.5, marginBottom: 0 }}>
+              {/* Fila 1: icono + nombre  ·  % del total (color del pilar) */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
-                  <span style={{ fontSize: 15, lineHeight: 1, display: "flex", alignItems: "center" }}>{p.icon}</span>
-                  <span style={{ fontSize: 15, lineHeight: 1, fontWeight: 700, color: t.text, display: "flex", alignItems: "center" }}>{p.label}</span>
+                  <span style={{ fontSize: 15, lineHeight: 1 }}>{p.icon}</span>
+                  <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 700, color: t.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.label}</span>
                 </div>
-                <span
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    padding: "2px 4px",
-                    borderRadius: 6,
-                    background: over ? (p.id === "ahorro" ? withAlpha(p.color, "33") : withAlpha(COLORS.overSoft, "22")) : withAlpha(dc, "22"),
-                    color: over ? (p.id === "ahorro" ? dc : COLORS.gasto) : dc,
-                  }}
-                >
-                  {badgeLabel}
-                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: dc, whiteSpace: "nowrap", flexShrink: 0 }}>{pctTotal}% del total</span>
               </div>
-              <div style={{ fontSize: 12, color: t.sub, marginBottom: 0 }}>{fmt(filteredSpent)}</div>
-              {!hasBudget ? (
-                <div style={{ fontSize: 10, color: t.sub, fontStyle: "italic" }}>Sin presupuesto</div>
-              ) : (
-                <div style={{ height: 8, marginTop: 0, marginBottom: 1.5, borderRadius: 2, background: isDark ? "#2D2D3A" : "#E5E7EB", overflow: "hidden" }}>
-                  <div
-                    style={{
-                      height: "100%",
-                      width: `${Math.min(pc, 100)}%`,
-                      borderRadius: 2,
-                      background: over ? (p.id === "ahorro" ? dc : "#FCA5A5") : dc,
-                    }}
-                  />
+
+              {/* Barra auto-escalable (solo con presupuesto) */}
+              {hasBudget && (
+                <div style={{ height: 8, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 9, marginBottom: 2 }}>
+                  <div style={{ width: `${coloredPct}%`, background: dc }} />
+                  {over && <div style={{ width: `${overSegPct}%`, background: overColor }} />}
+                </div>
+              )}
+
+              {/* Gastado */}
+              <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9 }}>{fmt(filteredSpent)}</div>
+
+              {/* % del presupuesto (solo con presupuesto) */}
+              {hasBudget && (
+                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 1 }}>
+                  {over ? `+${Math.ceil(pc - 100)}% sobre presupuesto` : `${pc}% del presupuesto`}
                 </div>
               )}
             </div>
@@ -218,7 +217,7 @@ export default function PillarCardsGrid({
                   : t.border  // Gris normal cuando no está seleccionado
               }`,
               borderRadius: 11,
-              padding: "1px 8px",
+              padding: "8px 10px",
               cursor: saldo >= 0 ? "pointer" : "default",
               outline: "none",
               transform: pressingId === "saldo"
@@ -236,26 +235,16 @@ export default function PillarCardsGrid({
             }}
             onClick={() => saldo >= 0 && setActiveId(activeId === "saldo" ? null : "saldo")}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 1.5, marginBottom: 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
-                <span style={{ fontSize: 15, lineHeight: 1, display: "flex", alignItems: "center" }}>{saldo < 0 ? "💰" : "💵"}</span>
-                <span style={{ fontSize: 15, lineHeight: 1, fontWeight: 700, color: t.text, display: "flex", alignItems: "center" }}>Saldo</span>
+                <span style={{ fontSize: 15, lineHeight: 1 }}>{saldo < 0 ? "💰" : "💵"}</span>
+                <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 700, color: t.text }}>Saldo</span>
               </div>
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  padding: "2px 4px",
-                  borderRadius: 6,
-                  background: saldo < 0 ? withAlpha(COLORS.gasto, "22") : withAlpha(SALDO_COLOR, "33"),
-                  color: saldo < 0 ? COLORS.gasto : COLORS.neutral,
-                  flexShrink: 0,
-                }}
-              >
+              <span style={{ fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0, color: saldo < 0 ? COLORS.gasto : (isDark ? SALDO_COLOR : "#64748B") }}>
                 {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
               </span>
             </div>
-            <div style={{ fontSize: 12, color: saldo < 0 ? COLORS.gasto : t.sub, marginBottom: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, marginTop: 9, color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
           </div>
