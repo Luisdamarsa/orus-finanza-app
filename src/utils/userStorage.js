@@ -227,4 +227,19 @@ export const userStorage = {
     const value = theme === "light" ? "light" : "dark";
     return userStorage.updateUser({ theme: value });
   },
+
+  /**
+   * Obtiene un valor genérico de las preferencias del usuario
+   */
+  get: (key, defaultValue = undefined) => {
+    const user = userStorage.getUser();
+    return user[key] !== undefined ? user[key] : defaultValue;
+  },
+
+  /**
+   * Guarda un valor genérico en las preferencias del usuario
+   */
+  set: (key, value) => {
+    return userStorage.updateUser({ [key]: value });
+  },
 };

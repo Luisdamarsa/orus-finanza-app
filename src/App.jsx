@@ -104,6 +104,28 @@ function Dashboard() {
   const [voicePrefill, setVoicePrefill] = useState(null);
   // 🆕 Tab de la página de Categorías ("gastos" | "ingresos"); persiste al ir/volver de crear categoría
   const [categoriesTab, setCategoriesTab] = useState("gastos");
+  // 🆕 Estados de Automatizaciones (persistidos en userStorage)
+  const [microphoneEnabled, setMicrophoneEnabled] = useState(() => userStorage.get("microphoneEnabled") !== false);
+  const [notificationListenerEnabled, setNotificationListenerEnabled] = useState(() => userStorage.get("notificationListenerEnabled") === true);
+  // Guardar cambios en userStorage
+  const handleSetMicrophoneEnabled = (value) => {
+    setMicrophoneEnabled(value);
+    userStorage.set("microphoneEnabled", value);
+  };
+  const handleSetNotificationListenerEnabled = (value) => {
+    setNotificationListenerEnabled(value);
+    userStorage.set("notificationListenerEnabled", value);
+  };
+  // Función para abrir Configuración → Accesibilidad
+  const onOpenAccessibilitySettings = () => {
+    if (window.Capacitor) {
+      window.Capacitor.Plugins.App.openUrl?.({
+        url: "android://settings/accessibility"
+      }).catch(() => {
+        console.log("No se puede abrir Settings (dev mode)");
+      });
+    }
+  };
   // Limpia el prefill al salir de "nueva transacción" (para que el lápiz manual no herede datos de voz)
   useEffect(() => {
     if (screen !== "new-transaction") setVoicePrefill(null);
@@ -421,6 +443,9 @@ function Dashboard() {
     resetCategoryEditing, startCategoryEditing,
     editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
     categoriesTab, setCategoriesTab,
+    microphoneEnabled, setMicrophoneEnabled: handleSetMicrophoneEnabled,
+    notificationListenerEnabled, setNotificationListenerEnabled: handleSetNotificationListenerEnabled,
+    onOpenAccessibilitySettings,
     setScreen,
   };
 
