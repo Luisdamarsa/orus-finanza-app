@@ -19,6 +19,7 @@ export default function TransactionScreen({
   editingTransaction,
   actions,
   onBack,
+  prefill,
 }) {
   const isEditing = mode === "edit";
   return (
@@ -33,6 +34,7 @@ export default function TransactionScreen({
         isDark={isDark}
         categories={categories}
         customConcepts={isEditing ? undefined : customConcepts}
+        prefill={isEditing ? undefined : prefill}
       />
     </ScreenShell>
   );

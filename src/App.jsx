@@ -100,6 +100,12 @@ function Dashboard() {
   // 🆕 Búsqueda de movimientos (lupa del FAB): abre Estado 2 y filtra por texto
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  // 🆕 Datos por voz para pre-llenar la pantalla de nueva transacción (se consume al abrirla)
+  const [voicePrefill, setVoicePrefill] = useState(null);
+  // Limpia el prefill al salir de "nueva transacción" (para que el lápiz manual no herede datos de voz)
+  useEffect(() => {
+    if (screen !== "new-transaction") setVoicePrefill(null);
+  }, [screen]);
   // 🆕 Pilar seleccionado para la página de movimientos
   const [customConcepts, setCustomConcepts] = useState([]);
   const {
@@ -391,6 +397,7 @@ function Dashboard() {
     showPeriodPicker, setShowPeriodPicker, showIncomes, setShowIncomes,
     handleSelectPillar, pressingFAB, setPressingFAB, txnActions,
     searchOpen, setSearchOpen, searchQuery, setSearchQuery,
+    setVoicePrefill,
     pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts,
     transactions, categories, customBudgets, setCustomBudgets,
     isLoading, startLoading, stopLoading,
@@ -404,7 +411,7 @@ function Dashboard() {
   const routerProps = {
     screen, isDark, t, setTheme,
     selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
-    categories, customConcepts, txnActions,
+    categories, customConcepts, txnActions, voicePrefill,
     editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
     showIncomes, setShowIncomes,
     selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,

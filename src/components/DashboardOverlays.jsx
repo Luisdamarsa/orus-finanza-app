@@ -25,6 +25,7 @@ export default function DashboardOverlays() {
     showUpdateBalance, saldo, setShowUpdateBalance, isMovementOpen, setIsMovementOpen,
     setFilterType, setMovementOpenedFrom, txnActions,
     setSearchOpen, setSearchQuery, searchOpen, searchQuery,
+    setVoicePrefill,
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
@@ -59,10 +60,18 @@ export default function DashboardOverlays() {
         <FloatingActionButtons isDark={isDark} pressingFAB={pressingFAB} setPressingFAB={setPressingFAB} setScreen={setScreen} onMic={() => setShowVoice(true)} onSearch={openSearch} searchOpen={searchOpen} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onCloseSearch={closeSearch} />
       </ErrorBoundary>
 
-      {/* Captura por voz (sin IA — Web Speech API) */}
+      {/* Dictado por voz (overlay): al terminar, pre-llena y navega a "nueva transacción" para confirmar */}
       {showVoice && (
         <ErrorBoundary fallback={null}>
-          <VoiceCapture isDark={isDark} onClose={() => setShowVoice(false)} onSave={(tx) => txnActions.createTransaction(tx)} />
+          <VoiceCapture
+            isDark={isDark}
+            onClose={() => setShowVoice(false)}
+            onResult={(prefill) => {
+              setVoicePrefill(prefill);
+              setShowVoice(false);
+              setScreen("new-transaction");
+            }}
+          />
         </ErrorBoundary>
       )}
 

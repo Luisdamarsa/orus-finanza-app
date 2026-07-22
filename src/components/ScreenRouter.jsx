@@ -24,7 +24,7 @@ import PreferencesPage from "./PreferencesPage";
 export default function ScreenRouter({
   screen, isDark, t, setTheme,
   selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
-  categories, customConcepts, txnActions,
+  categories, customConcepts, txnActions, voicePrefill,
   editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
   showIncomes, setShowIncomes,
   selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
@@ -47,7 +47,7 @@ export default function ScreenRouter({
   }
 
   if (screen === "new-transaction") {
-    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} onBack={() => setScreen("dashboard")} />;
+    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} prefill={voicePrefill} onBack={() => setScreen("dashboard")} />;
   }
 
   // Editar transacción

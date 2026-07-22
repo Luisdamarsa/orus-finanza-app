@@ -38,6 +38,7 @@ export default function TransactionPage({
   categories = {},
   isEditing = false,
   editingTransaction = null,
+  prefill = null, // 🆕 datos por voz para pre-llenar (modo nuevo)
 }) {
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
@@ -57,13 +58,13 @@ export default function TransactionPage({
   // 🆕 Estado de loading para skeleton
   const [isLoading] = useState(false);
 
-  // Estado del formulario
-  const [desc, setDesc] = useState("");
-  const [rawAmount, setRawAmount] = useState("");
-  const [isIncome, setIsIncome] = useState(false);
-  const [method, setMethod] = useState(null);
-  const [concept, setConcept] = useState(null);
-  const [pillarId, setPillarId] = useState(null);
+  // Estado del formulario (pre-llenado por voz si viene `prefill`)
+  const [desc, setDesc] = useState(prefill?.desc || "");
+  const [rawAmount, setRawAmount] = useState(prefill?.rawAmount || "");
+  const [isIncome, setIsIncome] = useState(prefill?.isIncome || false);
+  const [method, setMethod] = useState(prefill?.method || null);
+  const [concept, setConcept] = useState(prefill?.concept || null);
+  const [pillarId, setPillarId] = useState(prefill?.pillarId || null);
   const [conceptOpen, setConceptOpen] = useState(false);
   const [newConceptText, setNewConceptText] = useState("");
   const [isNewCategory, setIsNewCategory] = useState(false);
