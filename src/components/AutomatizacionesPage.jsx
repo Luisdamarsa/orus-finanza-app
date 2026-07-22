@@ -275,33 +275,33 @@ export default function AutomatizacionesPage({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "12px 14px",
-                  borderRadius: 12,
+                  gap: 14,
+                  padding: "14px 16px",
+                  borderRadius: 14,
                   background: isDark ? "#2D1E4A" : "#F5F3FF",
-                  fontSize: 12,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 700,
                   color: t.text,
                 }}
               >
                 <div
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 8,
+                    width: 48,
+                    height: 48,
+                    borderRadius: 10,
                     background: "#9B6DFF22",
                     border: "1px solid #9B6DFF44",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 18,
+                    fontSize: 24,
                     flexShrink: 0,
                   }}
                 >
                   🎤
                 </div>
                 <span style={{ flex: 1 }}>Micrófono</span>
-                <span style={{ color: microphoneEnabled ? "#22C55E" : "#999", fontSize: 11, fontWeight: 700 }}>
+                <span style={{ color: microphoneEnabled ? "#22C55E" : "#999", fontSize: 12, fontWeight: 700 }}>
                   {microphoneEnabled ? "✓" : "○"}
                 </span>
               </div>
@@ -311,33 +311,33 @@ export default function AutomatizacionesPage({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "12px 14px",
-                  borderRadius: 12,
+                  gap: 14,
+                  padding: "14px 16px",
+                  borderRadius: 14,
                   background: isDark ? "#3D2600" : "#FFFAEB",
-                  fontSize: 12,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 700,
                   color: t.text,
                 }}
               >
                 <div
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 8,
+                    width: 48,
+                    height: 48,
+                    borderRadius: 10,
                     background: "#FDE68A33",
                     border: "1px solid #FDE68A66",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 18,
+                    fontSize: 24,
                     flexShrink: 0,
                   }}
                 >
                   🔔
                 </div>
                 <span style={{ flex: 1 }}>Notificaciones de ORUS</span>
-                <span style={{ color: "#22C55E", fontSize: 11, fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#22C55E", fontSize: 12, fontWeight: 700 }}>✓</span>
               </div>
 
               {/* Accesibilidad para leer notificaciones (con fondo coloreado) */}
@@ -345,33 +345,33 @@ export default function AutomatizacionesPage({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "12px 14px",
-                  borderRadius: 12,
+                  gap: 14,
+                  padding: "14px 16px",
+                  borderRadius: 14,
                   background: isDark ? "#1A2E4A" : "#EBF8FF",
-                  fontSize: 12,
-                  fontWeight: 600,
+                  fontSize: 13,
+                  fontWeight: 700,
                   color: t.text,
                 }}
               >
                 <div
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 8,
+                    width: 48,
+                    height: 48,
+                    borderRadius: 10,
                     background: "#93C5FD33",
                     border: "1px solid #93C5FD66",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 18,
+                    fontSize: 24,
                     flexShrink: 0,
                   }}
                 >
                   🏦
                 </div>
                 <span style={{ flex: 1 }}>Accesibilidad para leer notificaciones</span>
-                <span style={{ color: notificationListenerEnabled ? "#22C55E" : "#999", fontSize: 11, fontWeight: 700 }}>
+                <span style={{ color: notificationListenerEnabled ? "#22C55E" : "#999", fontSize: 12, fontWeight: 700 }}>
                   {notificationListenerEnabled ? "✓" : "○"}
                 </span>
               </div>
