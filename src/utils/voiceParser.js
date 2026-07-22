@@ -104,15 +104,25 @@ export function parseVoiceTransaction(text) {
 
   let amount = 0;
 
-  // 1) Monto en dígitos: "20.000", "20000", "20 mil", "$20.000", "1.5 millones"
-  const digitMatch = lower.match(/\$?\s*(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d+)?)\s*(mil(?:es)?|millon(?:es)?|millón|k)?/);
+  // 1) Monto en dígitos con multiplicador: "20.000", "20000", "20 mil", "$20.000", "1.5 millones", "1.5m"
+  // Busca patrón: $? número (decimales o miles) multiplicador?
+  const digitMatch = lower.match(/\$?\s*(\d+(?:[.,]\d+)?)\s*(mil|miles|millon|millones|m)\s*(?:pesos)?/i) ||
+                     lower.match(/\$?\s*(\d{1,3}(?:[.,]\d{3})+)\s*(mil|miles|millon|millones|m|k)?\s*(?:pesos)?/i) ||
+                     lower.match(/\$?\s*(\d+(?:[.,]\d+)?)\s*(?:mil|miles|millon|millones|m|k)?\s*(?:pesos)?/i);
+
   if (digitMatch) {
-    let num = parseFloat(digitMatch[1].replace(/\.(?=\d{3}\b)/g, "").replace(/,(?=\d{3}\b)/g, "").replace(",", "."));
-    const mult = digitMatch[2];
-    if (mult) {
-      if (/^k$/.test(mult) || /^mil/.test(mult)) num *= 1000;
-      else num *= 1000000;
+    // Extraer número: reemplazar separadores de miles, convertir coma decimal a punto
+    let numStr = digitMatch[1].replace(/\.(?=\d{3}(?:[^0-9]|$))/g, "").replace(/,(?=\d{3}(?:[^0-9]|$))/g, "").replace(",", ".");
+    let num = parseFloat(numStr);
+
+    // Buscar multiplicador (mil, millones, m, k)
+    const multMatch = lower.match(/(\d+(?:[.,]\d+)?)\s*(mil|miles|millon|millones|m|k)\b/i);
+    if (multMatch) {
+      const mult = norm(multMatch[2]);
+      if (mult === "mil" || mult === "miles" || mult === "k") num *= 1000;
+      else if (mult === "millon" || mult === "millones" || mult === "m") num *= 1000000;
     }
+
     amount = Math.round(num);
   }
 
