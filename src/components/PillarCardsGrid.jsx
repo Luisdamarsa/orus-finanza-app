@@ -146,7 +146,7 @@ export default function PillarCardsGrid({
                     : t.border  // Gris cuando no está activo
                 }`,
                 borderRadius: 11,
-                padding: "8px 10px",
+                padding: "4px 10px",
                 cursor: "pointer",
                 outline: "none", // Quitar el outline del navegador al hacer click
                 transform: isPressingThisPillar
@@ -174,18 +174,18 @@ export default function PillarCardsGrid({
 
               {/* Barra auto-escalable (solo con presupuesto) */}
               {hasBudget && (
-                <div style={{ height: 8, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 9, marginBottom: 2 }}>
+                <div style={{ height: 8, borderRadius: 4, background: grayTrack, overflow: "hidden", display: "flex", marginTop: 9, marginBottom: 1 }}>
                   <div style={{ width: `${coloredPct}%`, background: dc }} />
                   {over && <div style={{ width: `${overSegPct}%`, background: overColor }} />}
                 </div>
               )}
 
               {/* Gastado */}
-              <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: hasBudget ? 5 : 9, textAlign: "left" }}>{fmt(filteredSpent)}</div>
 
               {/* % del presupuesto (solo con presupuesto) */}
               {hasBudget && (
-                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 1, textAlign: "left" }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: over ? overColor : dc, marginTop: 0, textAlign: "left" }}>
                   {over ? `+${Math.ceil(pc - 100)}% sobre presupuesto` : `${pc}% del presupuesto`}
                 </div>
               )}
@@ -217,7 +217,7 @@ export default function PillarCardsGrid({
                   : t.border  // Gris normal cuando no está seleccionado
               }`,
               borderRadius: 11,
-              padding: "8px 10px",
+              padding: "4px 10px",
               cursor: saldo >= 0 ? "pointer" : "default",
               outline: "none",
               transform: pressingId === "saldo"
@@ -244,7 +244,7 @@ export default function PillarCardsGrid({
                 {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
               </span>
             </div>
-            <div style={{ fontSize: 15, fontWeight: 800, marginTop: 9, textAlign: "left", color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginTop: 9, textAlign: "left", color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
           </div>
