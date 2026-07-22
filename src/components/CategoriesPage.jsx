@@ -33,7 +33,6 @@ export default function CategoriesPage({
 
   // 🆕 Ref para medir altura de descripción dinámicamente
   const descriptionRef = useRef(null);
-  const containerRef = useRef(null); // reveal por scroll de los pilares
   const [contentTop, setContentTop] = useState(220);
   // 🆕 Hooks para animación de press
   const pressBack = usePress();
@@ -56,18 +55,6 @@ export default function CategoriesPage({
       setContentTop(newContentTop);
     }
   }, []);
-
-  // 🆕 Reveal por scroll: cada pilar aparece desde abajo, uno tras otro
-  useEffect(() => {
-    const root = containerRef.current;
-    if (!root) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
-      { rootMargin: "0px 0px -40px 0px", threshold: 0.05 }
-    );
-    root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [tab]); // re-adjunta al volver al tab Gastos (si no, los pilares quedan invisibles)
 
   return (
     <>
@@ -118,24 +105,20 @@ export default function CategoriesPage({
                 <button
                   key={id}
                   onClick={() => setTab(id)}
-                  style={{ flex: 1, padding: "9px 0", borderRadius: 10, border: `1.5px solid ${tab === id ? "#9B6DFF" : t.border}`, background: tab === id ? "#9B6DFF22" : "transparent", color: tab === id ? "#9B6DFF" : t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  style={{ flex: 1, padding: "4px 0", borderRadius: 10, border: `1.5px solid ${tab === id ? "#9B6DFF" : t.border}`, background: tab === id ? "#9B6DFF22" : "transparent", color: tab === id ? "#9B6DFF" : t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
                   {label}
                 </button>
               ))}
             </div>
 
             {tab === "gastos" && (
-            <div ref={containerRef}>
-            <style>{`
-              .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
-              .reveal.in{opacity:1;transform:none;}
-            `}</style>
-            {/* Pilares y sus categorías */}
+            <div>
+            {/* Pilares y sus categorías (carga desde abajo con .orus-rise) */}
             {PILLARS.map((pillar, pillarIdx) => {
           const pillarCategories = categories[pillar.id] || [];
 
           return (
-            <div key={pillar.id} className="reveal" style={{ marginBottom: 16, transitionDelay: `${pillarIdx * 0.12}s` }}>
+            <div key={pillar.id} className="orus-rise" style={{ marginBottom: 16, animationDelay: `${pillarIdx * 0.1}s` }}>
               {/* Título del Pilar - Con tag/badge (icono + nombre dentro) */}
               <div
                 style={{
