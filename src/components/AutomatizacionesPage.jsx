@@ -97,7 +97,7 @@ export default function AutomatizacionesPage({
               borderRadius: 14,
               padding: "12px",
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 12,
             }}
           >
@@ -146,7 +146,7 @@ export default function AutomatizacionesPage({
               borderRadius: 14,
               padding: "12px",
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 12,
             }}
           >
@@ -193,7 +193,7 @@ export default function AutomatizacionesPage({
               borderRadius: 14,
               padding: "12px",
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 12,
             }}
           >
@@ -229,7 +229,7 @@ export default function AutomatizacionesPage({
 
             {/* Flujo Visual - Una Sola Línea */}
             <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 16, marginBottom: 16, overflow: "auto" }}>
-              <div style={{ display: "inline-flex", alignItems: "flex-start", gap: 12, whiteSpace: "nowrap" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 12, whiteSpace: "nowrap" }}>
                 <div style={{ textAlign: "center", minWidth: "auto" }}>
                   <div style={{ fontSize: 28, marginBottom: 4 }}>💳</div>
                   <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>Haces un<br/>Gasto</div>
@@ -252,32 +252,40 @@ export default function AutomatizacionesPage({
               </div>
             </div>
 
-            {/* Beneficios - Alineado a la Izquierda */}
+            {/* Beneficios - Icon Izq + Texto Derecha */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>✨ Beneficios Principales</div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>⏱️</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Ahorra Tiempo</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No abras la app para cada gasto. Automático al 100%.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>⏱️</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Ahorra Tiempo</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No agregues gastos manualmente</div>
+                </div>
               </div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>📊</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Datos Precisos</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>📊</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Datos Precisos</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
+                </div>
               </div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>🎯</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Control en Tiempo Real</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>🎯</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Control en Tiempo Real</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
+                </div>
               </div>
 
-              <div>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>💡</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Mejora Financiera</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>💡</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Mejora Financiera</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
+                </div>
               </div>
             </div>
 
@@ -302,16 +310,18 @@ export default function AutomatizacionesPage({
             </div>
 
             {/* Impacto */}
-            <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 8 }}>🎯 El Impacto Final</div>
-              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>
-                <strong style={{ color: t.text }}>Con automatización:</strong> Tienes datos 100% completos. Esto te permite:
-              </div>
-              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6, marginLeft: 16 }}>
-                • Identificar patrones de gasto<br/>
-                • Tomar decisiones reales basadas en datos<br/>
-                • Cumplir presupuestos sin overspending<br/>
-                • Ahorrar más viendo exactamente dónde va tu dinero
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>🎯 El Impacto Final</div>
+              <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 12 }}>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10, textAlign: "left" }}>
+                  <strong style={{ color: t.text }}>Con automatización:</strong> Tienes datos 100% completos. Esto te permite:
+                </div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6, textAlign: "left" }}>
+                  <div>• Identificar patrones de gasto</div>
+                  <div>• Tomar decisiones reales basadas en datos</div>
+                  <div>• Cumplir presupuestos sin overspending</div>
+                  <div>• Ahorrar más viendo exactamente dónde va tu dinero</div>
+                </div>
               </div>
             </div>
           </div>
