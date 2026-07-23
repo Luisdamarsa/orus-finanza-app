@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORUS Finanzas - MVP Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1a1830;
+            background: #f8f7ff;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, #9B6DFF 0%, #4F8EF7 100%);
+            color: white;
+            border-radius: 16px;
+        }
+        header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+        section {
+            background: white;
+            margin-bottom: 40px;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #e5e3f5;
+        }
+        h2 {
+            color: #9B6DFF;
+            font-size: 32px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #9B6DFF;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #534AB7;
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .problem-card {
+            background: #f8f7ff;
+            padding: 20px;
+            border-left: 4px solid #9B6DFF;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .solution-card {
+            background: #eeedfe;
+            padding: 20px;
+            border-left: 4px solid #4F8EF7;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .flow-diagram {
+            background: #f0eeff;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .flow-step {
+            display: inline-block;
+            background: white;
+            padding: 15px 20px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 2px solid #9B6DFF;
+            font-weight: 600;
+            min-width: 120px;
+        }
+        .flow-arrow {
+            display: inline-block;
+            color: #9B6DFF;
+            font-size: 24px;
+            margin: 0 10px;
+        }
+        .page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .page-card {
+            background: linear-gradient(135deg, #f8f7ff 0%, #eeedfe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #9B6DFF;
+        }
+        .page-card h4 {
+            color: #9B6DFF;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .page-card p {
+            font-size: 14px;
+            color: #534AB7;
+            line-height: 1.5;
+        }
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .key-feature {
+            display: flex;
+            gap: 20px;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f0eeff;
+            border-radius: 8px;
+        }
+        .key-feature-icon {
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+        .key-feature-content h4 {
+            color: #534AB7;
+            margin-bottom: 8px;
+        }
+        .key-feature-content p {
+            font-size: 14px;
+            color: #7B7A99;
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        li {
+            margin-bottom: 10px;
+            color: #534AB7;
+        }
+        .highlight {
+            background: #fffaed;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #9B6DFF;
+            font-weight: 600;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #9B6DFF, transparent);
+            margin: 40px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7B7A99;
+            font-size: 14px;
+            border-top: 1px solid #e5e3f5;
+            margin-top: 60px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #9B6DFF 0%, #4F8EF7 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-box .number {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .stat-box .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>⚡ ORUS Finanzas</h1>
+            <p>Aplicación de Finanzas Personales Automatizada para Latinoamérica</p>
+        </header>
+
+        <!-- VISIÓN -->
+        <section>
+            <h2>🎯 Visión</h2>
+            <p>ORUS es una aplicación mobile-first de finanzas personales que <span class="highlight">automatiza la captura de gastos</span> mediante lectura de notificaciones bancarias e IA, permitiendo que los usuarios controlen su dinero sin fricción. Además, introduciéndose a los <span class="highlight">Workspaces compartidos</span> para que parejas, amigos y roommates compartan gastos con total transparencia.</p>
+        </section>
+
+        <!-- PROBLEMAS QUE RESUELVE -->
+        <section>
+            <h2>🔴 Problemas que Resuelve</h2>
+
+            <div class="problem-card">
+                <strong>1. Fricción en la captura de gastos</strong>
+                <p>Abrir una app, entrar a transacciones, llenar un formulario cada vez que gastas = abandono. Nadie quiere estar pendiente de eso.</p>
+            </div>
+
+            <div class="problem-card">
+                <strong>2. Falta de contexto en transacciones</strong>
+                <p>¿Cuánto gasté el mes pasado? ¿En qué categoría? Los usuarios no lo saben. Los extractos bancarios son un desorden.</p>
+            </div>
+
+            <div class="problem-card">
+                <strong>3. Presupuestos olvidados</strong>
+                <p>Estableces un presupuesto, pero no hay recordatorio ni alerta cuando te acercas al límite. Se olvida.</p>
+            </div>
+
+            <div class="problem-card">
+                <strong>4. Finanzas compartidas sin transparencia</strong>
+                <p>Parejas/roommates no saben quién gastó qué. No hay un único lugar para ver gastos conjuntos. Conflictos inevitables.</p>
+            </div>
+
+            <div class="problem-card">
+                <strong>5. Apps complejas y lentas</strong>
+                <p>Competidores tienen demasiadas funciones. Interfaz abrumadora. Tiempo de carga lento. Experiencia frustrante.</p>
+            </div>
+        </section>
+
+        <!-- CÓMO LO RESUELVE -->
+        <section>
+            <h2>✅ Cómo ORUS Resuelve Estos Problemas</h2>
+
+            <div class="solution-card">
+                <strong>1. Captura Automática por Voz + Notificaciones</strong>
+                <p>El usuario dice "Gasté 50 mil en cine" → ORUS registra automáticamente. O si recibe notificación de Wallet, propone la transacción pre-llena. Zero fricción.</p>
+            </div>
+
+            <div class="solution-card">
+                <strong>2. Categorización Inteligente</strong>
+                <p>Cada gasto se asigna a un pilar: Fijos, Deuda, Ahorro (+ subcategorías). La IA parse automáticamente "cine" → "Entretenimiento" → "Fijos".</p>
+            </div>
+
+            <div class="solution-card">
+                <strong>3. Presupuestos Visuales con Alertas</strong>
+                <p>Barra de progreso por pillar. Si superan el 80%, alerta. Si llegan a 100%, imposible registrar más (sin hacer override).</p>
+            </div>
+
+            <div class="solution-card">
+                <strong>4. Workspaces Compartidos (Futuro Cercano)</strong>
+                <p>Un "workspace" para pareja/roommates. Todos ven los gastos en real-time. Transparencia total. Sin peleas sobre quién pagó qué.</p>
+            </div>
+
+            <div class="solution-card">
+                <strong>5. UI Minimalista y Rápida</strong>
+                <p>Una sola pantalla: Dashboard. Ves tu saldo, presupuestos, y últimos gastos. Todo en menos de 2 segundos. Limpio. Intuitivo.</p>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- FLUJO DE USUARIO PRINCIPAL -->
+        <section>
+            <h2>🔄 Flujo Principal del Usuario</h2>
+
+            <h3>Primer Acceso (Onboarding)</h3>
+            <div class="flow-diagram">
+                <div class="flow-step">Descarga</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Login</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Permisos</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Dashboard</div>
+            </div>
+
+            <h3>Uso Diario (Flujos Principales)</h3>
+
+            <div class="flow-diagram">
+                <strong style="display: block; margin-bottom: 20px;">Flujo 1: Registrar Gasto por Voz</strong>
+                <div class="flow-step">Abrir Micrófono</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Decir Gasto</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Confirmar</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Dashboard Actualiza</div>
+            </div>
+
+            <div class="flow-diagram">
+                <strong style="display: block; margin-bottom: 20px;">Flujo 2: Recibir Notificación de Wallet</strong>
+                <div class="flow-step">Pagar con NFC</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Wallet Notifica</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">ORUS Propone</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Usuario Confirma</div>
+            </div>
+
+            <div class="flow-diagram">
+                <strong style="display: block; margin-bottom: 20px;">Flujo 3: Revisar Presupuestos</strong>
+                <div class="flow-step">Ir a Dashboard</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Ver Progreso</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Ajustar si Necesita</div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- PÁGINAS PRINCIPALES -->
+        <section>
+            <h2>📱 Páginas y Flujos</h2>
+
+            <div class="page-grid">
+                <div class="page-card">
+                    <div class="icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <p><strong>Qué muestra:</strong> Resumen de saldo total, 3 pilares (Fijos, Deuda, Ahorro) con barra de progreso de presupuesto, últimos gastos registrados.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">🎤</div>
+                    <h4>Micrófono (Automatizaciones)</h4>
+                    <p><strong>Qué muestra:</strong> Estado del micrófono ON/OFF. Al activar, pantalla se oscurece y muestra la transcripción en tiempo real.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">💳</div>
+                    <h4>Notificaciones de Wallet</h4>
+                    <p><strong>Qué muestra:</strong> Toggle ON/OFF. Cuando activo, ORUS lee las notificaciones NFC y propone transacciones.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">➕</div>
+                    <h4>Nueva Transacción</h4>
+                    <p><strong>Qué muestra:</strong> Formulario con monto, categoría, descripción. Se pre-rellena si viene de voz o Wallet.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">🏷️</div>
+                    <h4>Categorías</h4>
+                    <p><strong>Qué muestra:</strong> Dos tabs: Gastos e Ingresos. Cada uno con sus categorías. Opción para crear nueva.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">💰</div>
+                    <h4>Presupuestos</h4>
+                    <p><strong>Qué muestra:</strong> Presupuesto por pillar. Barra visual. Editable por mes o permanente.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">📈</div>
+                    <h4>Movimientos</h4>
+                    <p><strong>Qué muestra:</strong> Listado de transacciones filtradas por pillar. Ordenadas por fecha. Editable.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">💵</div>
+                    <h4>Ingresos</h4>
+                    <p><strong>Qué muestra:</strong> Toggle que muestra/oculta ingresos. Cuando activo, se ve saldo de ingresos vs gastos.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">⚡</div>
+                    <h4>Automatizaciones</h4>
+                    <p><strong>Qué muestra:</strong> Toggles de: Micrófono, Wallet, Atajos iOS. Descripciones de qué hace cada uno.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">🔐</div>
+                    <h4>Permisos</h4>
+                    <p><strong>Qué muestra:</strong> Estado de permisos (Micrófono, Notificaciones). Botón para abrirlos en Ajustes del teléfono.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">⚙️</div>
+                    <h4>Configuración</h4>
+                    <p><strong>Qué muestra:</strong> Menú de: Perfil, Categorías, Presupuestos, Automatizaciones, Permisos, Preferencias, Acerca de.</p>
+                </div>
+
+                <div class="page-card">
+                    <div class="icon">📊</div>
+                    <h4>Informes (Próximo)</h4>
+                    <p><strong>Qué muestra:</strong> Gráficos de gastos por período. Tendencias. Comparativas. Exportar resumen mensual.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- CARACTERÍSTICAS DIFERENCIADORAS -->
+        <section>
+            <h2>⭐ Características Diferenciadoras</h2>
+
+            <div class="key-feature">
+                <div class="key-feature-icon">🎤</div>
+                <div class="key-feature-content">
+                    <h4>Captura por Voz (Web Speech API)</h4>
+                    <p>No requiere IA costosa. Solo reglas de parseo: "Gasté 50 mil en cine" → monto 50,000 + contexto "cine" → categoría "Entretenimiento".</p>
+                </div>
+            </div>
+
+            <div class="key-feature">
+                <div class="key-feature-icon">🔔</div>
+                <div class="key-feature-content">
+                    <h4>Lectura de Notificaciones NFC</h4>
+                    <p>Android: NotificationListenerService lee Wallet automáticamente. iOS: Atajos. No OAuth, no complicaciones.</p>
+                </div>
+            </div>
+
+            <div class="key-feature">
+                <div class="key-feature-icon">👥</div>
+                <div class="key-feature-content">
+                    <h4>Workspaces Compartidos (Futuro)</h4>
+                    <p>Parejas/roommates en un workspace. Ven gastos en real-time. Divisor automático de costos.</p>
+                </div>
+            </div>
+
+            <div class="key-feature">
+                <div class="key-feature-icon">📊</div>
+                <div class="key-feature-content">
+                    <h4>3 Pilares (No Arbitrario)</h4>
+                    <p>Fijos (renta, servicios), Deuda (tarjeta, préstamos), Ahorro (inversión). Simple pero cubre 90% de casos.</p>
+                </div>
+            </div>
+
+            <div class="key-feature">
+                <div class="key-feature-icon">⚡</div>
+                <div class="key-feature-content">
+                    <h4>UI Minimalista</h4>
+                    <p>Una sola pantalla principal (Dashboard). Acciones desde ahí. Menos clicks, menos confusión.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- ESTADÍSTICAS DEL MVP -->
+        <section>
+            <h2>📈 MVP Actual (v10.7.4)</h2>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="number">11</div>
+                    <div class="label">Páginas Funcionales</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">3</div>
+                    <div class="label">Métodos de Captura</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">3</div>
+                    <div class="label">Pilares Financieros</div>
+                </div>
+            </div>
+
+            <h3>Métodos de Captura Activos</h3>
+            <ul>
+                <li><strong>Voz:</strong> Web Speech API + Parser de reglas</li>
+                <li><strong>Wallet (Android):</strong> NotificationListenerService</li>
+                <li><strong>Manual:</strong> Formulario tradicional</li>
+            </ul>
+
+            <h3>Funcionalidades Core</h3>
+            <ul>
+                <li>✅ Registrar gastos/ingresos</li>
+                <li>✅ Categorizar automáticamente</li>
+                <li>✅ Ver presupuestos por pillar</li>
+                <li>✅ Alertas de límite de presupuesto</li>
+                <li>✅ Listar movimientos por pillar</li>
+                <li>✅ Editar/eliminar transacciones</li>
+                <li>✅ Activar automatizaciones (micrófono, wallet, atajos iOS)</li>
+                <li>✅ Tema oscuro/claro</li>
+            </ul>
+
+            <h3>Próximas Fases</h3>
+            <ol>
+                <li>Pulir UI Micrófono (VoiceCapture)</li>
+                <li>Implementar Informes/Reportes</li>
+                <li>Agregar Efectos visuales (tabs, carga)</li>
+                <li>Implementar Skeletons en carga</li>
+                <li>Conectar Base de Datos (Supabase)</li>
+                <li>Implementar Suscripciones (IAP + RevenueCat)</li>
+                <li>Agregar Workspaces Compartidos</li>
+            </ol>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- MODELO DE NEGOCIO -->
+        <section>
+            <h2>💰 Modelo de Negocio</h2>
+
+            <h3>Monetización</h3>
+            <p><strong>Precio Base:</strong> $10,000 COP/mes (~$2.50 USD/mes)</p>
+            <ul>
+                <li>Plan FREE: Acceso básico, máximo 3 categorías personalizadas</li>
+                <li>Plan PLUS: $10,000 COP/mes - Categorías ilimitadas + Reportes avanzados</li>
+                <li>Plan PRO: Workspaces compartidos (futuro, premium)</li>
+            </ul>
+
+            <h3>Distribución</h3>
+            <ul>
+                <li>iOS: App Store (IAP Apple)</li>
+                <li>Android: Google Play (IAP Google)</li>
+                <li>Web: App.orus.com (Stripe futuro)</li>
+            </ul>
+
+            <h3>Retención</h3>
+            <ul>
+                <li>Automatización → Menos fricción → Habitual usage</li>
+                <li>Notificaciones de presupuesto → Engagement recurrente</li>
+                <li>Workspaces → Efecto red (parejas, amigos) → Difusión viral</li>
+            </ul>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>ORUS Finanzas - MVP Document v1.0 | Creado para el equipo de desarrollo</p>
+            <p style="margin-top: 10px; font-size: 12px;">Última actualización: Julio 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

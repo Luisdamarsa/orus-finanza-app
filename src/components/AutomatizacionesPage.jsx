@@ -220,8 +220,113 @@ export default function AutomatizacionesPage({
           </div>
         </div>
 
+        {/* ===== CÓMO FUNCIONA LA AUTOMATIZACIÓN ===== */}
+        <div className="orus-rise" style={{ animationDelay: "0.22s" }}>
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, marginBottom: 16 }}>
+              🔄 Cómo Funciona la Automatización
+            </h3>
+
+            {/* Flujo Visual - Una Sola Línea */}
+            <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 16, marginBottom: 16, overflow: "auto" }}>
+              <div style={{ display: "inline-flex", alignItems: "flex-start", gap: 12, whiteSpace: "nowrap" }}>
+                <div style={{ textAlign: "center", minWidth: "auto" }}>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>💳</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>Haces un<br/>Gasto</div>
+                </div>
+                <div style={{ fontSize: 18, color: "#9B6DFF", marginTop: 8 }}>→</div>
+                <div style={{ textAlign: "center", minWidth: "auto" }}>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>🔔</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>ORUS lo<br/>Capta</div>
+                </div>
+                <div style={{ fontSize: 18, color: "#9B6DFF", marginTop: 8 }}>→</div>
+                <div style={{ textAlign: "center", minWidth: "auto" }}>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>🤖</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>Categoriza</div>
+                </div>
+                <div style={{ fontSize: 18, color: "#9B6DFF", marginTop: 8 }}>→</div>
+                <div style={{ textAlign: "center", minWidth: "auto" }}>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>✅</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>Registrado</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Beneficios - Icon Centrado Verticalmente */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>✨ Beneficios Principales</div>
+
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>⏱️</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Ahorra Tiempo</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No abras la app para cada gasto. Automático al 100%.</div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>📊</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Datos Precisos</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>🎯</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Control en Tiempo Real</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>💡</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Mejora Financiera</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Casos de Uso */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>📱 Casos de Uso Reales</div>
+
+              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 1: Cafés y Almuerzos</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Pagas café con NFC → Wallet notifica → ORUS abre app con transacción pre-llena</div>
+              </div>
+
+              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12, marginBottom: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 2: Compras Urgentes</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Dices "Gasté 200 mil en farmacia" → Micrófono registra → "Salud" categorizado. Listo en 3 segundos.</div>
+              </div>
+
+              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 3: Control de Presupuesto</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ves en el Dashboard que "Fijos" llegó a 85% → Alertas automáticas → Controla gastos innecesarios</div>
+              </div>
+            </div>
+
+            {/* Impacto */}
+            <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 8 }}>🎯 El Impacto Final</div>
+              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>
+                <strong style={{ color: t.text }}>Con automatización:</strong> Tienes datos 100% completos. Esto te permite:
+              </div>
+              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6, marginLeft: 16 }}>
+                • Identificar patrones de gasto<br/>
+                • Tomar decisiones reales basadas en datos<br/>
+                • Cumplir presupuestos sin overspending<br/>
+                • Ahorrar más viendo exactamente dónde va tu dinero
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ===== INFO GENERAL ===== */}
-        <div className="orus-rise" style={{ animationDelay: "0.22s", marginBottom: 20 }}>
+        <div className="orus-rise" style={{ animationDelay: "0.28s", marginBottom: 20 }}>
           <div
             style={{
               textAlign: "center",
