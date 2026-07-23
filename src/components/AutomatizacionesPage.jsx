@@ -252,40 +252,32 @@ export default function AutomatizacionesPage({
               </div>
             </div>
 
-            {/* Beneficios - Icon Centrado Verticalmente */}
+            {/* Beneficios - Alineado a la Izquierda */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>✨ Beneficios Principales</div>
 
-              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }}>⏱️</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Ahorra Tiempo</div>
-                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No abras la app para cada gasto. Automático al 100%.</div>
-                </div>
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>⏱️</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Ahorra Tiempo</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No abras la app para cada gasto. Automático al 100%.</div>
               </div>
 
-              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }}>📊</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Datos Precisos</div>
-                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
-                </div>
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>📊</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Datos Precisos</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
               </div>
 
-              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }}>🎯</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Control en Tiempo Real</div>
-                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
-                </div>
+              <div style={{ marginBottom: 10 }}>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>🎯</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Control en Tiempo Real</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
               </div>
 
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }}>💡</div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Mejora Financiera</div>
-                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
-                </div>
+              <div>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>💡</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Mejora Financiera</div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
               </div>
             </div>
 
