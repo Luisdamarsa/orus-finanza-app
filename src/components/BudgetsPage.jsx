@@ -43,14 +43,8 @@ export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSucc
   const [isLoading] = useState(false);
   // 🆕 Usar ref para guardar valores iniciales solo una vez
   const initialCategoryBudgetsRef = useRef(null);
-  // 🆕 Ref para medir altura de descripción dinámicamente
-  const descriptionRef = useRef(null);
-  const revealRef = useRef(null); // reveal por scroll de los pilares
-  const [contentTop, setContentTop] = useState(220);
   // 🆕 Estado para track de inputs siendo editados (raw values)
   const [editingInputs, setEditingInputs] = useState({});
-  // 🆕 Hook para animación de press en botón de atrás
-  const pressBack = usePress();
   // 🆕 Hook para animación de press en botón de guardar
   const pressSave = usePress();
 
@@ -61,27 +55,7 @@ export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSucc
     }
   }, [categoryBudgets]);
 
-  // 🆕 Medir altura dinámicamente de la descripción
-  useEffect(() => {
-    if (descriptionRef.current) {
-      const descriptionHeight = descriptionRef.current.offsetHeight;
-      // Descripción comienza en top: 164, más su altura, más padding bottom 6px
-      const newContentTop = 164 + descriptionHeight + 6;
-      setContentTop(newContentTop);
-    }
-  }, []);
 
-  // 🆕 Reveal por scroll: cada pilar aparece desde abajo, uno tras otro
-  useEffect(() => {
-    const root = revealRef.current;
-    if (!root) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
-      { rootMargin: "0px 0px -40px 0px", threshold: 0.05 }
-    );
-    root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
 
   // 🆕 Detectar cambios comparando con valores iniciales
   useEffect(() => {
@@ -226,46 +200,9 @@ export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSucc
     <PageLayout
       isDark={isDark}
       onBack={onBack}
-      title={
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-        }}>
-          <span style={{ fontSize: 22 }}>💰</span>
-          Presupuestos
-        </div>
-      }
-      pressBack={pressBack}
-      description={
-        <>
-          {/* Descripción 1 */}
-          <div style={{
-            fontSize: 13,
-            color: t.sub,
-            marginBottom: 4,
-            lineHeight: 1.4,
-            fontWeight: 400,
-            textAlign: "left",
-          }}>
-            Define cuánto quieres gastar en cada categoría y pilar. Los cambios se guardan automáticamente.
-          </div>
-
-          {/* Descripción 2 (Ayuda) */}
-          <div style={{
-            fontSize: 12,
-            color: t.sub,
-            opacity: 0.75,
-            fontStyle: "italic",
-            textAlign: "left",
-          }}>
-            Expande el Pilar para ver presupuestos de cada categoría
-          </div>
-        </>
-      }
-      descriptionRef={descriptionRef}
-      contentTopOffset={contentTop}
+      title="Presupuestos"
+      icon="💰"
+      description="Define cuánto quieres gastar en cada categoría y pilar. Los cambios se guardan automáticamente."
     >
       <style>{`
         ::-webkit-scrollbar { display: none; }
@@ -284,20 +221,19 @@ export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSucc
         skeleton={<MenuListSkeleton isDark={isDark} itemCount={10} />}
         isDark={isDark}
       >
-          <>
-            <style>{`
-              .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
-              .reveal.in{opacity:1;transform:none;}
-            `}</style>
-            {/* Lista de pilares */}
-            <div ref={revealRef} style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
+        <style>{`
+          .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
+          .reveal.in{opacity:1;transform:none;}
+        `}</style>
+        {/* Lista de pilares */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
               {PILLARS.map((pillar, pillarIdx) => {
             // 🆕 Traer categorías del pilar
             const pillarCategories = categories[pillar.id] || [];
             const isExpanded = expandedPillars[pillar.id] || false;
 
             return (
-              <div key={pillar.id} className="reveal" style={{ transitionDelay: `${pillarIdx * 0.12}s` }}>
+              <div key={pillar.id} style={{ transitionDelay: `${pillarIdx * 0.12}s` }}>
                 {/* Tarjeta del pilar - clickeable excepto el input */}
                 <div
                   data-pillar-card="true"
@@ -493,8 +429,7 @@ export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSucc
             );
               })}
             </div>
-          </>
-        </LoadingWrapper>
+      </LoadingWrapper>
     </PageLayout>
 
     {/* Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
