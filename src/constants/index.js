@@ -70,7 +70,7 @@ export const PILLARS = [
     darkColor: "#8B5CF6",
     bg: "#F5F3FF",
     darkBg: "#1e1635",
-    icon: "🎉",
+    icon: "✨",
     budget: 400000,  // 🆕
     history: [],     // 🆕
     get spent() { return getPillarTotals("ocio").spent; },
@@ -80,10 +80,10 @@ export const PILLARS = [
     id: "varios",
     label: "Varios",
     color: "#FDE68A",
-    darkColor: "#FDE68A",
+    darkColor: "#D97706",
     bg: "#FFFBEB",
     darkBg: "#231c0d",
-    icon: "🛒",
+    icon: "🎲",
     budget: null,  // 🆕 Sin presupuesto fijo
     history: [],   // 🆕
     get spent() { return getPillarTotals("varios").spent; },
@@ -117,8 +117,8 @@ export const PILLAR_MAP = {
   fijos: { color: "#93C5FD", icon: "🏠", label: "Fijos" },
   deuda: { color: "#FCA5A5", icon: "💰", label: "Deuda" },
   ahorro: { color: "#86EFAC", icon: "🐖", label: "Ahorro" },
-  ocio: { color: "#C4B5FD", icon: "🎉", label: "Ocio" },
-  varios: { color: "#FDE68A", icon: "🛒", label: "Varios" },
+  ocio: { color: "#C4B5FD", icon: "✨", label: "Ocio" },
+  varios: { color: "#FDE68A", icon: "🎲", label: "Varios" },
   ingreso: { color: "#FCD34D", icon: "💵", label: "Ingreso" }
 };
 

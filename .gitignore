@@ -18,6 +18,13 @@ dist-ssr
 PROD_V2.md
 PROD_V3.md
 
+# Python cache
+__pycache__/
+*.pyc
+
+# Output regenerable del generador de informes (duplica public/informes/)
+informes-anuales/output/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

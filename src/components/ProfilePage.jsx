@@ -2,230 +2,195 @@ import { useState, useEffect } from "react";
 import { userStorage } from "../utils/userStorage";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
-import PageLayout from "./PageLayout";
+import { useTheme } from "../hooks/useTheme";
 import DeleteAccountModal from "./DeleteAccountModal";
-import { CheckmarkIcon, TrashIcon, CopyIcon, GoogleIcon, AppleIcon } from "../icons/Icons";
-import LoadingWrapper from "./LoadingWrapper";
-import { FormSkeleton } from "./LoadingSkeleton";
 
 /**
  * Página de Perfil del usuario
- * Muestra y permite editar:
- * - Nombre de visualización (editable)
- * - Datos personales (read-only)
- * - Preferencias: moneda, idioma
+ * Layout clay exacto con tarjeta centrada y formularios
  */
 export default function ProfilePage({
-  isDark,
   onBack,
-  onSaveSuccess, // Callback para navegar de vuelta a Settings
+  onSaveSuccess,
+  setScreen,
 }) {
-  // 🆕 Usar el servicio de popups
+  const { isDark } = useTheme();
   const popup = usePopup();
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99", inputBg: "#2D2D3A", inputText: "#F0EEFF", disabled: "#9B99B3", disabledBg: "#3D3D4D" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0", inputBg: "#F1F0FF", inputText: "#1A1830", disabled: "#7B7A99", disabledBg: "#F5F3FF" };
 
-  // Estado local para los campos editables
+  // Tokens de diseño
+  const tokens = {
+    accent: "#9B6DFF",
+    accentSoft: "rgba(155,109,255,0.16)",
+    surface: "linear-gradient(155deg,#211d2c 0%,#141220 100%)",
+    raised: "linear-gradient(155deg,#262231 0%,#17151f 100%)",
+    shadowSm: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+    text: "#F5F3FF",
+    sub: "#8B87A3",
+    muted: "#5F5C74",
+    border: "rgba(139,135,163,0.15)",
+    inputBg: "rgba(53,48,69,0.4)",
+    errorGrad: "linear-gradient(155deg,#FF8A8A,#E4574B)",
+    errorShadow: "0 14px 26px -12px rgba(228,87,75,0.5)",
+  };
+
+  const pressBack = usePress();
+  const pressLogout = usePress();
+  const pressDelete = usePress();
+  const pressSave = usePress();
+
+  const [user, setUser] = useState(null);
   const [displayName, setDisplayName] = useState("");
-  // (Idioma y moneda se movieron a la página Preferencias.)
-
-  // Modal de eliminación de cuenta
+  const [hasChanged, setHasChanged] = useState(false);
+  const [copiedUserId, setCopiedUserId] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
 
-  // Datos del usuario (read-only)
-  const [user, setUser] = useState(null);
-
-  // Estados para detección de cambios
-  const [hasChanged, setHasChanged] = useState(false);
-  // Estado para mostrar que se copió el User ID
-  const [copiedUserId, setCopiedUserId] = useState(false);
-
-  // 🆕 Estado de loading para skeleton
-  const [isLoading, setIsLoading] = useState(true);
-
-  // 🆕 Usar hook de press effect para todos los botones
-  const pressBack = usePress();
-  const pressDelete = usePress();
-  const pressGuardar = usePress();
-  const pressLogout = usePress();
-
-  // Función para generar User ID único (10 caracteres alfanuméricos)
-  // Cargar datos del usuario al montar
+  // Cargar datos del usuario
   useEffect(() => {
     const userData = userStorage.getUser();
     setUser(userData);
     setDisplayName(userData.displayName);
-    setHasChanged(false); // Reset cambios al montar
-    setIsLoading(false); // 🆕 Terminar loading
   }, []);
 
-  // 🆕 Detectar cambios en tiempo real
-  const checkForChanges = () => {
-    if (!user) return;
-    const changed = displayName !== user.displayName;
-    setHasChanged(changed);
-  };
-
-  // Ejecutar checkForChanges cuando cualquier campo cambia
+  // Detectar cambios
   useEffect(() => {
-    checkForChanges();
+    if (!user) return;
+    setHasChanged(displayName !== user.displayName);
   }, [displayName, user]);
 
-  // Manejar cambios en displayName
   const handleDisplayNameChange = (value) => {
     setDisplayName(value);
   };
 
-  // 🆕 Función para copiar User ID al portapapeles
   const handleCopyUserId = async () => {
-    if (!user || !user.userId) return;
-
+    if (!user?.userId) return;
     try {
       await navigator.clipboard.writeText(user.userId);
       setCopiedUserId(true);
-      // Mostrar "Copiado" por 2 segundos
       setTimeout(() => setCopiedUserId(false), 2000);
     } catch (err) {
       console.error("Error al copiar:", err);
     }
   };
 
-  // 🆕 Guardar cambios
   const handleSave = () => {
-    if (!hasChanged) return; // No hacer nada si no hay cambios
-
+    if (!hasChanged) return;
     try {
-      userStorage.updateUser({
-        displayName,
-      });
-
+      userStorage.updateUser({ displayName });
       setHasChanged(false);
-
-      // 🆕 Mostrar popup de éxito usando el servicio
       popup.showEditPopup('Perfil');
     } catch (err) {
       console.error("Error al actualizar perfil:", err);
       popup.showErrorPopup("No se pudo actualizar el perfil");
-      return;
-    }
-
-    // Llamar a callback y regresa a Settings
-    if (onSaveSuccess) {
-      onSaveSuccess();
-    } else {
-      onBack();
     }
   };
 
-  if (!user) return null; // Esperar a que carguen los datos
-
-  // Componente para el botón Cerrar Sesión en el título
-  const logoutButtonInTitle = (
-    <button
-      onClick={onBack}
-      {...pressLogout.handlers}
-      style={{
-        position: "absolute",
-        right: 22,
-        padding: "8px 14px",
-        borderRadius: 6,
-        border: `1px solid ${t.border}`,
-        background: isDark ? "#252535" : "#F5F3FF",
-        color: t.text,
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: "pointer",
-        outline: "none",
-        ...pressLogout.getPressStyle({ scale: 0.95 }),
-      }}
-      onMouseEnter={(e) => {
-        if (!pressLogout.pressing) {
-          e.target.style.background = isDark ? "#2D2D3A" : "#F0EFF8";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!pressLogout.pressing) {
-          e.target.style.background = isDark ? "#252535" : "#F5F3FF";
-        }
-      }}>
-      Cerrar Sesión
-    </button>
-  );
+  if (!user) return null;
 
   return (
     <>
-    <PageLayout
-      isDark={isDark}
-      onBack={onBack}
-      title={
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-        }}>
-          <span style={{ fontSize: 22 }}>👤</span>
-          Perfil
-        </div>
-      }
-      pressBack={pressBack}
-      titleExtra={logoutButtonInTitle}
-    >
-      {/* LoadingWrapper para mostrar skeleton mientras carga */}
-      <LoadingWrapper
-        isLoading={isLoading}
-        skeleton={<FormSkeleton isDark={isDark} fieldCount={4} />}
-        isDark={isDark}
-      >
-        <>
-            {/* SECCIÓN 1: Nombre de Usuario (SIEMPRE Editable) */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8 }}>
-            <label
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: t.sub,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                flex: "0 0 auto",
-              }}>
-              Nombre de usuario
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => handleDisplayNameChange(e.target.value)}
-              style={{
-                flex: 1,
-                padding: "6px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.inputBg,
-                color: t.inputText,
-                fontSize: 14,
-                fontWeight: 600,
-                boxSizing: "border-box",
-                outline: "none",
-                transition: "all 0.2s",
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "#7C3AED";
-                e.target.style.boxShadow = "0 0 0 3px rgba(124, 58, 237, 0.1)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = t.border;
-                e.target.style.boxShadow = "none";
-              }}
-            />
-          </div>
+      <div style={{ position: "absolute", inset: 0, overflowY: "auto", padding: "26px 22px 60px", background: "#000000", textAlign: "left", fontFamily: "Manrope" }}>
 
-          {/* User ID - Alineado a la derecha debajo del input */}
-          {user && user.userId && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end", marginLeft: 0 }}>
-              <span style={{ fontSize: 11, color: t.sub, fontWeight: 500 }}>
-                User ID: <strong style={{ color: t.text, fontFamily: "monospace" }}>{user.userId}</strong>
+        {/* HEADER */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* Botón Atrás */}
+          <button
+            onClick={onBack}
+            {...pressBack.handlers}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              background: "none",
+              border: "none",
+              color: tokens.sub,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              padding: "6px 0",
+              fontFamily: "Manrope",
+            }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+            Atrás
+          </button>
+
+          {/* Botón Cerrar Sesión */}
+          <button
+            onClick={() => setScreen("onboarding")}
+            {...pressLogout.handlers}
+            style={{
+              padding: "9px 16px",
+              borderRadius: 14,
+              border: "none",
+              background: tokens.raised,
+              color: tokens.text,
+              fontWeight: 700,
+              fontSize: 12,
+              cursor: "pointer",
+              boxShadow: tokens.shadowSm,
+              fontFamily: "Manrope",
+              ...pressLogout.getPressStyle({ scale: 0.97 }),
+            }}>
+            Cerrar Sesión
+          </button>
+        </div>
+
+        {/* TÍTULO con ícono */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 20 }}>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 11,
+              background: tokens.accentSoft,
+              color: tokens.accent,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+          </div>
+          <span style={{ fontSize: 18, fontWeight: 800, color: tokens.text, fontFamily: "Manrope" }}>Perfil</span>
+        </div>
+
+        {/* TARJETA: Nombre de Usuario */}
+        <div
+          style={{
+            padding: "16px 18px",
+            borderRadius: 16,
+            background: tokens.surface,
+            boxShadow: tokens.shadowSm,
+            marginTop: 22,
+            textAlign: "left",
+            fontFamily: "Manrope",
+          }}>
+          <div style={{ fontSize: "10.5px", fontWeight: 800, color: tokens.sub, letterSpacing: "0.5px", textTransform: "uppercase" }}>
+            Nombre de Usuario
+          </div>
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              background: "none",
+              border: "none",
+              fontSize: 15,
+              fontWeight: 800,
+              color: tokens.text,
+              marginTop: 6,
+              padding: 0,
+              outline: "none",
+              fontFamily: "Manrope",
+            }}
+          />
+          {user.userId && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, justifyContent: "flex-start" }}>
+              <span style={{ fontSize: "10.5px", fontWeight: 600, color: tokens.muted }}>
+                User ID: {user.userId}
               </span>
               <button
                 onClick={handleCopyUserId}
@@ -233,273 +198,197 @@ export default function ProfilePage({
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  padding: "0",
+                  padding: 0,
                   display: "flex",
                   alignItems: "center",
-                  transition: "all 0.2s",
-                  flexShrink: 0,
+                  opacity: 0.7,
+                  transition: "opacity 0.2s",
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.opacity = "0.7";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.opacity = "1";
-                }}
-                title={copiedUserId ? "¡Copiado!" : "Copiar User ID"}>
-                <CopyIcon width={14} height={14} color={copiedUserId ? "#22C55E" : t.sub} strokeWidth={2} />
+                onMouseEnter={(e) => e.target.style.opacity = "1"}
+                onMouseLeave={(e) => e.target.style.opacity = "0.7"}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={copiedUserId ? "#22C55E" : tokens.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
               {copiedUserId && (
-                <span style={{ fontSize: 10, color: "#22C55E", fontWeight: 600 }}>Copiado</span>
+                <span style={{ fontSize: "10.5px", fontWeight: 600, color: "#22C55E" }}>Copiado</span>
               )}
             </div>
           )}
         </div>
 
-        {/* SECCIÓN 2: Datos Personales (Read-only) */}
-        <div style={{ marginTop: 4, paddingTop: 28, borderTop: `1px solid ${t.border}`, marginBottom: 28 }}>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: t.sub,
-              marginBottom: 12,
-              textTransform: "uppercase",
-              textAlign: "left",
-            }}>
+        {/* SECCIÓN: Información Personal */}
+        <div style={{ marginTop: 26, fontFamily: "Manrope" }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: tokens.sub, letterSpacing: "0.6px", textTransform: "uppercase" }}>
             Información Personal
           </div>
 
           {/* Nombre(s) */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                flex: "0 0 auto",
-              }}>
+          <div style={{ marginTop: 12 }}>
+            <label style={{ fontSize: "10.5px", fontWeight: 700, color: tokens.sub, display: "block", marginBottom: 6, fontFamily: "Manrope", textTransform: "uppercase" }}>
               Nombre(s)
             </label>
             <input
               type="text"
-              value={user.firstName}
+              value={user.firstName || ""}
               disabled
               style={{
-                flex: 1,
-                padding: "6px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.disabledBg,
-                color: t.disabled,
-                fontSize: 14,
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 14,
+                border: `1px solid ${tokens.border}`,
+                background: tokens.inputBg,
+                color: tokens.muted,
+                fontSize: "13.5px",
                 fontWeight: 600,
                 boxSizing: "border-box",
-                cursor: "not-allowed",
+                outline: "none",
+                fontFamily: "Manrope",
               }}
             />
           </div>
 
           {/* Apellido(s) */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                flex: "0 0 auto",
-              }}>
+          <div style={{ marginTop: 12 }}>
+            <label style={{ fontSize: "10.5px", fontWeight: 700, color: tokens.sub, display: "block", marginBottom: 6, fontFamily: "Manrope", textTransform: "uppercase" }}>
               Apellido(s)
             </label>
             <input
               type="text"
-              value={user.lastName}
+              value={user.lastName || ""}
               disabled
               style={{
-                flex: 1,
-                padding: "6px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.disabledBg,
-                color: t.disabled,
-                fontSize: 14,
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 14,
+                border: `1px solid ${tokens.border}`,
+                background: tokens.inputBg,
+                color: tokens.muted,
+                fontSize: "13.5px",
                 fontWeight: 600,
                 boxSizing: "border-box",
+                outline: "none",
+                fontFamily: "Manrope",
+              }}
+            />
+          </div>
+
+          {/* Correo Electrónico */}
+          <div style={{ marginTop: 12 }}>
+            <label style={{ fontSize: "10.5px", fontWeight: 700, color: tokens.sub, display: "block", marginBottom: 6, fontFamily: "Manrope", textTransform: "uppercase" }}>
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              value={user.email || ""}
+              disabled
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "14px 16px",
+                borderRadius: 14,
+                border: `1px solid ${tokens.border}`,
+                background: tokens.inputBg,
+                color: tokens.muted,
+                fontSize: "13.5px",
+                fontWeight: 600,
+                outline: "none",
+                fontFamily: "Manrope",
                 cursor: "not-allowed",
               }}
             />
           </div>
 
-          {/* Correo */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                flex: "0 0 auto",
-              }}>
-              Correo Electrónico
-            </label>
-            <div style={{ flex: 1, position: "relative" }}>
-              <input
-                type="email"
-                value={user.email}
-                disabled
-                style={{
-                  width: "100%",
-                  padding: "6px 14px 6px 34px",
-                  borderRadius: 8,
-                  border: `1px solid ${t.border}`,
-                  background: t.disabledBg,
-                  color: t.disabled,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  boxSizing: "border-box",
-                  cursor: "not-allowed",
-                }}
-              />
-              {user.authProvider === "google" && (
-                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
-                  <GoogleIcon size={16} />
-                </span>
-              )}
-              {user.authProvider === "apple" && (
-                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", display: "flex", pointerEvents: "none" }}>
-                  <AppleIcon size={16} color={isDark ? "#F0EEFF" : "#1A1830"} />
-                </span>
-              )}
-            </div>
-          </div>
-
           {/* Teléfono */}
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: t.sub,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                flex: "0 0 auto",
-              }}>
+          <div style={{ marginTop: 12 }}>
+            <label style={{ fontSize: "10.5px", fontWeight: 700, color: tokens.sub, display: "block", marginBottom: 6, fontFamily: "Manrope", textTransform: "uppercase" }}>
               Teléfono
             </label>
             <input
               type="tel"
-              value={user.phone}
+              value={user.phone || ""}
               disabled
               style={{
-                flex: 1,
-                padding: "6px 14px",
-                borderRadius: 8,
-                border: `1px solid ${t.border}`,
-                background: t.disabledBg,
-                color: t.disabled,
-                fontSize: 14,
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: 14,
+                border: `1px solid ${tokens.border}`,
+                background: tokens.inputBg,
+                color: tokens.muted,
+                fontSize: "13.5px",
                 fontWeight: 600,
                 boxSizing: "border-box",
-                cursor: "not-allowed",
+                outline: "none",
+                fontFamily: "Manrope",
               }}
             />
           </div>
         </div>
 
+        {/* BOTÓN Eliminar Cuenta */}
+        <button
+          onClick={() => setDeleteAccountModalOpen(true)}
+          {...pressDelete.handlers}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 16,
+            border: "none",
+            background: tokens.errorGrad,
+            color: "#fff",
+            fontWeight: 800,
+            fontSize: "13.5px",
+            marginTop: 26,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            boxShadow: tokens.errorShadow,
+            fontFamily: "Manrope",
+            ...pressDelete.getPressStyle({ scale: 0.97 }),
+          }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+          Eliminar Cuenta
+        </button>
+      </div>
 
-        {/* SECCIÓN 4: Zona de Peligro - Eliminar Cuenta */}
-        <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${t.border}` }}>
-          <button
-            onClick={() => setDeleteAccountModalOpen(true)}
-            {...pressDelete.handlers}
-            style={{
-              width: "100%",
-              padding: "6px 14px",
-              borderRadius: 8,
-              border: "none",
-              background: "#EF4444",
-              fontSize: 14,
-              fontWeight: 700,
-              boxSizing: "border-box",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              ...pressDelete.getPressStyle(),
-            }}
-            onMouseEnter={(e) => {
-              if (!pressDelete.pressing) {
-                e.target.style.background = "#DC2626";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!pressDelete.pressing) {
-                e.target.style.background = "#EF4444";
-              }
-            }}
-          >
-            {/* Icono de papelera centralizado */}
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                background: "rgba(255, 255, 255, 0.2)",
-                flexShrink: 0,
-              }}>
-              <TrashIcon width={14} height={14} color="#FFFFFF" strokeWidth={2.5} />
-            </div>
-            <span style={{ color: "#FFFFFF" }}>Eliminar Cuenta</span>
-          </button>
-        </div>
-        </>
-      </LoadingWrapper>
-    </PageLayout>
+      {/* Modal de Eliminación de Cuenta */}
+      <DeleteAccountModal
+        isDark={isDark}
+        isOpen={deleteAccountModalOpen}
+        onCancel={() => setDeleteAccountModalOpen(false)}
+        onConfirm={() => {
+          popup.showDeletePopup('cuenta');
+          setDeleteAccountModalOpen(false);
+        }}
+      />
 
-    {/* Modal de Eliminación de Cuenta */}
-    <DeleteAccountModal
-      isDark={isDark}
-      isOpen={deleteAccountModalOpen}
-      onCancel={() => setDeleteAccountModalOpen(false)}
-      onConfirm={() => {
-        popup.showDeletePopup('cuenta');
-        setDeleteAccountModalOpen(false);
-      }}
-    />
-
-    {/* Botón Guardar Flotante (✓) - Esquina Inferior Derecha */}
-    <div style={{ position: "fixed", bottom: 24, right: 22 }}>
+      {/* FAB flotante - Guardar cambios */}
       <button
         onClick={handleSave}
-        onPointerDown={() => hasChanged && pressGuardar.handlers.onPointerDown()}
-        onPointerUp={() => pressGuardar.handlers.onPointerUp()}
-        onPointerLeave={() => pressGuardar.handlers.onPointerLeave()}
         disabled={!hasChanged}
+        onPointerDown={() => hasChanged && pressSave.handlers.onPointerDown()}
+        onPointerUp={() => pressSave.handlers.onPointerUp()}
+        onPointerLeave={() => pressSave.handlers.onPointerLeave()}
         style={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
           width: 52,
           height: 52,
-          borderRadius: "50%",
+          borderRadius: 17,
           border: "none",
-          background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+          background: "linear-gradient(155deg,#B18CFF,#8B5CF6)",
           cursor: hasChanged ? "pointer" : "not-allowed",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          opacity: hasChanged ? (pressGuardar.pressing ? 0.9 : 1) : 0.45,
-          ...(hasChanged ? pressGuardar.getPressStyle({ scale: 0.93 }) : {}),
-        }}
-      >
-        <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
+          boxShadow: "0 18px 30px -10px rgba(139,92,246,0.65), inset 0 1px 0 rgba(255,255,255,0.3)",
+          opacity: hasChanged ? 1 : 0.4,
+          transition: "opacity 0.2s ease",
+          ...(hasChanged ? pressSave.getPressStyle({ scale: 0.94 }) : {}),
+        }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       </button>
-    </div>
     </>
   );
 }

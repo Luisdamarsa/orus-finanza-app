@@ -104,6 +104,7 @@ export default function PageHeader({
                 borderRadius: "50%",
                 background: "#FFFFFF",
                 transform: toggleValue ? "translateX(20px)" : "translateX(0)",
+                transition: "none",
               }}
             />
           </button>

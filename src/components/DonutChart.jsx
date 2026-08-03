@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "../hooks/useTheme";
+import { DARK, LIGHT } from "../constants/tokens";
 import { fmt } from "../utils/formatters";
 
 /**
@@ -45,14 +47,19 @@ export default function DonutChart({
   innerR,
   activeId,
   onSelect,
-  isDark,
+  isDark, // Aún recibido como prop para compatibilidad
   total,
   totalSpent,
   pillarSpends,
   hasSaldoAsignado,
   saldoValue,
   selectedPeriod,
+  showCenterText = true,
 }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark: isDarkTheme } = useTheme();
+  const tokens = isDarkTheme ? DARK : LIGHT;
+
   const [hovered, setHovered] = useState(null);
 
   // 🆕 Estado de animación del donut
@@ -143,7 +150,13 @@ export default function DonutChart({
       key={`donut-${selectedPeriod?.year}-${selectedPeriod?.month}`}
       width={cx * 2}
       height={cy * 2}
-      style={{ overflow: "visible", outline: "none" }}>
+      style={{
+        overflow: "visible",
+        outline: "none",
+        perspective: "1000px",
+        transform: "rotateX(8deg)",
+        filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.5))"
+      }}>
       {/* Segmentos del donut */}
       {arcs.map((arc) => {
         const isActive = activeId === arc.id;
@@ -204,11 +217,11 @@ export default function DonutChart({
         );
       })}
 
-      {/* Centro del donut (día: claro para que el texto oscuro se lea; noche: negro igual que antes) */}
-      <circle cx={cx} cy={cy} r={innerR} fill={isDark ? "#000000" : "#F8F7FF"} />
+      {/* 🆕 Centro del donut - con color del fondo según tema */}
+      <circle cx={cx} cy={cy} r={innerR} fill={tokens.bg} />
 
       {/* Texto dinámico en el centro */}
-      {displayValue !== undefined && (
+      {showCenterText && displayValue !== undefined && (
         <g>
           {/* Etiqueta (arriba si hay referencia, al medio si no) */}
           <text
@@ -218,7 +231,7 @@ export default function DonutChart({
             style={{
               fontSize: 13,
               fontWeight: 600,
-              fill: isDark ? "#7B7A99" : "#9896B0",
+              fill: tokens.sub,
             }}
           >
             {displayLabel}
@@ -232,7 +245,7 @@ export default function DonutChart({
             style={{
               fontSize: 22,
               fontWeight: 800,
-              fill: isDark ? "#F0EEFF" : "#1A1830",
+              fill: tokens.text,
             }}
           >
             {fmt(displayValue)}
@@ -247,7 +260,7 @@ export default function DonutChart({
               style={{
                 fontSize: 15,
                 fontWeight: 400,
-                fill: isDark ? "#7B7A99" : "#9896B0",
+                fill: tokens.sub,
               }}
             >
               de {fmt(displayReference)}

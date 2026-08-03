@@ -9,7 +9,6 @@ export default function SettingsScreen({ isDark, t, setScreen, showIncomes, setS
   return (
     <ScreenShell bg={t.bg}>
       <SettingsPage
-        isDark={isDark}
         onBack={() => setScreen("dashboard")}
         onBudgets={() => setScreen("budgets")}
         onProfile={() => setScreen("profile")}
@@ -22,6 +21,8 @@ export default function SettingsScreen({ isDark, t, setScreen, showIncomes, setS
         onPermissions={() => setScreen("permissions")}
         onSubscription={() => setScreen("subscription")}
         onPreferences={() => setScreen("preferences")}
+        onInformes={() => setScreen("reports")}
+        onLogout={() => setScreen("login")}
         showIncomes={showIncomes}
         setShowIncomes={setShowIncomes}
       />

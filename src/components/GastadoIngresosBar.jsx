@@ -1,4 +1,5 @@
 import { usePress } from "../hooks/usePress";
+import { DARK, LIGHT, SHADOWS, RADIUS } from "../constants/tokens";
 
 /**
  * GastadoIngresosBar.jsx
@@ -9,8 +10,9 @@ import { usePress } from "../hooks/usePress";
 export default function GastadoIngresosBar({ isDark, t, fmt, filterType, setFilterType, setFilteredPillar, isMovementOpen, movementOpenedFrom, setIsMovementOpen, setMovementOpenedFrom, totalSpent, incomingTotal }) {
   const pressGastado = usePress();
   const pressIngresos = usePress();
+  const tokens = isDark ? DARK : LIGHT;
   return (
-    <div style={{ display: "flex", gap: 6, height: 30 }}>
+    <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           <button
             onClick={() => {
               // Lógica: toggle solo si se abrió desde GASTADO, si no solo cambiar filtro
@@ -32,9 +34,22 @@ export default function GastadoIngresosBar({ isDark, t, fmt, filterType, setFilt
               }
             }}
             {...pressGastado.handlers}
-            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", background: filterType === "gastado" ? "#EF444433" : (isDark ? "#1f1010" : "#FEF2F2"), border: `1px solid ${filterType === "gastado" ? "#EF444488" : (isDark ? "#5c1a1a44" : "#FCA5A533")}`, borderRadius: 8, padding: "6px 7px", cursor: "pointer", outline: "none", ...pressGastado.getPressStyle() }}>
-            <span style={{ fontSize: 9, fontWeight: 700, color: filterType === "gastado" ? "#EF4444" : t.sub }}>GASTADO</span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#EF4444" }}>-{fmt(totalSpent)}</span>
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: filterType === "gastado" ? "rgba(255,138,138,0.2)" : tokens.surfaceFlat,
+              border: `1.5px solid ${filterType === "gastado" ? "#FF8A8A" : tokens.border}`,
+              borderRadius: "12px",
+              padding: "8px 12px",
+              cursor: "pointer",
+              outline: "none",
+              boxShadow: filterType === "gastado" ? SHADOWS.shadowSm : "none",
+              ...pressGastado.getPressStyle()
+            }}>
+            <span style={{ fontSize: 9.5, fontWeight: 800, color: filterType === "gastado" ? "#FF8A8A" : tokens.sub }}>GASTADO</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#FF8A8A" }}>-{fmt(totalSpent)}</span>
           </button>
           <button
             onClick={() => {
@@ -57,9 +72,22 @@ export default function GastadoIngresosBar({ isDark, t, fmt, filterType, setFilt
               }
             }}
             {...pressIngresos.handlers}
-            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", background: filterType === "ingresos" ? "#22C55E33" : (isDark ? "#0a1a10" : "#F0FDF4"), border: `1px solid ${filterType === "ingresos" ? "#22C55E88" : (isDark ? "#16532d44" : "#86EFAC33")}`, borderRadius: 8, padding: "6px 7px", cursor: "pointer", outline: "none", ...pressIngresos.getPressStyle() }}>
-            <span style={{ fontSize: 9, fontWeight: 700, color: filterType === "ingresos" ? "#22C55E" : t.sub }}>INGRESOS</span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#22C55E" }}>+{fmt(incomingTotal)}</span>
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: filterType === "ingresos" ? "rgba(134,239,172,0.2)" : tokens.surfaceFlat,
+              border: `1px solid ${filterType === "ingresos" ? "#86EFAC" : tokens.border}`,
+              borderRadius: "12px",
+              padding: "4px 6px",
+              cursor: "pointer",
+              outline: "none",
+              boxShadow: filterType === "ingresos" ? SHADOWS.shadowSm : "none",
+              ...pressIngresos.getPressStyle()
+            }}>
+            <span style={{ fontSize: 9.5, fontWeight: 800, color: filterType === "ingresos" ? "#86EFAC" : tokens.sub }}>INGRESOS</span>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#86EFAC" }}>+{fmt(incomingTotal)}</span>
           </button>
         </div>
   );

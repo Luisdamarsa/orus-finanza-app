@@ -1,13 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { rowStyles, getClayShadow } from "../utils/clayStyles";
+import { getStaggerDelay } from "../constants/animations";
 
 const PERMISSIONS = [
   { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "Optimo" },
   { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Microfono", why: "Para registrar gastos por voz: gasté 20 mil en el súper.", kind: "mic", req: "Optimo" },
 ];
 
-export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
+export default function PermissionsPage({ onBack, onOpenPrivacy }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
   const pressBack = usePress();
   const [status, setStatus] = useState({});
   const [hint, setHint] = useState(false);
@@ -24,9 +30,15 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
     return () => io.disconnect();
   }, []);
 
-  const t = isDark
-    ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   const set = (id, v) => setStatus((s) => ({ ...s, [id]: v }));
 
@@ -96,7 +108,16 @@ export default function PermissionsPage({ isDark, onBack, onOpenPrivacy }) {
         </div>
 
         {PERMISSIONS.map((p, i) => (
-          <div key={p.id} className="reveal" style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: 12, marginTop: 12, display: "flex", alignItems: "center", gap: 12, transitionDelay: (i * 0.09) + "s" }}>
+          <div key={p.id} className="reveal" style={{
+            ...rowStyles(t, isDark),
+            padding: 12,
+            marginTop: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            borderRadius: RADIUS.lg,
+            animationDelay: getStaggerDelay(i),
+          }}>
             {iconEl(p)}
             <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>

@@ -4,6 +4,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 // 🆕 Importar PopupProvider
 import { PopupProvider } from "./services/PopupService";
 
+// 🆕 Importar ThemeProvider y useTheme
+import { ThemeProvider } from "./context/ThemeContext";
+import { useTheme } from "./hooks/useTheme";
+
 // 🆕 Importar hooks
 import { useCategories } from "./hooks/useCategories";
 import { useCategoryEditing } from "./hooks/useCategoryEditing";
@@ -69,9 +73,9 @@ function getBudgetForMonth(pillarId, month, year, customBudgets) {
 }
 
 function Dashboard() {
-  // 🆕 Tema persistido (Preferencias). Default: noche. setTheme guarda + re-renderiza toda la app.
-  const [isDark, setIsDark] = useState(() => userStorage.getTheme() !== "light");
-  const setTheme = (dark) => { setIsDark(dark); userStorage.setTheme(dark ? "dark" : "light"); };
+  // 🆕 Tema desde ThemeContext (centralizado)
+  const { isDark, setIsDark } = useTheme();
+  const setTheme = setIsDark; // Alias para compatibilidad con código existente
   const [scrollY, setScrollY] = useState(0);
   const {
     selectedPeriod, setSelectedPeriod,
@@ -94,7 +98,7 @@ function Dashboard() {
   // 🆕 Rastrear pantalla anterior para navegación correcta (ej. Permisos → volver a Automatizaciones, no a Configuración)
   // Solo registra pantallas "principales", no pantallas hijas/modales (permissions, privacy-perms, terms, etc.)
   const [previousScreen, setPreviousScreen] = useState(null);
-  const mainScreens = ["dashboard", "settings", "automatizaciones", "profile", "categories", "budgets", "movimientos", "add-category", "show-incomes"];
+  const mainScreens = ["dashboard", "settings", "automatizaciones", "profile", "categories", "budgets", "movimientos", "add-category", "show-incomes", "notifications-setup", "shortcuts-setup", "reports", "my-reports"];
   useEffect(() => {
     if (screen && mainScreens.includes(screen) && screen !== previousScreen) {
       setPreviousScreen(screen);
@@ -473,13 +477,15 @@ function Dashboard() {
   );
 }
 
-// 🆕 Exporta Dashboard envuelto en ErrorBoundary y PopupProvider
+// 🆕 Exporta Dashboard envuelto en ThemeProvider, ErrorBoundary y PopupProvider
 export default function AppWithErrorBoundary() {
   return (
-    <ErrorBoundary>
-      <PopupProvider>
-        <Dashboard />
-      </PopupProvider>
-    </ErrorBoundary>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <PopupProvider>
+          <Dashboard />
+        </PopupProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }

@@ -1,4 +1,6 @@
+import { useEffect, useState, useRef } from "react";
 import { usePress } from "../hooks/usePress";
+import { DARK, LIGHT, SHADOWS } from "../constants/tokens";
 import { fmt } from "../utils/formatters";
 import CatBar from "./CatBar";
 import { getCategoryName } from "../utils/categoryUtils";
@@ -8,8 +10,9 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
 /**
  * PillarBarsPopup.jsx
  *
- * ESTADO 1: Popup modal que muestra desglose de categorías de un pilar
- * Se abre al clickear una tarjeta en PillarCardsGrid
+ * Popup modal O tarjeta inline que muestra desglose de categorías de un pilar
+ * - Modal: Se abre al clickear una tarjeta en PillarCardsGrid (isInline = false)
+ * - Inline: Se renderiza reemplazando el grid en DashboardExpandedState (isInline = true)
  *
  * Muestra:
  * - Nombre del pilar (con icono)
@@ -19,12 +22,12 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  *
  * Props:
  *   pillar - Objeto del pilar {id, label, icon, color, budget}
- *   categories - {pillarId: [cat1, cat2, ...]} categorías del usuario
  *   onClose - Callback para cerrar el popup
  *   onViewMovements - Callback al clickear "Ver movimientos"
  *   isDark - Tema oscuro
  *   transactions - Array de transacciones
  *   selectedPeriod - Período seleccionado
+ *   isInline - Si true, renderiza solo la tarjeta sin overlay modal
  */
 export default function PillarBarsPopup({
   pillar,
@@ -33,9 +36,82 @@ export default function PillarBarsPopup({
   isDark,
   transactions,
   selectedPeriod,
+  isInline = false,
 }) {
   // 🆕 Hook para animación de press en botón de ver movimientos
   const pressViewMovements = usePress();
+
+  // 🆕 Estado para expandir/colapsar bottom sheet
+  const [isExpanded, setIsExpanded] = useState(false);
+  const dragStartRef = useRef(null);
+  const categoriesRef = useRef(null);
+
+  // 🆕 Handlers para detectar drag
+  const handleDragStart = (e) => {
+    // Ignorar botones (cerrar + ver movimientos)
+    if (e.target.closest("button")) return;
+    // Ignorar categorías SOLO si NO está expandido (cuando está expandido, se puede jalar para colapsar)
+    if (!isExpanded && categoriesRef.current?.contains(e.target)) return;
+    // Almacenar posición Y + estado expandido actual
+    dragStartRef.current = { y: e.clientY, wasExpanded: isExpanded };
+    console.log(`🎯 Drag iniciado - Estado: ${isExpanded ? "EXPANDIDO" : "COLAPSADO"}`);
+  };
+
+  // 🆕 Detectar drag a nivel de documento
+  useEffect(() => {
+    const handleDragMove = (e) => {
+      if (!dragStartRef.current) return;
+      const diff = dragStartRef.current.y - e.clientY; // positivo = arriba, negativo = abajo
+      const wasExpanded = dragStartRef.current.wasExpanded;
+
+      if (diff > 8) {
+        // Jalar hacia arriba → expandir
+        console.log("⬆️  Jalado hacia ARRIBA - EXPANDIENDO");
+        setIsExpanded(true);
+        dragStartRef.current = null;
+      } else if (diff < -8) {
+        // Jalar hacia abajo
+        if (wasExpanded) {
+          // Si estaba expandido → colapsar
+          console.log("⬇️  Jalado hacia ABAJO - COLAPSANDO (estaba expandido)");
+          setIsExpanded(false);
+        } else {
+          // Si estaba colapsado → cerrar
+          console.log("⬇️  Jalado hacia ABAJO - CERRANDO (estaba colapsado)");
+          onClose();
+        }
+        dragStartRef.current = null;
+      }
+    };
+
+    const handleDragEnd = () => {
+      dragStartRef.current = null;
+    };
+
+    document.addEventListener("pointermove", handleDragMove);
+    document.addEventListener("pointerup", handleDragEnd);
+    document.addEventListener("pointerleave", handleDragEnd);
+
+    return () => {
+      document.removeEventListener("pointermove", handleDragMove);
+      document.removeEventListener("pointerup", handleDragEnd);
+      document.removeEventListener("pointerleave", handleDragEnd);
+    };
+  }, [onClose]);
+
+  // 🆕 Bloquear scroll del documento cuando el bottom sheet está abierto
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflowY = "hidden";
+    document.documentElement.style.overflowY = "hidden";
+
+    return () => {
+      document.body.style.overflowY = originalBodyOverflow;
+      document.documentElement.style.overflowY = originalHtmlOverflow;
+    };
+  }, []);
 
   const t = isDark
     ? { border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
@@ -88,80 +164,117 @@ export default function PillarBarsPopup({
 
   const totalSpent = Object.values(categorySpent).reduce((sum, v) => sum + v, 0);
 
+  // Si es inline, solo renderizar la tarjeta sin overlay
+  if (isInline) {
+    return (
+      <div style={{ borderRadius: 22, background: isDark ? "linear-gradient(155deg, #211d2c 0%, #141220 100%)" : "#FFFFFF", boxShadow: SHADOWS.shadowLg || "0 -20px 40px rgba(0,0,0,0.5)", animation: "clayRise 0.35s cubic-bezier(0.32, 0.72, 0.12, 1)", display: "flex", flexDirection: "column", padding: "18px" }}>
+        <style>{`@keyframes clayRise { from { transform:translateY(20px);opacity:0 } to { transform:translateY(0);opacity:1 } }`}</style>
+        {pillar.budget != null && (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, paddingBottom: 14, borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 12, background: pillar.color + "28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{pillar.icon}</div>
+              <div><div style={{ fontSize: 15, fontWeight: 800, color: "#F5F3FF" }}>{pillar.label}</div></div>
+            </div>
+            {(() => { const isOver = totalSpent > pillar.budget; const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF"; return <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>{fmt(totalSpent)}</div>{isMonthPeriod && <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>de {fmt(pillar.budget)}</div>}</div>; })()}
+          </div>
+        )}
+        <div style={{ maxHeight: "300px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const category = ALL_CATS.find(cat => cat.id === catId); let catName = getCategoryName(catId); if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) { const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`; catName = getAttributeAtDate(category, "name", queryDate); } return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
+        <button onClick={onViewMovements} {...pressViewMovements.handlers} style={{ width: "100%", padding: 13, borderRadius: 14, border: "none", background: "rgba(155,109,255,0.16)", color: "#9B6DFF", fontSize: 13, fontWeight: 800, cursor: "pointer", marginTop: "auto", flexShrink: 0, ...pressViewMovements.getPressStyle() }}>Ver movimientos →</button>
+      </div>
+    );
+  }
+
   return (
     <div
-      onPointerDown={onClose}
+      onPointerDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }}
       style={{
-        position: "absolute",
+        position: "fixed",
         inset: 0,
         zIndex: 50,
         background: "rgba(0,0,0,0.55)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px 18px",
-        animation: "fadeIn 0.2s ease",
+        animation: "fadeIn 0.25s ease",
+        pointerEvents: "auto",
       }}
     >
-      <style>{`@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }@keyframes popIn  { from { transform:scale(0.92);opacity:0 } to { transform:scale(1);opacity:1 } }`}</style>
+      <style>{`@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }@keyframes clayRise { from { transform:translateY(100%);opacity:0 } to { transform:translateY(0);opacity:1 } }`}</style>
 
       <div
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          // Ignorar clicks en el botón de cerrar
+          if (e.target.closest("button")) return;
+          handleDragStart(e);
+        }}
         style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
           width: "100%",
-          maxWidth: 300,
-          background: isDark ? "#1A1A2B" : "#FFFFFF",
-          borderRadius: 20,
-          border: `1px solid ${t.border}`,
-          padding: "16px",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.4)",
-          animation: "popIn 0.22s cubic-bezier(.34,1.56,.64,1)",
+          maxHeight: isExpanded ? "90vh" : "60vh",
+          boxSizing: "border-box",
+          background: isDark ? "linear-gradient(155deg, #211d2c, #141220)" : "#FFFFFF",
+          borderRadius: "22px 22px 0 0",
+          boxShadow: SHADOWS.shadowLg || "0 -20px 40px rgba(0,0,0,0.5)",
+          animation: "clayRise 0.35s cubic-bezier(0.32, 0.72, 0.12, 1)",
+          display: "flex",
+          flexDirection: "column",
+          zIndex: 51,
+          pointerEvents: "auto",
+          transition: "maxHeight 0.3s ease",
+          padding: "18px",
         }}
       >
-        {/* Header: Nombre del pilar + botón cerrar */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ fontSize: 18 }}>{pillar.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: t.text }}>{pillar.label}</div>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              background: isDark ? "#2D2D3A" : "#F0EFF8",
-              border: "none",
-              fontSize: 11,
-              cursor: "pointer",
-              color: t.sub,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Presupuesto total (si existe) */}
+        {/* Header + Presupuesto en la misma línea */}
         {pillar.budget != null && (
-          <div style={{ textAlign: "center", marginBottom: 14, paddingBottom: 14, borderBottom: `1px solid ${t.border}` }}>
-            <div style={{ fontSize: 9, color: pillar.color, fontWeight: 700, letterSpacing: 0.4 }}>
-              {pillar.label.toUpperCase()}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, paddingBottom: 14, borderBottom: `1px solid rgba(255,255,255,0.07)`, cursor: "grab", userSelect: "none" }}>
+            {/* Izquierda: Ícono + Nombre */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 34,
+                height: 34,
+                borderRadius: 12,
+                background: pillar.color + "28",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 20,
+                flexShrink: 0,
+              }}>
+                {pillar.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: "#F5F3FF" }}>{pillar.label}</div>
+              </div>
             </div>
-            <div style={{ fontSize: 14, fontWeight: 900, color: t.text, lineHeight: 1.1, marginTop: 4 }}>
-              {fmt(totalSpent)}
-            </div>
-            {isMonthPeriod && (
-              <div style={{ fontSize: 9, color: t.sub, marginTop: 2 }}>de {fmt(pillar.budget)}</div>
-            )}
+
+            {/* Derecha: Monto + Presupuesto */}
+            {(() => {
+              const isOver = totalSpent > pillar.budget;
+              const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF";
+              return (
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>
+                    {fmt(totalSpent)}
+                  </div>
+                  {isMonthPeriod && (
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>
+                      de {fmt(pillar.budget)}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
 
-        {/* Categorías - desde el prop categories (datos del usuario) - ahora con IDs */}
-        <div style={{ marginBottom: 12 }}>
+        {/* Categorías - scroll interno, máximo 5 visibles (o todas si expandido) */}
+        <div ref={categoriesRef} style={{ maxHeight: isExpanded ? "calc(90vh - 280px)" : "228px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12, transition: "maxHeight 0.3s ease" }}>
+          <style>{`::-webkit-scrollbar { display: none; }`}</style>
           {/* Filas desde categorySpent (incluye categorías borradas con gasto) para cuadrar con el total y con Movimientos */}
           {Object.keys(categorySpent)
             .sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0))
@@ -191,20 +304,22 @@ export default function PillarBarsPopup({
             })}
         </div>
 
-        {/* Botón Ver movimientos */}
+        {/* Botón Ver movimientos - FIJO AL FINAL */}
         <button
           onClick={onViewMovements}
           {...pressViewMovements.handlers}
           style={{
             width: "100%",
-            padding: "10px",
-            borderRadius: 10,
+            padding: "13px",
+            borderRadius: 14,
             border: "none",
-            background: pillar.color + "22",
-            color: pillar.color,
-            fontSize: 12,
-            fontWeight: 700,
+            background: "rgba(155,109,255,0.16)",
+            color: "#9B6DFF",
+            fontSize: 13,
+            fontWeight: 800,
             cursor: "pointer",
+            marginTop: "auto",
+            flexShrink: 0,
             ...pressViewMovements.getPressStyle(),
           }}
         >

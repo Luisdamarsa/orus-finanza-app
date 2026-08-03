@@ -87,10 +87,11 @@ export default function ColorBar({
   return (
     <div style={{
       display: "flex",
-      height: 7,
-      borderRadius: 5,
+      height: 8,
+      borderRadius: 4,
       overflow: "hidden",
       gap: 2,
+      marginTop: 14,
     }}>
       {segments.map((seg) => {
         const isAnimated = animatingSegments.has(seg.id);

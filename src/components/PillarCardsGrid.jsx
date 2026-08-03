@@ -4,6 +4,10 @@ import { PILLARS } from "../constants";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 import { COLORS, withAlpha } from "../services/colorService";
 import { DAY_PILLAR_COLOR } from "../constants";
+import { useTheme } from "../hooks/useTheme";
+import { RADIUS } from "../constants/tokens";
+import { cardStyles, getClayShadow, rowStyles } from "../utils/clayStyles";
+import { getPillarColor, getPillarSoftBg } from "../utils/colorUtils";
 
 /**
  * PillarCardsGrid.jsx
@@ -37,9 +41,13 @@ export default function PillarCardsGrid({
   SALDO_COLOR,
   setSelectedPillarDetail,
   setShowPillarBars,
+  showPillarBars,
   isDark,
   t,
 }) {
+  // 🆕 Tema desde ThemeContext para colores dinámicos
+  const { isDark: isDarkTheme } = useTheme();
+
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 
@@ -49,12 +57,11 @@ export default function PillarCardsGrid({
     setPressingId(pillarId);
   };
 
-  // 🆕 Handler para acción real (se ejecuta al SOLTAR / onClick)
-  const handlePillarSelect = (pillarId, pillar) => {
-    console.log("✅ CLICK - Seleccionando pilar:", pillarId);
-    setActiveId(pillarId);
-    setSelectedPillarDetail(pillar);
-    setShowPillarBars(true);
+  // 🆕 Handler para acción real (toggle: mismo pilar = deselecciona, otro pilar = selecciona)
+  const handlePillarSelect = (pillarId) => {
+    console.log("✅ CLICK - Toggle pilar:", pillarId, "activeId actual:", activeId);
+    // Toggle: si es el mismo pilar, deselecciona (null); si no, selecciona
+    setActiveId((prev) => (prev === pillarId ? null : pillarId));
   };
 
   const handlePillarPointerUp = () => {
@@ -68,11 +75,22 @@ export default function PillarCardsGrid({
     setPressingId(null);
   };
 
+  // 🆕 Reorden personalizado: fijos, deuda, ocio, varios, ahorro
+  const PILLARS_DISPLAY_ORDER = ["fijos", "deuda", "ocio", "varios", "ahorro"];
+  const orderedPillars = PILLARS_DISPLAY_ORDER.map(id => PILLARS.find(p => p.id === id));
+
+  // 🆕 Calcular si la última tarjeta debe ocupar 2 columnas
+  const totalCards = orderedPillars.length + (hasSaldo ? 1 : 0);
+  const isLastCardOdd = totalCards % 2 === 1;
+
   return (
     <>
       {/* Grid de tarjetas de pilares */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
-        {PILLARS.map((p, i) => {
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 0, width: "100%", boxSizing: "border-box", gridAutoRows: "max-content", alignItems: "stretch" }}>
+        {orderedPillars.map((p, i) => {
+          // 🆕 Si es la última tarjeta de pilares Y el total es impar, ocupar 2 columnas
+          const isLastPillar = i === PILLARS.length - 1;
+          const shouldSpan = isLastPillar && isLastCardOdd && !hasSaldo;
           const filteredSpent = pillarSpends[p.id];
           // 🆕 Obtener presupuesto del mes (personalizado o base)
           const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
@@ -115,13 +133,16 @@ export default function PillarCardsGrid({
           const isPressingThisPillar = pressingId === p.id;
           // 🆕 Entrada escalonada por FILA (grid de 2 columnas): fila 0, 1, 2...
           const row = Math.floor(i / 2);
+          // 🆕 Color dinámico del pilar según modo
+          const pillarColor = getPillarColor(p.id, isDarkTheme);
 
           return (
-            <div key={p.id} className="orus-rise" style={{ animationDelay: `${0.12 + row * 0.08}s` }}>
+            <div key={p.id} className="orus-rise" style={{ animationDelay: `${0.12 + row * 0.08}s`, gridColumn: shouldSpan ? "1 / -1" : "auto" }}>
             <div
+              className="clay-hoverable"
               onClick={(e) => {
                 e.stopPropagation(); // Detener click que resetea activeId
-                handlePillarSelect(p.id, p); // 🆕 Ejecutar acción al hacer click (soltar)
+                handlePillarSelect(p.id); // 🆕 Toggle pilar seleccionado
               }}
               onPointerDown={(e) => {
                 e.stopPropagation(); // Prevenir que el pointerDown se propague
@@ -130,31 +151,31 @@ export default function PillarCardsGrid({
               onPointerUp={handlePillarPointerUp}
               onPointerLeave={handlePillarPointerLeave}
               style={{
-                // 🎨 CAMBIO: Resalta en verde (Ahorro) o rojo (otros) si pasa presupuesto
+                // 🆕 Estado EXCEDIDO (over) vs Normal
                 background: over
                   ? p.id === "ahorro"
-                    ? isDark ? withAlpha(p.color, "33") : withAlpha(p.color, "22")  // Verde para Ahorro
-                    : isDark ? withAlpha(COLORS.gasto, "33") : withAlpha(COLORS.overSoft, "22")  // Rojo para otros
+                    ? "rgba(34,197,94,0.24)"     // Ahorro excedido: verde positivo
+                    : "rgba(239,68,68,0.24)"    // Otros: rojo gasto
                   : isAct
-                    ? (isDark ? p.darkBg : p.bg)  // Con color cuando está activo
-                    : (isDark ? "#252535" : "#FFFFFF"),  // Gris cuando no está activo
-                border: `1.5px solid ${
-                  over
-                    ? (p.id === "ahorro" ? withAlpha(p.color, "88") : withAlpha(COLORS.gasto, "88"))  // Rojo/Verde si pasa presupuesto
-                    : isAct
-                    ? p.color  // 🆕 Color del pilar cuando está seleccionado
-                    : t.border  // Gris cuando no está activo
-                }`,
-                borderRadius: 11,
-                padding: "4px 10px",
-                cursor: "pointer",
+                    ? (isDark ? p.darkBg : p.bg)
+                    : (isDark ? "linear-gradient(155deg, #211d2c 0%, #141220 100%)" : "linear-gradient(155deg, #ffffff 0%, #f5f3ff 100%)"),
+                border: "none",
+                borderRadius: "14px",
+                padding: "8px",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+                boxShadow: "0 20px 40px -16px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+                cursor: showPillarBars ? "default" : "pointer",
                 outline: "none", // Quitar el outline del navegador al hacer click
+                pointerEvents: showPillarBars ? "none" : "auto",
                 transform: isPressingThisPillar
                   ? "scale(0.98) translateY(1px)"  // Empequeñece al presionar
                   : isAct
                   ? "scale(1.10) translateY(-2px)"  // 🆕 Crece cuando está seleccionado
                   : "scale(1) translateY(0)",
-                opacity: isPressingThisPillar ? 0.7 : 1,
+                opacity: showPillarBars ? 0.5 : (isPressingThisPillar ? 0.7 : 1),
                 boxShadow: isPressingThisPillar
                   ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)"  // Hundida al presionar
                   : isAct
@@ -163,18 +184,22 @@ export default function PillarCardsGrid({
                 transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             >
-              {/* Fila 1: icono + nombre  ·  % del total (color del pilar) */}
+              {/* Fila 1: icono + nombre  ·  % del total (color del pilar) - solo si hay gasto > 0 */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
-                  <span style={{ fontSize: 15, lineHeight: 1 }}>{p.icon}</span>
+                  <div style={{ width: 24, height: 24, borderRadius: 8, background: getPillarSoftBg(p.id, isDarkTheme), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontSize: 16, lineHeight: 1 }}>{p.icon}</span>
+                  </div>
                   <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 700, color: t.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.label}</span>
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 700, color: dc, whiteSpace: "nowrap", flexShrink: 0 }}>{pctTotal}% del total</span>
+                {filteredSpent > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: dc, whiteSpace: "nowrap", flexShrink: 0 }}>{pctTotal}% del total</span>}
               </div>
 
-              {/* Barra auto-escalable con 3 bolitas (inicio · gastado · fin de presupuesto).
-                  Track 4px; bolitas 7px del color de su tramo (unidas, sin cortar la barra). */}
-              {hasBudget && (() => {
+              {/* Espaciador/Barra: reserva espacio incluso si no hay barra */}
+              <div style={{ minHeight: 12, marginTop: 4, marginBottom: 2 }}>
+                {/* Barra auto-escalable con 3 bolitas (inicio · gastado · fin de presupuesto).
+                    Track 4px; bolitas 7px del color de su tramo (unidas, sin cortar la barra). Solo si hay gasto > 0 */}
+                {hasBudget && filteredSpent > 0 && (() => {
                 const gastadoPos = over ? 100 : coloredPct;       // dónde va lo gastado
                 const budgetPos = over ? coloredPct : 100;         // dónde va el fin del presupuesto
                 const gastadoColor = over ? overColor : dc;
@@ -193,16 +218,17 @@ export default function PillarCardsGrid({
                   </div>
                 );
               })()}
+              </div>
 
-              {/* Gastado */}
-              <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.0, color: isDark ? "#F0EEFF" : "#1A1830", marginTop: 10, textAlign: "left" }}>{fmt(filteredSpent)}</div>
-
-              {/* % del presupuesto (solo con presupuesto) */}
-              {hasBudget && (
-                <div style={{ fontSize: 11, fontWeight: 600, lineHeight: 1.15, color: over ? overColor : dc, marginTop: 1, textAlign: "left" }}>
-                  {over ? `+${Math.ceil(pc - 100)}% sobre presupuesto` : `${pc}% del presupuesto`}
-                </div>
-              )}
+              {/* Fila: Monto (izq) + % presupuesto (der) - MISMO LINE */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 4, marginTop: 6, minWidth: 0 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.0, color: isDark ? "#F0EEFF" : "#1A1830", flexShrink: 0 }}>{fmt(filteredSpent)}</span>
+                {hasBudget && filteredSpent > 0 && (
+                  <span style={{ fontSize: 8.5, fontWeight: 700, lineHeight: 1.25, color: over ? overColor : dc, whiteSpace: "normal", textAlign: "right", minWidth: 0, maxWidth: "60px" }}>
+                    {over ? `+${Math.ceil(pc - 100)}% sobre\npresupuesto` : `${pc}% presup.`}
+                  </span>
+                )}
+              </div>
             </div>
             </div>
           );
@@ -210,7 +236,7 @@ export default function PillarCardsGrid({
 
         {/* Tarjeta de Saldo */}
         {hasSaldo && (
-          <div className="orus-rise" style={{ animationDelay: `${0.12 + Math.floor(PILLARS.length / 2) * 0.08}s` }}>
+          <div className="orus-rise" style={{ animationDelay: `${0.12 + Math.floor(PILLARS.length / 2) * 0.08}s`, gridColumn: isLastCardOdd ? "1 / -1" : "auto" }}>
           <div
             onClick={(e) => e.stopPropagation()} // Detener click que resetea activeId
             onPointerDown={(e) => {
@@ -221,17 +247,16 @@ export default function PillarCardsGrid({
             onPointerLeave={() => setPressingId(null)}
             style={{
               background: saldo < 0
-                ? (isDark ? "#2a1111" : "#FEF2F2")
-                : (isDark ? "#1E1E2E" : "#FFFFFF"),
-              border: `1.5px solid ${
-                saldo < 0
-                  ? withAlpha(COLORS.gasto, "88")  // Rojo si saldo es negativo
-                  : activeId === "saldo"
-                  ? COLORS.neutral  // 🆕 Color gris/plata cuando está seleccionado
-                  : t.border  // Gris normal cuando no está seleccionado
-              }`,
-              borderRadius: 11,
-              padding: "4px 10px",
+                ? "rgba(239,68,68,0.24)"  // Rojo si saldo es negativo (excedido)
+                : (isDark ? "linear-gradient(155deg, #211d2c 0%, #141220 100%)" : "linear-gradient(155deg, #ffffff 0%, #f5f3ff 100%)"),
+              border: "none",
+              borderRadius: "14px",
+              padding: "8px",
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              boxShadow: "0 20px 40px -16px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
               cursor: saldo >= 0 ? "pointer" : "default",
               outline: "none",
               transform: pressingId === "saldo"
@@ -251,14 +276,17 @@ export default function PillarCardsGrid({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
-                <span style={{ fontSize: 15, lineHeight: 1 }}>{saldo < 0 ? "💰" : "💵"}</span>
+                <div style={{ width: 24, height: 24, borderRadius: 8, background: isDarkTheme ? "#2D2D3A" : "#E5E3F5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span style={{ fontSize: 16, lineHeight: 1 }}>{saldo < 0 ? "💰" : "💵"}</span>
+                </div>
                 <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 700, color: t.text }}>Saldo</span>
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0, color: saldo < 0 ? COLORS.gasto : (isDark ? SALDO_COLOR : "#64748B") }}>
                 {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
               </span>
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.0, marginTop: 10, textAlign: "left", color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
+            <div style={{ minHeight: 12, marginTop: 4, marginBottom: 2 }} />
+            <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.0, marginTop: 6, textAlign: "left", color: saldo < 0 ? COLORS.gasto : (isDark ? "#F0EEFF" : "#1A1830") }}>
               {saldo < 0 ? "-$" + Math.abs(saldo).toLocaleString("es-CO") : fmt(saldo)}
             </div>
           </div>

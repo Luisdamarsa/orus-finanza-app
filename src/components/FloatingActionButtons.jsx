@@ -1,94 +1,148 @@
+import { usePress } from "../hooks/usePress";
+import { DARK, LIGHT, SHADOWS } from "../constants/tokens";
 
 /**
  * FloatingActionButtons.jsx
  *
- * Controles flotantes del dashboard (Estado 1 y 2):
- *  - Lupa (buscar): esquina inferior IZQUIERDA (opuesta al micrófono).
- *  - Lápiz (nueva transacción a mano) + Micrófono (voz): esquina inferior DERECHA.
- * Al activar la búsqueda, la barra aparece ABAJO en la misma línea que el lápiz y el
- * micrófono: va desde la esquina izquierda hasta el lápiz, y el mic sigue visible a la derecha.
- * Extraído de DashboardOverlays para tener su propio ErrorBoundary.
+ * Barra flotante con 3 botones de acción (Estado 1 y 2):
+ *  - Lupa (búsqueda): 48×48px, secundario, izquierda
+ *  - Lápiz (nueva transacción): 48×48px, secundario, derecha
+ *  - Micrófono (voz): 58×58px, principal (gradiente púrpura), derecha
+ *
+ * En modo búsqueda, se abre una barra de input entre lupa y lápiz/mic.
  */
 export default function FloatingActionButtons({
   isDark, pressingFAB, setPressingFAB, setScreen, onMic,
   onSearch, searchOpen, searchQuery, setSearchQuery, onCloseSearch,
 }) {
-  const t = isDark
-    ? { card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
+  const tokens = isDark ? DARK : LIGHT;
+  const pressSearch = usePress();
+  const pressEdit = usePress();
+  const pressMic = usePress();
 
-  // Botón lápiz (nueva transacción a mano) — se reutiliza en ambos modos
+  // Botón lápiz (nueva transacción) — 48×48px, secundario
   const pencilButton = (
     <button
       onClick={() => setScreen("new-transaction")}
-      onPointerDown={() => setPressingFAB("pencil")}
-      onPointerUp={() => setPressingFAB(null)}
-      onPointerLeave={() => setPressingFAB(null)}
+      {...pressEdit.handlers}
       style={{
-        width: 32, height: 32, borderRadius: "50%", border: "none",
-        background: isDark ? "#3A3A52" : "#94A3B8",
+        width: 48,
+        height: 48,
+        borderRadius: "50%",
+        border: "none",
+        background: tokens.raised,
+        color: tokens.sub,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         cursor: "pointer",
-        boxShadow: "0 3px 10px rgba(0,0,0,0.28)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-        transform: pressingFAB === "pencil" ? "scale(0.90)" : "scale(1)",
-        opacity: pressingFAB === "pencil" ? 0.7 : 1,
-        transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+        boxShadow: SHADOWS.shadowSm,
+        outline: "none",
+        transition: "all 0.15s",
+        ...pressEdit.getPressStyle(),
       }}>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20h4L20 8l-4-4L4 16v4z" />
+        <path d="M14 6l4 4" />
       </svg>
     </button>
   );
 
-  // Botón micrófono (voz) — se reutiliza en ambos modos
+  // Botón micrófono (voz) — 58×58px, principal, gradiente púrpura
   const micButton = (
     <button
       onClick={onMic}
-      onPointerDown={() => setPressingFAB("mic")}
-      onPointerUp={() => setPressingFAB(null)}
-      onPointerLeave={() => setPressingFAB(null)}
+      {...pressMic.handlers}
       style={{
-        width: 52, height: 52, borderRadius: "50%", border: "none",
-        background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+        width: 58,
+        height: 58,
+        borderRadius: "50%",
+        border: "none",
+        background: "linear-gradient(155deg, #B18CFF, #8B5CF6)",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         cursor: "pointer",
-        boxShadow: "0 6px 24px rgba(155,109,255,0.45)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-        transform: pressingFAB === "mic" ? "scale(0.93)" : "scale(1)",
-        opacity: pressingFAB === "mic" ? 0.8 : 1,
-        transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+        boxShadow: "0 18px 30px -10px rgba(139,92,246,0.65), inset 0 1px 0 rgba(255,255,255,0.3)",
+        outline: "none",
+        transition: "all 0.15s",
+        ...pressMic.getPressStyle(),
       }}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
-        <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
-        <line x1="12" y1="17" x2="12" y2="21" />
-        <line x1="8" y1="21" x2="16" y2="21" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        <line x1="12" y1="19" x2="12" y2="23" />
+        <line x1="8" y1="23" x2="16" y2="23" />
       </svg>
     </button>
   );
 
-  // MODO BÚSQUEDA: barra + lápiz + micrófono en la misma línea (la barra va de la izquierda al lápiz)
+  // MODO BÚSQUEDA: barra de input + lápiz + micrófono en la misma línea
   if (searchOpen) {
     return (
-      <div style={{ position: "absolute", bottom: 24, left: 22, right: 22, zIndex: 35, display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8, background: t.card, border: `1.5px solid ${t.border}`, borderRadius: 22, padding: "9px 14px", boxShadow: "0 6px 20px rgba(0,0,0,0.22)" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-            <circle cx="11" cy="11" r="7" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <div style={{
+        position: "absolute",
+        bottom: 22,
+        left: 22,
+        right: 22,
+        zIndex: 35,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+      }}>
+        {/* Barra de búsqueda */}
+        <div style={{
+          flex: 1,
+          minWidth: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: tokens.raised,
+          border: `1px solid ${tokens.border}`,
+          borderRadius: 12,
+          padding: "8px 12px",
+          boxShadow: SHADOWS.shadowSm,
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: tokens.sub, flexShrink: 0 }}>
+            <circle cx="10" cy="10" r="6" />
+            <path d="M20 20l-5-5" />
           </svg>
           <input
             autoFocus
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Fijos, Tarjeta, Cine…"
-            style={{ flex: 1, minWidth: 0, border: "none", outline: "none", background: "transparent", color: t.text, fontSize: 13.5 }}
+            placeholder="Buscar…"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              color: tokens.text,
+              fontSize: 12.5,
+              fontWeight: 500,
+            }}
           />
           <button
             onClick={onCloseSearch}
             aria-label="Cerrar búsqueda"
-            style={{ flexShrink: 0, width: 22, height: 22, borderRadius: "50%", border: "none", background: isDark ? "#2D2D3A" : "#F0EFF8", color: t.sub, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            style={{
+              flexShrink: 0,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              border: "none",
+              background: "transparent",
+              color: tokens.sub,
+              fontSize: 14,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: 0.6,
+              transition: "opacity 0.15s",
+            }}>
             ✕
           </button>
         </div>
@@ -98,36 +152,49 @@ export default function FloatingActionButtons({
     );
   }
 
-  // MODO NORMAL: lupa a la izquierda; lápiz + micrófono a la derecha
+  // MODO NORMAL: lupa izquierda; lápiz + micrófono derecha
   return (
     <>
-      {/* Lupa — esquina inferior izquierda */}
+      {/* Lupa — 48×48px, izquierda inferior */}
       <button
         onClick={onSearch}
-        onPointerDown={() => setPressingFAB("search")}
-        onPointerUp={() => setPressingFAB(null)}
-        onPointerLeave={() => setPressingFAB(null)}
+        {...pressSearch.handlers}
         style={{
-          // bottom 34 (no 24): centra la lupa a la misma altura que el lápiz,
-          // que está centrado en la fila del micrófono (52px de alto).
-          position: "absolute", bottom: 34, left: 22, zIndex: 35,
-          width: 32, height: 32, borderRadius: "50%", border: "none",
-          background: isDark ? "#3A3A52" : "#94A3B8",
+          position: "absolute",
+          bottom: 22,
+          left: 22,
+          zIndex: 35,
+          width: 48,
+          height: 48,
+          borderRadius: "50%",
+          border: "none",
+          background: tokens.raised,
+          color: tokens.sub,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           cursor: "pointer",
-          boxShadow: "0 3px 10px rgba(0,0,0,0.28)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transform: pressingFAB === "search" ? "scale(0.90)" : "scale(1)",
-          opacity: pressingFAB === "search" ? 0.7 : 1,
-          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+          boxShadow: SHADOWS.shadowSm,
+          outline: "none",
+          transition: "all 0.15s",
+          ...pressSearch.getPressStyle(),
         }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="7" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+          <circle cx="10" cy="10" r="6" />
+          <path d="M20 20l-5-5" />
         </svg>
       </button>
 
-      {/* Lápiz + Micrófono — esquina inferior derecha */}
-      <div style={{ position: "absolute", bottom: 24, right: 22, zIndex: 35, display: "flex", alignItems: "center", gap: 10 }}>
+      {/* Lápiz + Micrófono — derecha inferior, gap 10px */}
+      <div style={{
+        position: "absolute",
+        bottom: 22,
+        right: 22,
+        zIndex: 35,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+      }}>
         {pencilButton}
         {micButton}
       </div>

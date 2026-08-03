@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from "react";
+import { Tag } from "lucide-react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { rowStyles, buttonStyles } from "../utils/clayStyles";
 
 /**
  * CategoriesPage.jsx
@@ -14,14 +18,12 @@ import { MenuListSkeleton } from "./LoadingSkeleton";
  * Permite agregar nuevas categorías
  *
  * Props:
- *   isDark - Tema oscuro
  *   onBack - Callback para volver atrás
  *   onAddCategory - Callback para abrir AddCategoryPage (nueva)
  *   onEditCategory - Callback para editar categoría (categoryName, pillarId)
  *   categories - {pillarId: [cat1, cat2, ...]}
  */
 export default function CategoriesPage({
-  isDark,
   onBack,
   onAddCategory,
   onEditCategory,
@@ -29,9 +31,18 @@ export default function CategoriesPage({
   tab = "gastos",
   setTab,
 }) {
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+  const tokens = isDark ? DARK : LIGHT;
+
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   // 🆕 Ref para medir altura de descripción dinámicamente
   const descriptionRef = useRef(null);
@@ -62,7 +73,8 @@ export default function CategoriesPage({
     <PageLayout
       isDark={isDark}
       onBack={onBack}
-      title="🏷️ Categorías"
+      title="Categorías"
+      icon={<Tag size={20} strokeWidth={1.6} />}
       pressBack={pressBack}
       description={
         <>

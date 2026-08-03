@@ -8,9 +8,9 @@ export default function ProfileScreen({ isDark, t, setScreen }) {
   return (
     <ScreenShell bg={t.bg}>
       <ProfilePage
-        isDark={isDark}
         onBack={() => setScreen("settings")}
         onSaveSuccess={() => setScreen("settings")}
+        setScreen={setScreen}
       />
     </ScreenShell>
   );

@@ -34,54 +34,142 @@ export default function Movimientos({ isDark, transactions, filteredPillar, setF
   const displayTxns = filterTransactions(transactions, { selectedPeriod, filteredPillar, filterType });
 
   return (
-    <div style={{ marginTop: 0 }}>
+    <div
+      onClick={handleOpen}
+      style={{
+        marginTop: "8px",
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "9px 15px",
+        borderRadius: "16px",
+        background: "linear-gradient(155deg, #262231 0%, #17151f 100%)",
+        boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+        border: "none",
+        boxSizing: "border-box",
+        cursor: "pointer",
+        transition: "all 0.2s ease",
+      }}
+      onPointerDown={() => setPressingMovimientos(true)}
+      onPointerUp={() => setPressingMovimientos(false)}
+      onPointerLeave={() => setPressingMovimientos(false)}
+    >
+      {/* Label + Badge */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+        <button
+          onClick={handleOpen}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: 0,
+            outline: "none",
+          }}
+        >
+          <span style={{ fontSize: 12.5, fontWeight: 800, color: "#F5F3FF" }}>Movimientos</span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 800,
+              color: "#9B6DFF",
+              background: "rgba(155,109,255,0.16)",
+              padding: "1px 6px",
+              borderRadius: "10px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {displayTxns.length}
+          </span>
+        </button>
+
+        {/* Chips de filtros activos */}
+        {filterType && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setFilterType(null);
+            }}
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              color: filterType === "gastado" ? "#FF8A8A" : "#86EFAC",
+              padding: "3px 8px",
+              borderRadius: "20px",
+              fontSize: 10,
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              whiteSpace: "nowrap",
+              cursor: "pointer",
+            }}
+          >
+            {filterType === "gastado" ? "Gastado" : "Ingresos"}
+            <span>✕</span>
+          </div>
+        )}
+
+        {filteredPillar && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setFilteredPillar(null);
+            }}
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              color: PILLAR_MAP[filteredPillar]?.color,
+              padding: "3px 8px",
+              borderRadius: "20px",
+              fontSize: 10,
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              whiteSpace: "nowrap",
+              cursor: "pointer",
+            }}
+          >
+            {PILLAR_MAP[filteredPillar]?.icon}
+            {PILLAR_MAP[filteredPillar]?.label}
+            <span>✕</span>
+          </div>
+        )}
+      </div>
+
+      {/* Chevron */}
       <button
         onClick={handleOpen}
-        onPointerDown={() => {
-          console.log("🔻 Movimientos presionado");
-          setPressingMovimientos(true);
-        }}
-        onPointerUp={() => {
-          console.log("🔺 Movimientos soltado");
-          setPressingMovimientos(false);
-        }}
-        onPointerLeave={() => {
-          console.log("🚫 Mouse salió de Movimientos");
-          setPressingMovimientos(false);
-        }}
         style={{
-          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: pressingMovimientos ? "rgba(0, 0, 0, 0.2)" : t.bg,
-          border: `1.5px solid ${t.divider}`, padding: "10px 8px 10px", cursor: "pointer",
-          position: "sticky", top: 0, zIndex: 20, borderRadius: 24, marginBottom: 0,
-          overflow: "hidden", boxSizing: "border-box",
-          transform: pressingMovimientos ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
-          boxShadow: pressingMovimientos ? "inset 0 2px 6px rgba(0, 0, 0, 0.3)" : "none",
-          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: t.text }}>Movimientos</span>
-          <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 10, background: isDark ? "#2D2D3A" : "#E5E3F5", color: t.sub }}>{displayTxns.length}</span>
-          {/* 🆕 Badge para filtro de tipo (Gastado/Ingresos) */}
-          {filterType && (
-            <div onClick={e => { e.stopPropagation(); setFilterType(null); }} style={{
-              marginLeft: 6, padding: "1px 7px", borderRadius: 10, border: "none",
-              background: filterType === "gastado" ? "#EF444422" : "#22C55E22",
-              color: filterType === "gastado" ? "#EF4444" : "#22C55E",
-              fontSize: 10, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-            }}>
-              {filterType === "gastado" ? "Gastado" : "Ingresos"}<span>✕</span>
-            </div>
-          )}
-          {filteredPillar && (
-            <div onClick={e => { e.stopPropagation(); setFilteredPillar(null); }} style={{
-              marginLeft: 6, padding: "1px 7px", borderRadius: 10, border: "none", background: PILLAR_MAP[filteredPillar]?.color + "22", color: PILLAR_MAP[filteredPillar]?.color, fontSize: 10, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-            }}>
-              {PILLAR_MAP[filteredPillar]?.icon}{PILLAR_MAP[filteredPillar]?.label}<span>✕</span>
-            </div>
-          )}
-        </div>
-        <span style={{ fontSize: 11, color: t.sub, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s", marginRight: 8 }}>▼</span>
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          flexShrink: 0,
+          padding: 0,
+          outline: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#8B87A3"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+        >
+          <path d="M5 9l7 7 7-7" />
+        </svg>
       </button>
     </div>
   );

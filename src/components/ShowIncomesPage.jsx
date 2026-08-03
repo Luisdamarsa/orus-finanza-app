@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageHeader from "./PageHeader";
+import DonutChartComponent from "./DonutChart";
 import { PAGE_HEADERS } from "../data/pageHeaders";
+import { fmt } from "../utils/formatters";
+import { DARK, LIGHT } from "../constants/tokens";
 
 /**
  * ShowIncomesPage.jsx
@@ -10,20 +14,27 @@ import { PAGE_HEADERS } from "../data/pageHeaders";
  * Muestra descripción y toggle para activar/desactivar ingresos
  *
  * Props:
- *   isDark - Tema oscuro
  *   onBack - Callback para volver atrás
  *   showIncomesEnabled - Estado actual del toggle
  *   onToggleShowIncomes - Callback cuando cambia el toggle
  */
 export default function ShowIncomesPage({
-  isDark,
   onBack,
   showIncomesEnabled,
   onToggleShowIncomes,
 }) {
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+  const tokens = isDark ? DARK : LIGHT;
+
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   // 🆕 Estado para el top del contenido dinámico
   const [contentTop, setContentTop] = useState(220);
@@ -100,7 +111,7 @@ export default function ShowIncomesPage({
         onToggleChange={onToggleShowIncomes}
       />
 
-      {/* Contenido scrolleable (vacío en esta versión) */}
+      {/* Contenido scrolleable */}
       <div
         style={{
           position: "absolute",
@@ -115,6 +126,144 @@ export default function ShowIncomesPage({
           boxSizing: "border-box",
         }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+        {/* Section 1: Qué ves - Donut */}
+        <div className="orus-rise" style={{ marginBottom: 28, display: "flex", flexDirection: "column", alignItems: "center", animationDelay: "0.04s" }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 16px 0", textAlign: "center", width: "100%" }}>📊 Dashboard</h3>
+
+          {/* Donut Component Real - No clickeable */}
+          <div style={{ marginBottom: 12, pointerEvents: "none" }}>
+            <DonutChartComponent
+              segments={[
+                { id: "fijos", label: "Fijos", color: "#93C5FD", pct: 17 },
+                { id: "deuda", label: "Deuda", color: "#FCA5A5", pct: 10 },
+                { id: "ahorro", label: "Ahorro", color: "#86EFAC", pct: 8 },
+                { id: "ocio", label: "Ocio", color: "#C4B5FD", pct: 9 },
+                { id: "varios", label: "Varios", color: "#FDE68A", pct: 8 },
+                { id: "saldo", label: "Tu saldo", color: "#E5E7EB", pct: 48 },
+              ]}
+              cx={114}
+              cy={114}
+              outerR={90}
+              innerR={54}
+              activeId={null}
+              onSelect={() => {}}
+              isDark={isDark}
+              total={3250000}
+              totalSpent={1690000}
+              pillarSpends={{ fijos: 552500, deuda: 325000, ahorro: 260000, ocio: 292500, varios: 260000 }}
+              hasSaldoAsignado={true}
+              saldoValue={1560000}
+              selectedPeriod={null}
+            />
+          </div>
+
+          {/* Tags de pilares - Formato Acerca de ORUS */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#93C5FD22", color: "#93C5FD" }}>Fijos</span>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FCA5A522", color: "#FCA5A5" }}>Deuda</span>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#86EFAC22", color: "#86EFAC" }}>Ahorro</span>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#C4B5FD22", color: "#C4B5FD" }}>Ocio</span>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FDE68A22", color: "#FDE68A" }}>Varios</span>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#E5E7EB22", color: "#E5E7EB" }}>Tu saldo</span>
+          </div>
+
+        </div>
+
+        {/* Section 2: Tu Saldo - Layout dos columnas */}
+        <div className="orus-rise" style={{ marginBottom: 28, display: "flex", gap: 8, alignItems: "flex-start", animationDelay: "0.12s" }}>
+          {/* Columna izquierda: Texto explicativo */}
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6 }}>
+              <strong style={{ color: t.text, display: "block", marginBottom: 6 }}>En el donut verás tu saldo en gris.</strong>
+              La tarjeta de la derecha muestra exactamente cuánto dinero te sobra después de tus gastos.
+            </div>
+          </div>
+
+          {/* Columna derecha: Tarjeta Saldo - No clickeable */}
+          <div style={{ pointerEvents: "none", flexShrink: 0 }}>
+            <div style={{
+              background: isDark ? "#1E1E2E" : "#FFFFFF",
+              border: `1.5px solid ${t.border}`,
+              borderRadius: 11,
+              padding: "8px 10px",
+              outline: "none",
+              width: 160,
+            }}>
+              {/* Línea 1: icono + nombre (izquierda) + % del total (derecha) */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
+                  <span style={{ fontSize: 16, lineHeight: 1 }}>💵</span>
+                  <span style={{ fontSize: 13, lineHeight: 1, fontWeight: 700, color: t.text }}>Saldo</span>
+                </div>
+                <span style={{ fontSize: 10, fontWeight: 700, color: isDark ? "#CBD5E1" : "#64748B", whiteSpace: "nowrap", flexShrink: 0 }}>
+                  48% del total
+                </span>
+              </div>
+              {/* Línea 2: valor */}
+              <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.0, textAlign: "left", color: isDark ? "#F0EEFF" : "#1A1830" }}>
+                {fmt(1560000)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Ingresos vs Gastos */}
+        <div className="orus-rise" style={{ marginBottom: 24, animationDelay: "0.20s" }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 12px 0" }}>💰 Ingresos vs Gastos</h3>
+
+          {/* Botones GASTADO / INGRESOS - No clickeables */}
+          <div style={{ display: "flex", gap: 6, height: 36, marginBottom: 12 }}>
+            {/* GASTADO */}
+            <div style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: isDark ? "#1f1010" : "#FEF2F2",
+              border: `1px solid ${isDark ? "#5c1a1a44" : "#FCA5A533"}`,
+              borderRadius: 8,
+              padding: "8px 10px",
+              pointerEvents: "none",
+            }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: t.sub }}>GASTADO</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#EF4444" }}>-{fmt(1690000)}</span>
+            </div>
+
+            {/* INGRESOS */}
+            <div style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: isDark ? "#0a1a10" : "#F0FDF4",
+              border: `1px solid ${isDark ? "#16532d44" : "#86EFAC33"}`,
+              borderRadius: 8,
+              padding: "8px 10px",
+              pointerEvents: "none",
+            }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: t.sub }}>INGRESOS</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: "#22C55E" }}>+{fmt(3250000)}</span>
+            </div>
+          </div>
+
+          {/* Explicación */}
+          <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6 }}>
+            Ve inmediatamente cuánto ingresó y cuánto gastaste en este período. Los números se actualizan en tiempo real.
+          </div>
+        </div>
+
+        {/* Section 4: Por qué es útil */}
+        <div className="orus-rise" style={{ marginBottom: 40, animationDelay: "0.28s" }}>
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 12px 0", textAlign: "center" }}>✨ Por qué activarlo</h3>
+
+          <div style={{ background: t.card, borderRadius: 12, padding: 12, fontSize: 11, color: t.sub, lineHeight: 1.6, border: `0.5px solid ${t.border}`, textAlign: "left" }}>
+            <div style={{ marginBottom: 10 }}><strong style={{ color: t.text }}>📊 Visión real:</strong> No solo ves lo que gastas, sino también lo que entra. Entiendes si ese mes fue positivo o negativo.</div>
+            <div style={{ marginBottom: 10 }}><strong style={{ color: t.text }}>💰 Saldo disponible:</strong> Sabes exactamente cuánto dinero libre tienes después de todos tus gastos. Sin suposiciones.</div>
+            <div><strong style={{ color: t.text }}>🎯 Decisiones mejores:</strong> Con ingresos + gastos visibles, tomas decisiones financieras más precisas. ¿Puedo gastar más? ¿Debo ahorrar más?</div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

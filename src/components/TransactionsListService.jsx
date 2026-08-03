@@ -55,48 +55,39 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
           Sin movimientos
         </div>
       )}
-      {groups.map((group) => (
-        <div key={group.date} style={{ display: "contents" }}>
-          {/* Fecha - Sticky Header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingTop: 6,
-              paddingBottom: 3,
-              position: "sticky",
-              top: stickyTop,
-              zIndex: 20,
-              // Día: fondo claro (antes fijo negro → banda negra); Noche: negro igual que antes.
-              background: isDark ? "#000000" : t.bg,
-              marginBottom: 6,
-              marginTop: 0,
-            }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: t.sub }}>
-              {group.label.toUpperCase()}
-            </span>
-            <span
+      {/* Contenedor externo de la lista */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 10 }}>
+        {groups.map((group) => (
+          <div key={group.date}>
+            {/* Fecha - Sticky Header */}
+            <div
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: group.dayTotal < 0 ? "#EF4444" : "#22C55E",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 2px 6px",
+                position: "sticky",
+                top: stickyTop,
+                zIndex: 20,
+                background: isDark ? "#000000" : t.bg,
               }}>
-              {group.dayTotal < 0 ? "-" : "+"}
-              {fmt(Math.abs(group.dayTotal))}
-            </span>
-          </div>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", letterSpacing: "0.4px" }}>
+                {group.label.toUpperCase()}
+              </span>
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: group.dayTotal < 0 ? "#FF8A8A" : "#86EFAC",
+                }}>
+                {group.dayTotal < 0 ? "-" : "+"}
+                {fmt(Math.abs(group.dayTotal))}
+              </span>
+            </div>
 
-          {/* Contenedor de transacciones */}
-          <div
-            style={{
-              borderRadius: 14,
-              overflow: "hidden",
-              border: `1px solid ${t.divider}`,
-              position: "relative",
-              zIndex: 0,
-            }}>
-            {group.items.map((tx, i) => {
+            {/* Contenedor de transacciones del día */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+              {group.items.map((tx, i) => {
               const isIngreso = tx.amount > 0 || tx.pillar === "ingreso";
               const pillar = PILLAR_MAP[tx.pillar] || PILLAR_MAP["varios"];
               const method = METHOD_META[tx.method] || METHOD_META["Banco"];
@@ -113,57 +104,46 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 12,
-                    padding: "13px 16px",
-                    borderBottom:
-                      i < group.items.length - 1
-                        ? `1px solid ${t.divider}`
-                        : "none",
-                    background: isPressingThisTransaction
-                      ? "rgba(0, 0, 0, 0.1)"
-                      : isIngreso
-                      ? isDark
-                        ? "#0b1f14"
-                        : "#f0fdf4"
-                      : isDark
-                      ? "#1A1A28"
-                      : "#FFFFFF",
+                    justifyContent: "space-between",
+                    padding: "11px 14px",
+                    borderRadius: 16,
+                    background: "#1a1725",
+                    boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
                     position: "relative",
                     zIndex: 0,
                     cursor: onEditTransaction ? "pointer" : "default",
                     transform: isPressingThisTransaction ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
                     opacity: isPressingThisTransaction ? 0.7 : 1,
-                    boxShadow: isPressingThisTransaction ? "inset 0 2px 6px rgba(0, 0, 0, 0.2)" : "none",
                     transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}>
-                  {/* Ícono/Badge */}
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      flexShrink: 0,
-                      background: isIngreso
-                        ? "#22C55E28"
-                        : pillar.color + "28",
-                      border: `1px solid ${
-                        isIngreso ? "#22C55E44" : pillar.color + "44"
-                      }`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 16,
-                    }}>
-                    {isIngreso ? "💚" : pillar.icon}
-                  </div>
-
-                  {/* Descripción y categoría */}
-                  <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                  {/* Contenedor izquierdo: Ícono + Descripción */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                    {/* Ícono/Badge */}
                     <div
                       style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: t.text,
+                        width: 32,
+                        height: 32,
+                        borderRadius: 11,
+                        flexShrink: 0,
+                        background: isIngreso
+                          ? "rgba(134,239,172,0.16)"
+                          : pillar.color + "28",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 15,
+                        color: isIngreso ? "#86EFAC" : pillar.color,
+                      }}>
+                      {isIngreso ? "💚" : pillar.icon}
+                    </div>
+
+                    {/* Descripción y categoría */}
+                    <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        fontWeight: 700,
+                        color: "#F5F3FF",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -180,14 +160,12 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                       }}>
                       <span
                         style={{
-                          fontSize: 10,
+                          fontSize: 9,
                           fontWeight: 700,
+                          color: "#8B87A3",
+                          background: "linear-gradient(155deg,#262231,#17151f)",
                           padding: "1px 6px",
-                          borderRadius: 5,
-                          background: isDark
-                            ? method.darkBg || "#1e2535"
-                            : method.bg || "#F1F5F9",
-                          color: method.color,
+                          borderRadius: 8,
                         }}>
                         {tx.method}
                       </span>
@@ -237,37 +215,33 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         </span>
                       )}
                     </div>
+                    </div>
                   </div>
 
-                  {/* Monto y hora */}
+                  {/* Monto y hora (derecha) */}
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 12.5,
                         fontWeight: 800,
                         color: isIngreso
-                          ? "#22C55E"
-                          : tx.pillar === "ahorro"
-                          ? isDark
-                            ? "#86EFAC"
-                            : "#22C55E"
-                          : isDark
-                          ? "#FCA5A5"
-                          : "#EF4444",
+                          ? "#86EFAC"
+                          : "#FF8A8A",
                       }}>
                       {isIngreso ? "+" : "-"}
                       {fmt(Math.abs(tx.amount))}
                     </div>
-                    <div style={{ fontSize: 10, color: t.sub, marginTop: 2 }}>
+                    <div style={{ fontSize: 9, fontWeight: 600, color: "#5F5C74", marginTop: 2 }}>
                       {tx.time}
                     </div>
                   </div>
                 </div>
               );
-            })}
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
       {hasMore && (
         <div ref={sentinelRef} style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "18px 0 28px", minHeight: 20 }}>
           <style>{`@keyframes orusSpin { to { transform: rotate(360deg); } }`}</style>

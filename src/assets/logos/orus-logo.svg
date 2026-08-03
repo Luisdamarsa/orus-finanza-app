@@ -1,0 +1,28 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo negro -->
+  <rect width="1024" height="1024" fill="#000000"/>
+
+  <!-- Donut segmentos (35/15/20/25/15) -->
+  <g transform="translate(512, 512)">
+    <!-- Fijos 35% (azul) -->
+    <path d="M 0,-380 A 380,380 0 0,1 308.6,-202.8" fill="none" stroke="#93C5FD" stroke-width="100" stroke-linecap="round"/>
+
+    <!-- Deuda 15% (rojo) -->
+    <path d="M 308.6,-202.8 A 380,380 0 0,1 371.2,60.2" fill="none" stroke="#FCA5A5" stroke-width="100" stroke-linecap="round"/>
+
+    <!-- Ahorro 20% (verde) -->
+    <path d="M 371.2,60.2 A 380,380 0 0,1 202.8,334.3" fill="none" stroke="#86EFAC" stroke-width="100" stroke-linecap="round"/>
+
+    <!-- Ocio 25% (púrpura) -->
+    <path d="M 202.8,334.3 A 380,380 0 0,1 -202.8,334.3" fill="none" stroke="#C4B5FD" stroke-width="100" stroke-linecap="round"/>
+
+    <!-- Varios 15% (amarillo) -->
+    <path d="M -202.8,334.3 A 380,380 0 0,1 -308.6,-202.8" fill="none" stroke="#FDE68A" stroke-width="100" stroke-linecap="round"/>
+
+    <!-- Centro negro -->
+    <circle cx="0" cy="0" r="200" fill="#000000"/>
+
+    <!-- Texto ORUS -->
+    <text x="0" y="60" font-size="140" font-weight="800" fill="#F0EEFF" text-anchor="middle" font-family="Arial, sans-serif" letter-spacing="5">ORUS</text>
+  </g>
+</svg>

@@ -1,0 +1,86 @@
+{
+ "pillars": {
+  "fijos": 1200000,
+  "deuda": 500000,
+  "ahorro": 300000,
+  "ocio": 400000,
+  "varios": null
+ },
+ "categories": {
+  "cat_arriendo": {
+   "name": "Arriendo",
+   "pillar": "fijos",
+   "budget": 700000
+  },
+  "cat_internet": {
+   "name": "Internet",
+   "pillar": "fijos",
+   "budget": 130000
+  },
+  "cat_servicios": {
+   "name": "Servicios",
+   "pillar": "fijos",
+   "budget": 200000
+  },
+  "cat_suscripciones": {
+   "name": "Suscripciones",
+   "pillar": "fijos",
+   "budget": 170000
+  },
+  "cat_tarjeta_visa": {
+   "name": "Tarjeta Visa",
+   "pillar": "deuda",
+   "budget": 300000
+  },
+  "cat_credito_banco": {
+   "name": "Crédito banco",
+   "pillar": "deuda",
+   "budget": 200000
+  },
+  "cat_fondo_emergencia": {
+   "name": "Fondo emergencia",
+   "pillar": "ahorro",
+   "budget": 200000
+  },
+  "cat_meta_viaje": {
+   "name": "Meta viaje",
+   "pillar": "ahorro",
+   "budget": 100000
+  },
+  "cat_restaurantes": {
+   "name": "Restaurantes",
+   "pillar": "ocio",
+   "budget": 150000
+  },
+  "cat_domicilios": {
+   "name": "Domicilios",
+   "pillar": "ocio",
+   "budget": 100000
+  },
+  "cat_cine_planes": {
+   "name": "Cine / Planes",
+   "pillar": "ocio",
+   "budget": 80000
+  },
+  "cat_bares": {
+   "name": "Bares",
+   "pillar": "ocio",
+   "budget": 70000
+  },
+  "cat_supermercado": {
+   "name": "Supermercado",
+   "pillar": "varios",
+   "budget": null
+  },
+  "cat_transporte": {
+   "name": "Transporte",
+   "pillar": "varios",
+   "budget": null
+  },
+  "cat_salud": {
+   "name": "Salud",
+   "pillar": "varios",
+   "budget": null
+  }
+ }
+}

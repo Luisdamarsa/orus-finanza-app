@@ -1,9 +1,16 @@
 import { useState, useRef, useEffect } from "react";
+import { Zap } from "lucide-react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { cardStyles, getClayShadow, buttonStyles, rowStyles } from "../utils/clayStyles";
+import { getStaggerDelay } from "../constants/animations";
+
+// Hook para efecto de presionado en tarjetas
+const usePressEffect = () => usePress();
 
 export default function AutomatizacionesPage({
-  isDark,
   onBack,
   onPermissions,
   microphoneEnabled,
@@ -13,8 +20,14 @@ export default function AutomatizacionesPage({
   iosShortcutsEnabled,
   setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
+  setScreen,
 }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+
   const pressBack = usePress();
+  const pressNotif = usePress();
+  const pressShortcut = usePress();
   const [pressingButton, setPressingButton] = useState(null);
   const descriptionRef = useRef(null);
   const [contentTop, setContentTop] = useState(220);
@@ -28,9 +41,15 @@ export default function AutomatizacionesPage({
     }
   }, []);
 
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   const Toggle = ({ value, onChange }) => (
     <button
@@ -65,7 +84,8 @@ export default function AutomatizacionesPage({
     <PageLayout
       isDark={isDark}
       onBack={onBack}
-      title="⚡ Automatizaciones"
+      title="Automatizaciones"
+      icon={<Zap size={20} strokeWidth={1.6} />}
       descriptionRef={descriptionRef}
       contentTopOffset={contentTop}
       pressBack={pressBack}
@@ -88,113 +108,101 @@ export default function AutomatizacionesPage({
       }
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        {/* ===== SECCIÓN 1: MICRÓFONO ===== */}
+        {/* ===== SECCIÓN 1: NOTIFICACIONES DE WALLET ===== */}
         <div className="orus-rise" style={{ animationDelay: "0.04s" }}>
-          <div
-            style={{
-              background: t.card,
-              border: `1px solid ${t.border}`,
-              borderRadius: 14,
-              padding: "12px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 12,
-            }}
-          >
-            <div
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => {
+                setScreen("notifications-setup");
+                console.log("📱 AutomatizacionesPage: Tarjeta 'Notificaciones' ABIERTA");
+              }}
+              {...pressNotif.handlers}
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 11,
-                background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
+                width: "100%",
+                padding: "12px",
+                borderRadius: RADIUS.lg,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
+                gap: 12,
+                cursor: "pointer",
+                outline: "none",
+                ...rowStyles(t, isDark),
+                ...pressNotif.getPressStyle({ opacity: 0.85, scale: 0.98 }),
               }}
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 11,
+                  background: "linear-gradient(135deg, #4285F4, #34A853)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
               >
-                <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
-                <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-                <line x1="8" y1="21" x2="16" y2="21" />
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <path d="M1 10h22"></path>
+                </svg>
+              </div>
+              <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                  <b style={{ fontSize: 13, color: t.text }}>Notificaciones de Wallet</b>
+                  {notificationListenerEnabled && (
+                    <div
+                      style={{
+                        background: "#86EFAC",
+                        color: "#166534",
+                        fontSize: 8,
+                        fontWeight: 700,
+                        padding: "2px 6px",
+                        borderRadius: 10,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Activada
+                    </div>
+                  )}
+                </div>
+                <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45 }}>Cuando pagas con NFC, ORUS lee la notificación y te pregunta si registrarla.</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-              <b style={{ fontSize: 13, color: t.text, display: "block", marginBottom: 3 }}>Microfono</b>
-              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45 }}>Para registrar gastos por voz sin abrir la app.</div>
-            </div>
-            <Toggle value={microphoneEnabled} onChange={setMicrophoneEnabled} />
+            </button>
           </div>
         </div>
 
-        {/* ===== SECCIÓN 2: GOOGLE PAY ===== */}
+        {/* ===== SECCIÓN 2: SHORTCUTS iOS ===== */}
         <div className="orus-rise" style={{ animationDelay: "0.10s" }}>
-          <div
-            style={{
-              background: t.card,
-              border: `1px solid ${t.border}`,
-              borderRadius: 14,
-              padding: "12px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 12,
+          <button
+            onClick={() => {
+              setScreen("shortcuts-setup");
+              console.log("🎯 AutomatizacionesPage: Tarjeta 'Atajos iOS' ABIERTA");
             }}
-          >
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 11,
-                background: "linear-gradient(135deg, #4285F4, #34A853)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <path d="M1 10h22"></path>
-              </svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-              <b style={{ fontSize: 13, color: t.text, display: "block", marginBottom: 3 }}>Notificaciones de Wallet</b>
-              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45 }}>Cuando pagas con NFC, ORUS lee la notificación y te pregunta si registrarla.</div>
-            </div>
-            <Toggle value={notificationListenerEnabled} onChange={setNotificationListenerEnabled} />
-          </div>
-        </div>
-
-        {/* ===== SECCIÓN 3: SHORTCUTS iOS ===== */}
-        <div className="orus-rise" style={{ animationDelay: "0.16s" }}>
-          <div
+            {...pressShortcut.handlers}
             style={{
-              background: t.card,
-              border: `1px solid ${t.border}`,
-              borderRadius: 14,
+              width: "100%",
+              borderRadius: RADIUS.lg,
               padding: "12px",
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
+              ...rowStyles(t, isDark),
               gap: 12,
+              cursor: "pointer",
+              outline: "none",
+              ...pressShortcut.getPressStyle({ opacity: 0.85, scale: 0.98 }),
             }}
           >
             <div
@@ -213,15 +221,34 @@ export default function AutomatizacionesPage({
               📱
             </div>
             <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-              <b style={{ fontSize: 13, color: t.text, display: "block", marginBottom: 3 }}>Atajo de Notificaciones (iOS)</b>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                <b style={{ fontSize: 13, color: t.text }}>Atajo de Notificaciones</b>
+                {iosShortcutsEnabled && (
+                  <div
+                    style={{
+                      background: "#86EFAC",
+                      color: "#166534",
+                      fontSize: 8,
+                      fontWeight: 700,
+                      padding: "2px 6px",
+                      borderRadius: 10,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Activado
+                  </div>
+                )}
+              </div>
               <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45 }}>Lee pagos de Apple Pay mediante Atajos configurados.</div>
             </div>
-            <Toggle value={iosShortcutsEnabled} onChange={setIosShortcutsEnabled} />
-          </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
         </div>
 
         {/* ===== CÓMO FUNCIONA LA AUTOMATIZACIÓN ===== */}
-        <div className="orus-rise" style={{ animationDelay: "0.22s" }}>
+        <div className="orus-rise" style={{ animationDelay: "0.16s" }}>
           <div style={{ marginBottom: 24 }}>
             <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, marginBottom: 16 }}>
               🔄 Cómo Funciona la Automatización
@@ -229,7 +256,7 @@ export default function AutomatizacionesPage({
 
             {/* Flujo Visual - Una Sola Línea */}
             <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 16, marginBottom: 16, overflow: "auto" }}>
-              <div style={{ display: "inline-flex", alignItems: "flex-start", gap: 12, whiteSpace: "nowrap" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 12, whiteSpace: "nowrap" }}>
                 <div style={{ textAlign: "center", minWidth: "auto" }}>
                   <div style={{ fontSize: 28, marginBottom: 4 }}>💳</div>
                   <div style={{ fontSize: 10, fontWeight: 600, color: t.text, lineHeight: 1.2 }}>Haces un<br/>Gasto</div>
@@ -252,32 +279,40 @@ export default function AutomatizacionesPage({
               </div>
             </div>
 
-            {/* Beneficios - Alineado a la Izquierda */}
+            {/* Beneficios - Icon Izq + Texto Derecha */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>✨ Beneficios Principales</div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>⏱️</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Ahorra Tiempo</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No abras la app para cada gasto. Automático al 100%.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>⏱️</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Ahorra Tiempo</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>No agregues gastos manualmente</div>
+                </div>
               </div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>📊</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Datos Precisos</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>📊</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Datos Precisos</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Cada gasto queda registrado. Sin olvidar ninguno.</div>
+                </div>
               </div>
 
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>🎯</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Control en Tiempo Real</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
+              <div style={{ display: "flex", gap: 12, marginBottom: 10, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>🎯</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Control en Tiempo Real</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ve tu presupuesto actualizado al instante.</div>
+                </div>
               </div>
 
-              <div>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>💡</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 2 }}>Mejora Financiera</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>💡</div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text }}>Mejora Financiera</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4}}>Con datos completos, haces decisiones mejores.</div>
+                </div>
               </div>
             </div>
 
@@ -285,33 +320,54 @@ export default function AutomatizacionesPage({
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>📱 Casos de Uso Reales</div>
 
-              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12, marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 1: Cafés y Almuerzos</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Pagas café con NFC → Wallet notifica → ORUS abre app con transacción pre-llena</div>
+              {/* Caso 1: Notificación */}
+              <div style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "flex-start", textAlign: "left" }}>
+                <div style={{ fontSize: 20, flexShrink: 0, marginTop: 2 }}>🔔</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 3 }}>Caso 1: Cafés y Almuerzos</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Pagas café con NFC → Wallet notifica → ORUS abre app con transacción pre-llena</div>
+                </div>
               </div>
 
-              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12, marginBottom: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 2: Compras Urgentes</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Dices "Gasté 200 mil en farmacia" → Micrófono registra → "Salud" categorizado. Listo en 3 segundos.</div>
+              {/* Caso 2: Micrófono (SVG) */}
+              <div style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "flex-start", textAlign: "left" }}>
+                <div style={{ width: 28, height: 28, borderRadius: 6, background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
+                    <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 3 }}>Caso 2: Compras Urgentes</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Dices "Gasté 200 mil en farmacia" → Micrófono registra → "Salud" categorizado. Listo en 3 segundos.</div>
+                </div>
               </div>
 
-              <div style={{ background: isDark ? "#141420" : "#FFFFFF", border: `1px solid ${t.border}`, borderRadius: 8, padding: 12 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 4 }}>Caso 3: Control de Presupuesto</div>
-                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ves en el Dashboard que "Fijos" llegó a 85% → Alertas automáticas → Controla gastos innecesarios</div>
+              {/* Caso 3: Presupuesto */}
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", textAlign: "left" }}>
+                <div style={{ fontSize: 20, flexShrink: 0, marginTop: 2 }}>📊</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: t.text, marginBottom: 3 }}>Caso 3: Control de Presupuesto</div>
+                  <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.4 }}>Ves en el Dashboard que "Fijos" llegó a 85% → Alertas automáticas → Controla gastos innecesarios</div>
+                </div>
               </div>
             </div>
 
             {/* Impacto */}
-            <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 8 }}>🎯 El Impacto Final</div>
-              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10 }}>
-                <strong style={{ color: t.text }}>Con automatización:</strong> Tienes datos 100% completos. Esto te permite:
-              </div>
-              <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6, marginLeft: 16 }}>
-                • Identificar patrones de gasto<br/>
-                • Tomar decisiones reales basadas en datos<br/>
-                • Cumplir presupuestos sin overspending<br/>
-                • Ahorrar más viendo exactamente dónde va tu dinero
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 10 }}>🎯 El Impacto Final</div>
+              <div style={{ background: isDark ? "#1C1C2E" : "#F5F3FF", borderRadius: 12, padding: 12 }}>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.5, marginBottom: 10, textAlign: "left" }}>
+                  <strong style={{ color: t.text }}>Con automatización:</strong> Tienes datos 100% completos. Esto te permite:
+                </div>
+                <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6, textAlign: "left" }}>
+                  <div>• Identificar patrones de gasto</div>
+                  <div>• Tomar decisiones reales basadas en datos</div>
+                  <div>• Cumplir presupuestos sin overspending</div>
+                  <div>• Ahorrar más viendo exactamente dónde va tu dinero</div>
+                </div>
               </div>
             </div>
           </div>

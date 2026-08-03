@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import HeaderService from "./HeaderService";
 import Periodo from "./Periodo";
 import ErrorBoundary from "./ErrorBoundary";
@@ -28,7 +28,7 @@ export default function DashboardScreen() {
     setFilteredPillar, setIsMovementOpen, setMovementOpenedFrom, totalSpent, incomingTotal,
     setScrollY, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, filteredPillar,
     transactions, startTransactionEditing, newTxnToast,
-    searchOpen, searchQuery,
+    searchOpen, searchQuery, setSearchOpen, showPillarBars,
   } = useDashboard();
 
   // 🆕 key que reinicia scroll + paginación al cambiar de periodo/filtro/búsqueda
@@ -45,6 +45,28 @@ export default function DashboardScreen() {
   useEffect(() => {
     if (searchOpen && listScrollRef.current) listScrollRef.current.scrollTop = 0;
   }, [searchQuery, searchOpen]);
+
+  // 🆕 Medir altura dinámica del header para calcular el top del scroll container
+  const [headerHeight, setHeaderHeight] = useState(showIncomes ? 149 : 115);
+  useEffect(() => {
+    const measureHeaderHeight = () => {
+      if (headerRef?.current) {
+        const height = headerRef.current.offsetHeight;
+        // El header comienza en top: 52, más su altura = total
+        setHeaderHeight(52 + height);
+      }
+    };
+
+    const rafId = requestAnimationFrame(() => {
+      requestAnimationFrame(measureHeaderHeight);
+    });
+
+    window.addEventListener("resize", measureHeaderHeight);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", measureHeaderHeight);
+    };
+  }, [showIncomes]);
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: isDark ? "#0D0D1A" : "#E9E7F5", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", overflow: "hidden" }}>
@@ -73,8 +95,9 @@ export default function DashboardScreen() {
 
         {/* Scroll Container */}
         <div onScroll={e => setScrollY(e.target.scrollTop)} style={{
-          position: "absolute", top: showIncomes ? 149 : 115, left: 0, right: 0, bottom: isMovementOpen ? 0 : "auto",
-          overflowY: isMovementOpen ? "auto" : "hidden", overflowX: "hidden", paddingBottom: 280, boxSizing: "border-box", scrollbarWidth: "none"
+          position: "absolute", top: headerHeight, left: 0, right: 0, bottom: isMovementOpen ? 0 : "auto",
+          overflowY: isMovementOpen ? "auto" : "hidden", overflowX: "hidden", paddingBottom: 280, boxSizing: "border-box", scrollbarWidth: "none",
+          pointerEvents: showPillarBars ? "none" : "auto"
         }}>
           <style>{`::-webkit-scrollbar { display: none; }`}</style>
 

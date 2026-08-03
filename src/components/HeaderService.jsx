@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { usePress } from "../hooks/usePress";
+import { DARK, LIGHT, SHADOWS, RADIUS } from "../constants/tokens";
 import ErrorBoundary from "./ErrorBoundary";
 import GastadoIngresosBar from "./GastadoIngresosBar";
 
@@ -44,29 +45,37 @@ const HeaderService = forwardRef(({
 }, ref) => {
   // 🆕 Hooks para efecto de press en cada botón
   const pressSettings = usePress();
+  // 🆕 Seleccionar tokens según el tema
+  const tokens = isDark ? DARK : LIGHT;
 
   return (
-    <div ref={ref} style={{ position: "absolute", top: 52, left: 0, right: 0, zIndex: 30, background: t.bg, padding: "8px 22px 15px", boxSizing: "border-box", borderBottom: `1px solid ${t.border}`, display: "flex", flexDirection: "column", justifyContent: showIncomes ? "space-between" : "flex-end" }}>
+    <div ref={ref} style={{ position: "absolute", top: 52, left: 0, right: 0, zIndex: 30, background: t.bg, padding: "0 22px", boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: showIncomes ? "space-between" : "flex-start" }}>
       {/* Row 1: Luis Daniel + Config (SIEMPRE visible) */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: 40, marginBottom: showIncomes ? 4 : 0, marginTop: showIncomes ? 0 : "auto" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: 34, marginBottom: 0, marginTop: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-          <div style={{ fontSize: showIncomes ? 15 : 18, fontWeight: 800, color: t.text }}>{userStorage.getDisplayName()}</div>
-          <div style={{ fontSize: showIncomes ? 10 : 12, color: t.sub }}>Buenos días 👋</div>
+          <div style={{ fontSize: showIncomes ? 15 : 17, fontWeight: 800, color: t.text }}>{userStorage.getDisplayName()}</div>
+          <div style={{ fontSize: showIncomes ? 10.5 : 11.5, fontWeight: 600, color: tokens.accent }}>Buenos días</div>
         </div>
-        {/* Botón Settings (Engranaje) */}
+        {/* Botón Settings (Engranaje) - FAB style: 48x48px circular */}
         <ErrorBoundary fallback={null}>
         <button
           onClick={() => setScreen("settings")}
           {...pressSettings.handlers}
           style={{
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            width: showIncomes ? 28 : 34, height: showIncomes ? 28 : 34, borderRadius: "50%", border: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 34,
+            height: 34,
+            borderRadius: "12px",
+            border: "none",
             cursor: "pointer",
-            background: isDark ? "#1E1E2E" : "#F0EFF8",
-            outline: "1.5px solid transparent",
+            background: tokens.raised,
+            boxShadow: SHADOWS.shadowSm,
+            outline: "none",
             ...pressSettings.getPressStyle(),
           }}>
-          <svg width={showIncomes ? "16" : "19"} height={showIncomes ? "16" : "19"} viewBox="0 0 24 24" fill="none" stroke={isDark ? "#C4C2E0" : "#6B7280"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ color: tokens.sub }}>
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
           </svg>

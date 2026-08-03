@@ -31,7 +31,6 @@ export default function TransactionScreen({
         onDone={isEditing ? undefined : actions.createTransaction}
         onSave={isEditing ? actions.saveTransaction : undefined}
         onDelete={isEditing ? actions.removeTransaction : undefined}
-        isDark={isDark}
         categories={categories}
         customConcepts={isEditing ? undefined : customConcepts}
         prefill={isEditing ? undefined : prefill}

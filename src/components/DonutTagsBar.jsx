@@ -1,3 +1,8 @@
+import { useTheme } from "../hooks/useTheme";
+import { getPillarColor, getPillarSoftBg } from "../utils/colorUtils";
+import { RADIUS } from "../constants/tokens";
+import { pillStyles, getClayShadow } from "../utils/clayStyles";
+
 /**
  * DonutTagsBar.jsx
  *
@@ -22,11 +27,14 @@ export default function DonutTagsBar({
   pressingSegmentId,
   setPressingSegmentId,
   isMovementOpen,
-  isDark,
+  isDark, // Aún recibido como prop para compatibilidad
   t,
 }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark: isDarkTheme } = useTheme();
+
   return (
-    <div style={{ display: "flex", flexWrap: "nowrap", gap: 3, justifyContent: "center", marginBottom: 6, overflow: "hidden" }}>
+    <div style={{ display: "flex", flexWrap: "nowrap", gap: 4, justifyContent: "center", margin: "8px 0", overflow: "hidden" }}>
       {segments.map(seg => {
         // Saldo no es clickeable en Estado 2
         const isSaldo = seg.id === "saldo";
@@ -34,6 +42,11 @@ export default function DonutTagsBar({
 
         const isPressing = pressingSegmentId === seg.id; // Verificar si este tag está siendo presionado
         if (isPressing) console.log("🎯 RENDERING DONUT TAG PRESSED:", seg.id, "pressingSegmentId:", pressingSegmentId);
+
+        // 🆕 Color dinámico del pilar
+        const pillarColor = getPillarColor(seg.id, isDarkTheme);
+        // 🆕 Fondo suave del pilar
+        const pillarSoftBg = getPillarSoftBg(seg.id, isDarkTheme);
 
         return (
           <button
@@ -65,10 +78,10 @@ export default function DonutTagsBar({
             onClick={() => isClickable && setActiveId(activeId === seg.id ? null : seg.id)}
             disabled={!isClickable}
             style={{
-              display: "inline-flex", alignItems: "center", gap: 3, padding: "3px 6px", borderRadius: 20,
-              border: `1.5px solid ${activeId === seg.id ? seg.color : "transparent"}`,
-              background: activeId === seg.id ? seg.color + "22" : isDark ? "#1E1E2E" : "#F0EFF8",
-              color: activeId === seg.id ? seg.color : t.sub, fontSize: 9.5, fontWeight: 700,
+              display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 7px", borderRadius: "20px",
+              border: `1px solid ${activeId === seg.id ? pillarColor : "transparent"}`,
+              background: activeId === seg.id ? pillarSoftBg : isDarkTheme ? "#1E1E2E" : "#F0EFF8",
+              color: activeId === seg.id ? pillarColor : t.sub, fontSize: 9.5, fontWeight: 700,
               cursor: isClickable ? "pointer" : "default",
               whiteSpace: "nowrap",
               opacity: isPressing ? 0.5 : (isClickable ? 1 : 0.6), // Más oscuro al presionar
@@ -76,7 +89,7 @@ export default function DonutTagsBar({
               boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none", // Efecto hundido
               transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // Transición suave
             }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: seg.color, display: "inline-block" }} />
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: pillarColor, display: "inline-block" }} />
             {seg.label}
           </button>
         );

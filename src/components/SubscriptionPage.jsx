@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
 import { userStorage } from "../utils/userStorage";
+import { DARK, LIGHT } from "../constants/tokens";
 
 /**
  * SubscriptionPage.jsx — "Mi Plan".
@@ -117,7 +119,35 @@ const PLANS = [
   },
 ];
 
-export default function SubscriptionPage({ isDark, onBack }) {
+// Componente reutilizable para botón de plan
+const PlanButton = ({ plan, onSelect, t }) => {
+  const planPress = usePress();
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+      {...planPress.handlers}
+      style={{
+        width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
+        background: plan.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (plan.highlight ? "#9B6DFF" : t.text),
+        color: plan.gold ? "#3D2B00" : (plan.highlight ? "#fff" : t.bg),
+        fontSize: 13.5, fontWeight: plan.gold ? 800 : 700, cursor: "pointer",
+        boxShadow: plan.gold ? "0 2px 10px rgba(224,169,62,0.4)" : "none",
+        border: "none",
+        ...planPress.getPressStyle({ opacity: 0.85, scale: 0.98 }),
+      }}
+    >
+      Elegir {plan.name}
+    </button>
+  );
+};
+
+export default function SubscriptionPage({ onBack }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+
   const pressBack = usePress();
   const containerRef = useRef(null);
   // Plan activo del usuario (desde userStorage). Ej: "FREE" -> "free"
@@ -139,9 +169,15 @@ export default function SubscriptionPage({ isDark, onBack }) {
     return () => io.disconnect();
   }, [confirming]); // re-adjunta el observer al volver de la confirmación (si no, las tarjetas quedan invisibles)
 
-  const t = isDark
-    ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   const toggle = (id) => setExpanded((cur) => (cur === id ? null : id));
 
@@ -242,6 +278,21 @@ export default function SubscriptionPage({ isDark, onBack }) {
               background: cp.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (cp.highlight ? "#9B6DFF" : (cp.id === "free" ? "#22C55E" : t.text)),
               color: cp.gold ? "#3D2B00" : (cp.id === "free" || cp.highlight ? "#fff" : t.bg),
               fontSize: 14, fontWeight: 800, cursor: "pointer",
+              transition: "all 0.15s ease",
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.opacity = "0.85";
+              e.currentTarget.style.transform = "scale(0.98)";
+              console.log(`💳 SubscriptionPage: Botón 'Continuar con ${cp.name}' PRESIONADO`);
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.opacity = "1";
+              e.currentTarget.style.transform = "scale(1)";
+              console.log(`💳 SubscriptionPage: Botón 'Continuar con ${cp.name}' SOLTADO`);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+              e.currentTarget.style.transform = "scale(1)";
             }}
           >
             {cp.price === 0 ? "Cambiar a ORUS Free" : `Continuar con ${cp.name}`}
@@ -373,24 +424,28 @@ export default function SubscriptionPage({ isDark, onBack }) {
               )}
 
               {/* Botón de acción (no expande la tarjeta) */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (isCurrent) return;
-                  setPayHint(false);
-                  setConfirming(p.id); // abre la pantalla de confirmación
-                }}
-                style={{
-                  width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
-                  border: isCurrent ? `1.5px solid ${t.border}` : "none",
-                  background: isCurrent ? "transparent" : (p.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (p.highlight ? "#9B6DFF" : t.text)),
-                  color: isCurrent ? t.sub : (p.gold ? "#3D2B00" : (p.highlight ? "#fff" : t.bg)),
-                  fontSize: 13.5, fontWeight: p.gold ? 800 : 700, cursor: isCurrent ? "default" : "pointer",
-                  boxShadow: !isCurrent && p.gold ? "0 2px 10px rgba(224,169,62,0.4)" : "none",
-                }}
-              >
-                {isCurrent ? "Tu plan actual" : `Elegir ${p.name}`}
-              </button>
+              {isCurrent ? (
+                <button
+                  style={{
+                    width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
+                    border: `1.5px solid ${t.border}`,
+                    background: "transparent",
+                    color: t.sub,
+                    fontSize: 13.5, fontWeight: 700, cursor: "default",
+                  }}
+                >
+                  Tu plan actual
+                </button>
+              ) : (
+                <PlanButton
+                  plan={p}
+                  onSelect={() => {
+                    setPayHint(false);
+                    setConfirming(p.id);
+                  }}
+                  t={t}
+                />
+              )}
             </div>
           );
         })}

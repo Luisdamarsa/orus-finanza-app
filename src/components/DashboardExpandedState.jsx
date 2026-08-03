@@ -4,6 +4,7 @@ import { DonutSkeleton, CardsGridSkeleton } from "./LoadingSkeleton";
 import DonutTagsBar from "./DonutTagsBar";
 import DonutChartComponent from "./DonutChart";
 import PillarCardsGrid from "./PillarCardsGrid";
+import PillarBarsPopup from "./PillarBarsPopup";
 import { PILLARS, SALDO_COLOR } from "../constants";
 import { useDashboard } from "../contexts/DashboardContext";
 
@@ -21,8 +22,9 @@ export default function DashboardExpandedState() {
     totalSpent, saldoForDonut, pillarSpends, selectedPeriod,
     pressingSegmentId, setPressingSegmentId,
     chipPcts, customBudgets, getBudgetForMonth, hasSaldo, saldo, saldoPctFinal,
-    setSelectedPillarDetail, setShowPillarBars,
+    setSelectedPillarDetail, setShowPillarBars, showPillarBars,
     donutRef, donutContainerRef, pillarsGridRef,
+    transactions, setScreen,
   } = useDashboard();
 
   return (
@@ -30,7 +32,7 @@ export default function DashboardExpandedState() {
       {/* 🆕 Contenedor del donut + botones para detectar click outside */}
       <div ref={donutContainerRef}>
         {/* Donut */}
-        <div ref={donutRef} style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4 }}>
+        <div ref={donutRef} style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", margin: "8px 0 0" }}>
           <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
 <LoadingWrapper
             isLoading={isLoading("donut")}
@@ -43,7 +45,7 @@ export default function DashboardExpandedState() {
         </div>
 
         {/* Botones/Tags del donut - Componente separado (entra desde abajo) */}
-        <div className="orus-rise" style={{ animationDelay: "0.04s" }}>
+        <div className="orus-rise" style={{ animationDelay: "0.04s", margin: "8px 0 0" }}>
         <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
 <DonutTagsBar
           segments={segments}
@@ -59,34 +61,52 @@ export default function DashboardExpandedState() {
         </div>
       </div>
 
-      {/* 🆕 Ocultar barra de categorías cuando filterType es "ingresos" - con ref para medir altura */}
-      <div ref={pillarsGridRef} style={{ display: filterType === "ingresos" ? "none" : "block", marginBottom: filterType === "ingresos" ? 0 : 12 }}>
+      {/* 🆕 Condicional: Grid de tarjetas O Tarjeta expandida */}
+      <div ref={pillarsGridRef} style={{ display: filterType === "ingresos" ? "none" : "block", marginTop: 8, overflow: "hidden", paddingX: 0 }}>
         <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
-<LoadingWrapper
-          isLoading={isLoading("cardsGrid")}
-          skeleton={<CardsGridSkeleton isDark={isDark} />}
-          isDark={isDark}
-        >
-          <PillarCardsGrid
-            PILLARS={PILLARS}
-            chipPcts={chipPcts}
-            pillarSpends={pillarSpends}
-            activeId={activeId}
-            setActiveId={setActiveId}
-            selectedPeriod={selectedPeriod}
-            customBudgets={customBudgets}
-            getBudgetForMonth={getBudgetForMonth}
-            hasSaldo={hasSaldo}
-            saldo={saldo}
-            saldoPctFinal={saldoPctFinal}
-            SALDO_COLOR={SALDO_COLOR}
-            setSelectedPillarDetail={setSelectedPillarDetail}
-            setShowPillarBars={setShowPillarBars}
-            isDark={isDark}
-            t={t}
-          />
-        </LoadingWrapper>
-</ErrorBoundary>
+          {!activeId ? (
+            // Grid normal (sin pilar seleccionado)
+            <LoadingWrapper
+              isLoading={isLoading("cardsGrid")}
+              skeleton={<CardsGridSkeleton isDark={isDark} />}
+              isDark={isDark}
+            >
+              <PillarCardsGrid
+                PILLARS={PILLARS}
+                chipPcts={chipPcts}
+                pillarSpends={pillarSpends}
+                activeId={activeId}
+                setActiveId={setActiveId}
+                selectedPeriod={selectedPeriod}
+                customBudgets={customBudgets}
+                getBudgetForMonth={getBudgetForMonth}
+                hasSaldo={hasSaldo}
+                saldo={saldo}
+                saldoPctFinal={saldoPctFinal}
+                SALDO_COLOR={SALDO_COLOR}
+                setSelectedPillarDetail={setSelectedPillarDetail}
+                setShowPillarBars={setShowPillarBars}
+                showPillarBars={showPillarBars}
+                isDark={isDark}
+                t={t}
+              />
+            </LoadingWrapper>
+          ) : (
+            // Tarjeta expandida (pilar seleccionado) - reutilizando PillarBarsPopup inline
+            <PillarBarsPopup
+              pillar={PILLARS.find(p => p.id === activeId)}
+              onClose={() => setActiveId(null)}
+              onViewMovements={() => {
+                setScreen("movimientos");
+                setSelectedPillarDetail(PILLARS.find(p => p.id === activeId));
+              }}
+              isDark={isDark}
+              transactions={transactions}
+              selectedPeriod={selectedPeriod}
+              isInline={true}
+            />
+          )}
+        </ErrorBoundary>
       </div>
     </div>
   );

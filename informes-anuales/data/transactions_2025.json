@@ -1,0 +1,1442 @@
+[
+ {
+  "date": "2025-01-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-01-03",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-01-05",
+  "time": "14:20",
+  "description": "Rappi Comida",
+  "method": "Nequi",
+  "amount": -55000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-01-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-01-10",
+  "time": "20:00",
+  "description": "Restaurante Masa",
+  "method": "Tarjeta",
+  "amount": -95000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-01-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -420000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-01-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-01-18",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -125000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-01-20",
+  "time": "18:15",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -43000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-01-22",
+  "time": "19:30",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -52000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-01-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -300000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-01-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2800000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-02-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-02-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-02-04",
+  "time": "14:20",
+  "description": "Uber Eats",
+  "method": "Nequi",
+  "amount": -62000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-02-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-02-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-02-10",
+  "time": "20:00",
+  "description": "El Corral Gourmet",
+  "method": "Tarjeta",
+  "amount": -105000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-02-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -480000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-02-14",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -135000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-02-16",
+  "time": "15:30",
+  "description": "Gas Natural Fenosa",
+  "method": "Banco",
+  "amount": -40000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-02-18",
+  "time": "18:15",
+  "description": "Stiefel Pub",
+  "method": "Tarjeta",
+  "amount": -58000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-02-20",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -280000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-02-22",
+  "time": "16:20",
+  "description": "TransMilenio Recarga",
+  "method": "Llave",
+  "amount": -35000,
+  "pillar": "varios",
+  "category_id": "cat_transporte",
+  "category": "Transporte"
+ },
+ {
+  "date": "2025-02-24",
+  "time": "12:30",
+  "description": "Andrés Carne de Res",
+  "method": "Tarjeta",
+  "amount": -128000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-02-28",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2900000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-03-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-03-03",
+  "time": "14:20",
+  "description": "iFood Comida",
+  "method": "Nequi",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-03-05",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-03-08",
+  "time": "19:45",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -40000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-03-10",
+  "time": "12:30",
+  "description": "Restaurante Wok",
+  "method": "Tarjeta",
+  "amount": -72000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-03-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -400000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-03-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-03-18",
+  "time": "11:00",
+  "description": "Makro Supermercado",
+  "method": "Tarjeta",
+  "amount": -145000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-03-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -250000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-03-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2800000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-04-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-04-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-04-04",
+  "time": "14:20",
+  "description": "Uber Eats",
+  "method": "Nequi",
+  "amount": -55000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-04-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -45000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-04-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-04-10",
+  "time": "20:00",
+  "description": "Restaurante Masa",
+  "method": "Tarjeta",
+  "amount": -98000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-04-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -520000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-04-14",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -142000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-04-16",
+  "time": "15:30",
+  "description": "Gas Natural Fenosa",
+  "method": "Banco",
+  "amount": -40000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-04-18",
+  "time": "18:15",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -65000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-04-20",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -350000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-04-22",
+  "time": "16:20",
+  "description": "TransMilenio Recarga",
+  "method": "Llave",
+  "amount": -35000,
+  "pillar": "varios",
+  "category_id": "cat_transporte",
+  "category": "Transporte"
+ },
+ {
+  "date": "2025-04-24",
+  "time": "12:30",
+  "description": "Cinemark IMAX",
+  "method": "Tarjeta",
+  "amount": -52000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-04-26",
+  "time": "19:00",
+  "description": "Andrés Carne de Res",
+  "method": "Tarjeta",
+  "amount": -118000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-04-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 3000000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-05-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-05-03",
+  "time": "14:20",
+  "description": "iFood Comida",
+  "method": "Nequi",
+  "amount": -52000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-05-05",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-05-08",
+  "time": "19:45",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -43000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-05-10",
+  "time": "20:00",
+  "description": "Restaurante Wok",
+  "method": "Tarjeta",
+  "amount": -75000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-05-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -380000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-05-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-05-18",
+  "time": "11:00",
+  "description": "Carrefour",
+  "method": "Tarjeta",
+  "amount": -128000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-05-22",
+  "time": "18:15",
+  "description": "Stiefel Pub",
+  "method": "Tarjeta",
+  "amount": -58000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-05-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -280000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-05-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2750000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-06-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-06-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-06-04",
+  "time": "14:20",
+  "description": "Rappi Comida",
+  "method": "Nequi",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-06-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -45000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-06-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-06-10",
+  "time": "20:00",
+  "description": "Restaurante Masa",
+  "method": "Tarjeta",
+  "amount": -92000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-06-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -420000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-06-14",
+  "time": "11:00",
+  "description": "Makro Supermercado",
+  "method": "Tarjeta",
+  "amount": -155000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-06-16",
+  "time": "15:30",
+  "description": "Gas Natural Fenosa",
+  "method": "Banco",
+  "amount": -40000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-06-18",
+  "time": "18:15",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -60000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-06-20",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -300000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-06-24",
+  "time": "12:30",
+  "description": "Cinemark",
+  "method": "Tarjeta",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-06-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2850000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-07-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-07-05",
+  "time": "14:20",
+  "description": "Uber Eats",
+  "method": "Nequi",
+  "amount": -50000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-07-08",
+  "time": "19:45",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -43000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-07-10",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-07-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -400000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-07-15",
+  "time": "11:00",
+  "description": "Carrefour",
+  "method": "Tarjeta",
+  "amount": -105000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-07-18",
+  "time": "18:15",
+  "description": "Stiefel Pub",
+  "method": "Tarjeta",
+  "amount": -55000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-07-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -320000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-07-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2800000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-08-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-08-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-08-04",
+  "time": "14:20",
+  "description": "iFood Comida",
+  "method": "Nequi",
+  "amount": -52000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-08-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-08-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-08-10",
+  "time": "20:00",
+  "description": "El Corral Gourmet",
+  "method": "Tarjeta",
+  "amount": -85000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-08-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -450000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-08-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-08-18",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -130000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-08-22",
+  "time": "18:15",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -62000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-08-25",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -270000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-08-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2900000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-09-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-09-03",
+  "time": "14:20",
+  "description": "Rappi Comida",
+  "method": "Nequi",
+  "amount": -45000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-09-05",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-09-08",
+  "time": "19:45",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -40000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-09-10",
+  "time": "20:00",
+  "description": "Restaurante Wok",
+  "method": "Tarjeta",
+  "amount": -70000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-09-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -380000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-09-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-09-18",
+  "time": "11:00",
+  "description": "Makro Supermercado",
+  "method": "Tarjeta",
+  "amount": -140000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-09-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -300000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-09-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2800000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-10-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-10-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-10-04",
+  "time": "14:20",
+  "description": "Uber Eats",
+  "method": "Nequi",
+  "amount": -55000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-10-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -45000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-10-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-10-10",
+  "time": "20:00",
+  "description": "Restaurante Masa",
+  "method": "Tarjeta",
+  "amount": -95000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-10-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -500000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-10-14",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -145000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-10-16",
+  "time": "15:30",
+  "description": "Gas Natural Fenosa",
+  "method": "Banco",
+  "amount": -40000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-10-18",
+  "time": "18:15",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -60000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-10-20",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -330000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-10-22",
+  "time": "16:20",
+  "description": "TransMilenio Recarga",
+  "method": "Llave",
+  "amount": -35000,
+  "pillar": "varios",
+  "category_id": "cat_transporte",
+  "category": "Transporte"
+ },
+ {
+  "date": "2025-10-24",
+  "time": "12:30",
+  "description": "Cinemark",
+  "method": "Tarjeta",
+  "amount": -50000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-10-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 3000000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-11-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-11-03",
+  "time": "14:20",
+  "description": "iFood Comida",
+  "method": "Nequi",
+  "amount": -50000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-11-05",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-11-08",
+  "time": "19:45",
+  "description": "Cine Colombia",
+  "method": "Tarjeta",
+  "amount": -40000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-11-10",
+  "time": "20:00",
+  "description": "Restaurante Wok",
+  "method": "Tarjeta",
+  "amount": -72000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-11-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -420000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-11-15",
+  "time": "15:30",
+  "description": "Luz EPM",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-11-18",
+  "time": "11:00",
+  "description": "Carrefour",
+  "method": "Tarjeta",
+  "amount": -125000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-11-22",
+  "time": "18:15",
+  "description": "Stiefel Pub",
+  "method": "Tarjeta",
+  "amount": -58000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-11-25",
+  "time": "10:45",
+  "description": "Meta Viaje Deposito",
+  "method": "Banco",
+  "amount": -290000,
+  "pillar": "ahorro",
+  "category_id": "cat_meta_viaje",
+  "category": "Meta viaje"
+ },
+ {
+  "date": "2025-11-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2850000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ },
+ {
+  "date": "2025-12-01",
+  "time": "08:00",
+  "description": "Arriendo Apto 301",
+  "method": "Banco",
+  "amount": -700000,
+  "pillar": "fijos",
+  "category_id": "cat_arriendo",
+  "category": "Arriendo"
+ },
+ {
+  "date": "2025-12-02",
+  "time": "10:30",
+  "description": "Internet Claro",
+  "method": "Banco",
+  "amount": -120000,
+  "pillar": "fijos",
+  "category_id": "cat_internet",
+  "category": "Internet"
+ },
+ {
+  "date": "2025-12-04",
+  "time": "14:20",
+  "description": "Rappi Comida",
+  "method": "Nequi",
+  "amount": -52000,
+  "pillar": "ocio",
+  "category_id": "cat_domicilios",
+  "category": "Domicilios"
+ },
+ {
+  "date": "2025-12-06",
+  "time": "19:45",
+  "description": "Cine Royal",
+  "method": "Tarjeta",
+  "amount": -48000,
+  "pillar": "ocio",
+  "category_id": "cat_cine_planes",
+  "category": "Cine / Planes"
+ },
+ {
+  "date": "2025-12-08",
+  "time": "08:00",
+  "description": "Agua EAAB",
+  "method": "Banco",
+  "amount": -60000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-12-10",
+  "time": "20:00",
+  "description": "Restaurante Masa",
+  "method": "Tarjeta",
+  "amount": -100000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-12-12",
+  "time": "08:30",
+  "description": "Pago Tarjeta Visa",
+  "method": "Banco",
+  "amount": -480000,
+  "pillar": "deuda",
+  "category_id": "cat_tarjeta_visa",
+  "category": "Tarjeta Visa"
+ },
+ {
+  "date": "2025-12-14",
+  "time": "11:00",
+  "description": "Carrefour Market",
+  "method": "Tarjeta",
+  "amount": -160000,
+  "pillar": "varios",
+  "category_id": "cat_supermercado",
+  "category": "Supermercado"
+ },
+ {
+  "date": "2025-12-16",
+  "time": "15:30",
+  "description": "Gas Natural Fenosa",
+  "method": "Banco",
+  "amount": -40000,
+  "pillar": "fijos",
+  "category_id": "cat_servicios",
+  "category": "Servicios"
+ },
+ {
+  "date": "2025-12-18",
+  "time": "18:15",
+  "description": "Bar La Puerta",
+  "method": "Tarjeta",
+  "amount": -65000,
+  "pillar": "ocio",
+  "category_id": "cat_bares",
+  "category": "Bares"
+ },
+ {
+  "date": "2025-12-20",
+  "time": "10:45",
+  "description": "Fondo Emergencia",
+  "method": "Banco",
+  "amount": -380000,
+  "pillar": "ahorro",
+  "category_id": "cat_fondo_emergencia",
+  "category": "Fondo emergencia"
+ },
+ {
+  "date": "2025-12-24",
+  "time": "12:30",
+  "description": "Cena Navidad",
+  "method": "Tarjeta",
+  "amount": -120000,
+  "pillar": "ocio",
+  "category_id": "cat_restaurantes",
+  "category": "Restaurantes"
+ },
+ {
+  "date": "2025-12-30",
+  "time": "12:00",
+  "description": "Sueldo Empresa ABC",
+  "method": "Banco",
+  "amount": 2950000,
+  "pillar": "ingreso",
+  "category_id": null,
+  "category": null
+ }
+]

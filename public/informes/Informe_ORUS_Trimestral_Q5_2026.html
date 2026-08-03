@@ -1,0 +1,197 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Análisis Trimestral Ene–Mar 2026 · Luis Daniel MartÃ­nez</title><style>
+/* A4 page simulation for screen viewing */
+html { background:#ccc; padding:15px; }
+body { width:210mm; margin:0 auto 20mm; padding:9mm 11mm 11mm 11mm;
+  font-family:Helvetica,Arial,sans-serif; color:#1A1830; font-size:8.7pt; line-height:1.4;
+  background:white; box-shadow:0 0 15px rgba(0,0,0,0.2);
+  display:flex; flex-direction:column; position:relative; min-height:297mm; }
+
+/* Print styles */
+@page { size:A4; margin:9mm 11mm 11mm 11mm; }
+@media print {
+  html { background:white; padding:0; }
+  body { width:100%; height:auto; margin:0; box-shadow:none; padding:0; }
+}
+
+* { box-sizing:border-box; }
+.pageb { page-break-before:always; }
+h1 { font-size:16.5pt; margin:0; letter-spacing:.2px; white-space:nowrap; }
+h2 { font-size:12.5pt; margin:10px 0 5px; padding-bottom:4px; border-bottom:2px solid #E5E3F5; }
+.sub { color:#7B7A99; font-size:9pt; margin-top:3px; }
+p { margin:6px 0; } b { color:#1A1830; }
+.header { display:flex; justify-content:space-between; align-items:flex-start;
+  background:#F5F3FF; border-left:5px solid #9B6DFF; border-radius:12px; padding:16px 18px; }
+.header .l { display:flex; align-items:center; gap:14px; }
+.logobox { width:80px; height:80px; background:#fff; border:1px solid #E5E3F5; border-radius:14px;
+  display:flex; align-items:center; justify-content:center; flex:0 0 80px; }
+.header .r { text-align:right; }
+.uname { font-weight:bold; font-size:11pt; }
+.chip { display:inline-block; background:#EDE9FB; color:#6D28D9; border-radius:8px;
+  padding:3px 10px; font-size:8pt; margin-top:6px; font-weight:bold; }
+.pub { color:#A9A5BC; font-size:7.6pt; margin-top:10px; white-space: nowrap; }
+.kpis { display:flex; gap:10px; margin-top:10px; }
+.kpi { flex:1; border:1px solid #E5E3F5; border-radius:12px; padding:8px 12px; background:#fff; }
+.kpi .kl { font-size:7.4pt; color:#7B7A99; font-weight:bold; letter-spacing:.4px; text-transform:uppercase; }
+.kpi .kv { font-size:14pt; font-weight:bold; margin:2px 0; }
+.kpi .ks { font-size:7.4pt; color:#A9A5BC; }
+.kpi.g .kv { color:#16A34A; } .kpi.r .kv { color:#DC2626; } .kpi.p .kv { color:#7C3AED; }
+.healthband { display:flex; align-items:center; gap:16px; margin-top:10px;
+  background:linear-gradient(90deg,#F5F3FF,#F0FDF4); border:1px solid #E5E3F5; border-radius:12px; padding:9px 16px; }
+.hscore { flex:0 0 auto; display:flex; align-items:center; gap:10px; padding-right:16px; border-right:1px solid #E5E3F5; }
+.hnum { font-size:30pt; font-weight:bold; color:#9B6DFF; line-height:1; white-space:nowrap; }
+.hden { font-size:13pt; color:#A9A5BC; font-weight:bold; }
+.hcap { font-size:8.5pt; font-weight:bold; color:#1A1830; }
+.hbars { flex:1 1 auto; min-width:0; }
+.htitle { font-size:7.2pt; color:#A9A5BC; font-weight:bold; text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+.hmini { display:flex; align-items:center; gap:10px; margin:4px 0; }
+.hml { flex:0 0 178px; width:178px; font-size:7.8pt; color:#7B7A99; white-space:nowrap; }
+.htrack { flex:1 1 auto; min-width:46px; height:10px; background:#EFEDF7; border-radius:6px; overflow:hidden; }
+.hfill { height:100%; background:#9B6DFF; border-radius:6px; min-width:2px; }
+.hmv { flex:0 0 42px; width:42px; text-align:right; font-weight:bold; font-size:8.5pt; color:#9B6DFF; }
+.hpts { font-size:6.5pt; color:#A9A5BC; font-weight:normal; margin-left:2px; }
+.hverdict { flex:0 0 150px; padding-left:14px; border-left:1px solid #E5E3F5; }
+.hvbig { font-size:12pt; font-weight:bold; color:#16A34A; }
+.hvsub { font-size:7.6pt; color:#7B7A99; }
+.mompanel { background:#FAFAFE; border:1px solid #E5E3F5; border-radius:10px; padding:9px 12px; }
+.momtitle { font-size:8.4pt; font-weight:bold; color:#1A1830; margin-bottom:6px; }
+.mom { display:flex; align-items:flex-start; gap:7px; margin:5px 0; }
+.mtxt { flex:1; } .mml { font-size:7.3pt; color:#A9A5BC; } .mmv { font-size:8pt; color:#4A4860; }
+.tnote, .dnote { font-size:7pt; color:#A9A5BC; margin-top:5px; line-height:1.35; }
+.dnote { text-align:center; padding:0 4px; }
+.row { display:flex; gap:16px; align-items:flex-start; }
+.col { flex:1; } .col.narrow { flex:0 0 190px; text-align:center; }
+table.t { width:100%; border-collapse:collapse; font-size:8.3pt; }
+table.t th { background:#F1F0F8; color:#4A4860; text-align:left; padding:7px 8px; font-size:7.6pt;
+  text-transform:uppercase; letter-spacing:.3px; border-bottom:1px solid #E5E3F5; }
+table.t td { padding:6px 8px; border-bottom:1px solid #EFEDF7; vertical-align:middle; }
+table.t .num { text-align:right; white-space:nowrap; }
+table.t .rules { text-align:center; font-weight:bold; color:#4A4860; background:#FAFAFE; vertical-align:middle; }
+.cmt { color:#7B7A99; font-size:7.8pt; } .pico { color:#7B7A99; font-size:7.8pt; }
+tr.tot td { font-weight:bold; background:#F0FDF4; border-top:1px solid #D6F5E3; }
+.pill { display:inline-block; padding:2px 9px; border-radius:8px; font-weight:bold; font-size:7.8pt; }
+.badge { display:inline-block; background:#DCFCE7; color:#16A34A; padding:2px 9px; border-radius:7px; font-weight:bold; font-size:7.6pt; }
+.badge.blue { background:#EFF6FF; color:#2563EB; }
+.pos { color:#16A34A; font-weight:bold; } .warnv { color:#2563EB; font-weight:bold; } .neu { color:#4A4860; }
+.donutwrap { position:relative; width:150px; height:150px; margin:2px auto 0; }
+.dcenter { position:absolute; top:0; left:0; width:150px; height:150px; display:flex;
+  flex-direction:column; align-items:center; justify-content:center; }
+.dlabel { font-size:7.5pt; color:#A9A5BC; letter-spacing:1px; }
+.damount { font-size:12.5pt; font-weight:bold; color:#1A1830; }
+.ctitle { font-size:8pt; font-weight:bold; color:#4A4860; text-align:center; margin-bottom:2px; }
+.legend { display:flex; flex-wrap:wrap; gap:5px 10px; justify-content:center; margin-top:8px; }
+.legend.sm { font-size:7.6pt; }
+.lg { font-size:7.8pt; color:#4A4860; white-space:nowrap; }
+.dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:3px; vertical-align:middle; }
+.chart { margin-top:6px; }
+.concl { border:1px solid #E5E3F5; background:#FAFAFE; border-radius:10px; padding:9px 14px; margin-top:8px; font-size:8.4pt; }
+table.sem { border-collapse:separate; border-spacing:3px; width:100%; font-size:7.6pt; margin-top:2px; }
+table.sem th.sm { padding:3px 0; text-align:center; color:#7B7A99; font-size:7pt; font-weight:bold; }
+table.sem td.sp { padding:0 6px 0 0; }
+table.sem td.sc { text-align:center; font-weight:bold; padding:7px 0; border-radius:5px; }
+.semkey { display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; font-size:7.4pt; color:#7B7A99; align-items:center; }
+.kd { display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:3px; vertical-align:middle; }
+.semnote { color:#A9A5BC; }
+.bchg { font-size:7.5pt; color:#6D28D9; margin-top:6px; background:#F5F3FF; border:1px solid #E5E3F5; border-radius:7px; padding:5px 10px; line-height:1.4; }
+.logro { background:#F0FDF4; border-left:3px solid #86EFAC; border-radius:8px; padding:8px 11px; margin-bottom:7px; }
+.lgt { font-weight:bold; font-size:8.6pt; } .lgb { color:#4A4860; font-size:7.9pt; margin-top:2px; }
+.mrow { display:flex; align-items:center; gap:9px; margin:4px 0; }
+.mlbl { width:64px; font-size:8pt; font-weight:bold; }
+.mtrack { flex:1; height:12px; background:#EFEDF7; border-radius:6px; overflow:hidden; }
+.mfill { height:100%; border-radius:6px; }
+.mval { width:80px; text-align:right; font-size:7.8pt; color:#7B7A99; }
+.mnote { font-size:7.6pt; color:#A9A5BC; margin-top:7px; }
+.reco { background:#F5F3FF; border-left:4px solid #9B6DFF; border-radius:8px; padding:9px 13px; margin-bottom:8px; }
+.rt { font-weight:bold; font-size:9pt; } .rb { color:#4A4860; font-size:8.2pt; margin-top:3px; }
+.foot { margin-top:auto; text-align:center; color:#A9A5BC; font-size:7.6pt; padding-top:8px; border-top:1px solid #E5E3F5; background:white; display:block; }
+@page :last { margin-bottom:11mm; }
+@page :last .foot { display:block; }
+.secintro { color:#4A4860; font-size:8.5pt; margin:3px 0 6px; }
+
+.cmp { border:1px solid #E5E3F5; border-radius:12px; margin-top:10px; overflow:hidden; }
+.cmptitle { background:#F5F3FF; color:#4A4860; font-weight:bold; font-size:8pt; padding:6px 12px;
+  text-transform:uppercase; letter-spacing:.3px; border-bottom:1px solid #E5E3F5; }
+.cmpbody { display:flex; justify-content:space-between; align-items:stretch; padding:10px 16px; gap:6px; }
+.cmpk { text-align:center; display:flex; flex-direction:column; justify-content:center; }
+.cmpdiv { flex:0 0 1px; width:1px; background:#E5E3F5; align-self:stretch; margin:0 6px; }
+.ck { font-size:6.9pt; color:#7B7A99; white-space:nowrap; } .cv { font-size:8.8pt; margin-top:3px; white-space:nowrap; }
+.dz { color:#A9A5BC; font-weight:bold; }
+.ppbody { padding:10px 16px; }
+.pprow { display:flex; align-items:center; justify-content:center; gap:26px; margin-bottom:7px; }
+.ppt { display:flex; flex-direction:column; align-items:center; } .ppm { font-size:7.4pt; color:#7B7A99; }
+.ppv { font-size:10pt; font-weight:bold; color:#1A1830; white-space:nowrap; }
+.pparrow { color:#C4B5FD; font-size:14pt; font-weight:bold; }
+.ppnote { font-size:7.8pt; color:#7B7A99; line-height:1.4; padding-top:6px; border-top:1px solid #E5E3F5; text-align:center; }
+table.sem3 { border-spacing:5px 3px; }
+table.sem3 td.sc { padding:6px 0; font-size:8.5pt; }
+.muro { border-radius:8px; padding:6px 11px; margin-bottom:5px; }
+.muro.logro { background:#F0FDF4; border-left:3px solid #86EFAC; }
+.muro.alerta { background:#FEF6EE; border-left:3px solid #FDBA74; }
+.mtag { font-size:6.6pt; font-weight:bold; letter-spacing:.5px; }
+.muro.logro .mtag { color:#16A34A; } .muro.alerta .mtag { color:#C2560C; }
+.mtt { font-weight:bold; font-size:8.6pt; margin-top:1px; } .mtb { color:#4A4860; font-size:7.9pt; margin-top:1px; }
+/* compactado trimestral para asegurar 2 páginas */
+h2 { margin:7px 0 4px; }
+.reco { padding:7px 13px; margin-bottom:6px; }
+.foot { margin-top:auto; padding-top:8px; display:block !important; }
+@page :last .foot { display:block; }
+/* ajustes de formato */
+.pub { white-space:nowrap; margin-top:10px; }               /* pie de encabezado con espacio visual */
+.badge { white-space:nowrap; }              /* "+ Excedente" en una línea */
+table.sem3 { width:auto; margin:2px auto 0; } /* semáforo centrado (pilares + celdas juntos) */
+table.sem3 td.sc { min-width:74px; }
+.semkey { justify-content:center; }         /* leyenda del semáforo centrada */
+</style></head><body>
+<div class="header"><div class="l"><div class="logobox"><svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+  <!-- Fijos 35% (Azul) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#93C5FD" stroke-width="48" stroke-linecap="round" stroke-dasharray="329.87 942.48" stroke-dashoffset="0" transform="rotate(-90 200 200)"/>
+  <!-- Deuda 15% (Rojo) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#FCA5A5" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-329.87" transform="rotate(-90 200 200)"/>
+  <!-- Ahorro 20% (Verde) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#86EFAC" stroke-width="48" stroke-linecap="round" stroke-dasharray="188.50 942.48" stroke-dashoffset="-471.24" transform="rotate(-90 200 200)"/>
+  <!-- Ocio 15% (Púrpura) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#C4B5FD" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-659.74" transform="rotate(-90 200 200)"/>
+  <!-- Varios 15% (Amarillo) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#FDE68A" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-801.11" transform="rotate(-90 200 200)"/>
+  <!-- Centro blanco -->
+  <circle cx="200" cy="200" r="80" fill="white"/>
+  <!-- ORUS texto -->
+  <text x="200" y="230" font-size="80" font-weight="800" fill="#9B6DFF" text-anchor="middle">ORUS</text>
+</svg></div>
+  <div><h1>ANÁLISIS TRIMESTRAL</h1>
+    <div class="sub">Informe de Comportamiento, Presupuestos y Salud Financiera</div></div></div>
+  <div class="r"><div class="uname">Luis Daniel MartÃ­nez</div>
+    <div class="chip">Trimestre: Ene–Mar 2026</div>
+    <div class="pub">Publicado: 1 de marzo de 2026 · Fuente: Base de datos ORUS</div></div></div>
+<div class="kpis">
+  <div class="kpi"><div class="kl">Ingresos del Trim.</div><div class="kv">$8.500.000</div><div class="ks">Promedio: $2.83M / mes</div></div>
+  <div class="kpi r"><div class="kl">Gastos del Trim.</div><div class="kv">$4.772.000</div><div class="ks">Ejecutado: 56.1% del ingreso</div></div>
+  <div class="kpi g"><div class="kl">Ahorro Formal</div><div class="kv">$530.000</div><div class="ks">Meta trim.: $0.90M</div></div>
+  <div class="kpi g"><div class="kl">Liquidez Libre</div><div class="kv">$3.728.000</div><div class="ks">43.9% sin comprometer</div></div>
+</div>
+<div class="healthband"><div class="hscore"><div class="hnum">97<span class="hden">/100</span></div><div class="hcap">Índice de Salud<br>del Trimestre</div></div><div class="hbars"><div class="htitle">Componentes del puntaje (0–100)</div><div class="hmini"><div class="hml">Tasa de ahorro efectiva (50.1%)</div><div class="htrack"><div class="hfill" style="width:100%"></div></div><div class="hmv">100<span class="hpts">pts</span></div></div><div class="hmini"><div class="hml">Cumplimiento de presupuesto (92%)</div><div class="htrack"><div class="hfill" style="width:92%"></div></div><div class="hmv">92<span class="hpts">pts</span></div></div><div class="hmini"><div class="hml">Índice de cobertura (1.78×)</div><div class="htrack"><div class="hfill" style="width:100%"></div></div><div class="hmv">100<span class="hpts">pts</span></div></div></div><div class="hverdict"><div class="hvbig">Excelente</div><div class="hvsub">Trimestre bajo control con foco de mejora puntual.</div></div></div>
+<div class="cmp"><div class="cmptitle">vs. Trimestre Anterior · Octubre–Diciembre 2025</div><div class="cmpbody"><div class="cmpk"><div class="ck">Gasto total</div><div class="cv"><span style="color:#16A34A;font-weight:bold">▼ 25.8%</span></div></div><div class="cmpk"><div class="ck">Ahorro</div><div class="cv"><span style="color:#DC2626;font-weight:bold">▼ 47.0%</span></div></div><div class="cmpk"><div class="ck">Liquidez</div><div class="cv"><span style="color:#16A34A;font-weight:bold">▲ 57.6%</span></div></div><div class="cmpk"><div class="ck">Salud</div><div class="cv"><span style="color:#16A34A;font-weight:bold">▲ 3 pts</span></div></div><div class="cmpdiv"></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></div><div class="cv"><span style="color:#16A34A;font-weight:bold">▼ 3.8%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></div><div class="cv"><span style="color:#16A34A;font-weight:bold">▼ 35.7%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></div><div class="cv"><span style="color:#DC2626;font-weight:bold">▼ 47.0%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></div><div class="cv"><span style="color:#16A34A;font-weight:bold">▼ 40.7%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#FFFBEB;color:#B45309">Varios</span></div><div class="cv"><span style="color:#16A34A;font-weight:bold">▼ 48.0%</span></div></div></div></div>
+<h2>1. Diagnóstico del Trimestre · 50/30/20</h2>
+<div class="row"><div class="col"><table class="t"><thead><tr><th>Pilar Finanzas</th><th class="num">Gasto Trim.</th><th class="num">% del Ingreso</th><th>Regla Ideal</th><th>Estado</th></tr></thead><tbody><tr><td><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></td><td class="num">$2.560.000</td><td class="num">30.1%</td><td class="rules" rowspan="2">50%</td><td><span class="badge">Sano</span></td></tr><tr><td><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></td><td class="num">$900.000</td><td class="num">10.6%</td><td><span class="badge">Controlado</span></td></tr><tr><td><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></td><td class="num">$540.000</td><td class="num">6.4%</td><td class="rules" rowspan="2">30%</td><td><span class="badge">Optimizado</span></td></tr><tr><td><span class="pill" style="background:#FFFBEB;color:#B45309">Varios</span></td><td class="num">$242.000</td><td class="num">2.8%</td><td><span class="badge">Alineado</span></td></tr><tr><td><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></td><td class="num">$530.000</td><td class="num">6.2%</td><td class="rules" rowspan="1">20%</td><td><span class="badge">+ Excedente</span></td></tr><tr class="tot"><td>Excedente Libre / Liquidez</td><td class="num">$3.728.000</td><td class="num">43.9%</td><td class="rules">—</td><td><span class="badge blue">Disponible</span></td></tr></tbody></table>
+  <div class="tnote">"Gasto Trim." = gastado en los 3 meses. "% del Ingreso" = gasto del pilar ÷ ingresos del trimestre.</div></div>
+  <div class="col narrow"><div class="ctitle">Distribución del Gasto · Ene–Mar 2026</div><div class="donutwrap"><svg viewBox="0 0 140 140" width="150" height="150"><circle cx="70" cy="70" r="54" fill="none" stroke="#EFEDF7" stroke-width="20"/><circle cx="70" cy="70" r="54" fill="none" stroke="#93C5FD" stroke-width="20" stroke-linecap="round" stroke-dasharray="176.02 163.27" stroke-dashoffset="0.00" transform="rotate(-90 70 70)"/><circle cx="70" cy="70" r="54" fill="none" stroke="#FCA5A5" stroke-width="20" stroke-linecap="round" stroke-dasharray="57.99 281.30" stroke-dashoffset="-182.02" transform="rotate(-90 70 70)"/><circle cx="70" cy="70" r="54" fill="none" stroke="#86EFAC" stroke-width="20" stroke-linecap="round" stroke-dasharray="31.68 307.61" stroke-dashoffset="-246.01" transform="rotate(-90 70 70)"/><circle cx="70" cy="70" r="54" fill="none" stroke="#C4B5FD" stroke-width="20" stroke-linecap="round" stroke-dasharray="32.39 306.90" stroke-dashoffset="-283.69" transform="rotate(-90 70 70)"/><circle cx="70" cy="70" r="54" fill="none" stroke="#FDE68A" stroke-width="20" stroke-linecap="round" stroke-dasharray="11.21 328.09" stroke-dashoffset="-322.09" transform="rotate(-90 70 70)"/></svg><div class="dcenter"><div class="dlabel">GASTADO</div><div class="damount">$4.772.000</div></div></div><div class="legend"><span class="lg"><span class="dot" style="background:#93C5FD"></span>Fijos <b>53.6%</b></span><span class="lg"><span class="dot" style="background:#FCA5A5"></span>Deuda <b>18.9%</b></span><span class="lg"><span class="dot" style="background:#86EFAC"></span>Ahorro <b>11.1%</b></span><span class="lg"><span class="dot" style="background:#C4B5FD"></span>Ocio <b>11.3%</b></span><span class="lg"><span class="dot" style="background:#FDE68A"></span>Varios <b>5.1%</b></span></div>
+    <div class="dnote">% sobre el gasto total ($4.77M).</div></div></div>
+<div class="concl"><b>Lectura rápida:</b> usaste el <b>40.7%</b> del ingreso en Necesidades
+y el <b>9.2%</b> en Deseos, con un superávit libre del <b>43.9%</b>.</div>
+
+<div class="pageb"></div>
+<h2>2. Comportamiento Mensual del Trimestre</h2>
+<div class="row" style="align-items:stretch">
+  <div class="col" style="flex:1.7"><div class="ctitle" style="text-align:left">Gasto por Pilar · mes a mes</div><div class="chart"><svg viewBox="0 0 330 150" width="100%" height="150"><line x1="36" y1="132.0" x2="330" y2="132.0" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="135.0" font-size="7" fill="#A9A5BC" text-anchor="end">$0.0M</text><line x1="36" y1="107.2" x2="330" y2="107.2" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="110.2" font-size="7" fill="#A9A5BC" text-anchor="end">$0.5M</text><line x1="36" y1="82.4" x2="330" y2="82.4" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="85.4" font-size="7" fill="#A9A5BC" text-anchor="end">$1.0M</text><line x1="36" y1="57.6" x2="330" y2="57.6" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="60.6" font-size="7" fill="#A9A5BC" text-anchor="end">$1.5M</text><line x1="36" y1="32.8" x2="330" y2="32.8" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="35.8" font-size="7" fill="#A9A5BC" text-anchor="end">$2.0M</text><line x1="36" y1="8.0" x2="330" y2="8.0" stroke="#EFEDF7" stroke-width="1"/><text x="32" y="11.0" font-size="7" fill="#A9A5BC" text-anchor="end">$2.5M</text><rect x="62.0" y="91.3" width="46.0" height="40.7" fill="#93C5FD"/><rect x="62.0" y="77.4" width="46.0" height="13.9" fill="#FCA5A5"/><rect x="62.0" y="77.4" width="46.0" height="0.0" fill="#86EFAC"/><rect x="62.0" y="71.6" width="46.0" height="5.8" fill="#C4B5FD"/><rect x="62.0" y="66.9" width="46.0" height="4.7" fill="#FDE68A"/><text x="85.0" y="144.0" font-size="8" fill="#7B7A99" text-anchor="middle">Ene</text><rect x="160.0" y="86.4" width="46.0" height="45.6" fill="#93C5FD"/><rect x="160.0" y="70.5" width="46.0" height="15.9" fill="#FCA5A5"/><rect x="160.0" y="44.2" width="46.0" height="26.3" fill="#86EFAC"/><rect x="160.0" y="23.2" width="46.0" height="21.0" fill="#C4B5FD"/><rect x="160.0" y="15.9" width="46.0" height="7.3" fill="#FDE68A"/><text x="183.0" y="144.0" font-size="8" fill="#7B7A99" text-anchor="middle">Feb</text><rect x="258.0" y="91.3" width="46.0" height="40.7" fill="#93C5FD"/><rect x="258.0" y="76.4" width="46.0" height="14.9" fill="#FCA5A5"/><rect x="258.0" y="76.4" width="46.0" height="0.0" fill="#86EFAC"/><rect x="258.0" y="76.4" width="46.0" height="0.0" fill="#C4B5FD"/><rect x="258.0" y="76.4" width="46.0" height="0.0" fill="#FDE68A"/><text x="281.0" y="144.0" font-size="8" fill="#7B7A99" text-anchor="middle">Mar</text></svg></div><div class="legend sm"><span class="lg"><span class="dot" style="background:#93C5FD"></span>Fijos</span><span class="lg"><span class="dot" style="background:#FCA5A5"></span>Deuda</span><span class="lg"><span class="dot" style="background:#86EFAC"></span>Ahorro</span><span class="lg"><span class="dot" style="background:#C4B5FD"></span>Ocio</span><span class="lg"><span class="dot" style="background:#FDE68A"></span>Varios</span></div></div>
+  <div class="col mompanel" style="flex:1"><div class="momtitle">Momentos del Trimestre</div><div class="mom"><span class="dot" style="background:#FCA5A5"></span><div class="mtxt"><div class="mml">Mayor gasto</div><div class="mmv"><b>Febrero</b> · $2.340.000</div></div></div><div class="mom"><span class="dot" style="background:#FCA5A5"></span><div class="mtxt"><div class="mml">Mayor pago de deuda</div><div class="mmv"><b>Febrero</b> · $320.000</div></div></div><div class="mom"><span class="dot" style="background:#86EFAC"></span><div class="mtxt"><div class="mml">Mejor mes de ahorro</div><div class="mmv"><b>Febrero</b> · $530.000</div></div></div><div class="mom"><span class="dot" style="background:#C4B5FD"></span><div class="mtxt"><div class="mml">Mayor gasto en ocio</div><div class="mmv"><b>Febrero</b> · $423.000</div></div></div></div></div>
+<div class="ctitle" style="text-align:left;font-size:9pt;margin:14px 0 5px">Semáforo Mensual: Gasto vs Presupuesto</div>
+<table class="sem sem3"><thead><tr><th></th><th class="sm">Ene</th><th class="sm">Feb</th><th class="sm">Mar</th></tr></thead><tbody><tr><td class="sp"><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></td><td class="sc" style="background:#DCFCE7;color:#16A34A">68</td><td class="sc" style="background:#FEF3C7;color:#B45309">77</td><td class="sc" style="background:#DCFCE7;color:#16A34A">68</td></tr><tr><td class="sp"><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></td><td class="sc" style="background:#DCFCE7;color:#16A34A">56</td><td class="sc" style="background:#DCFCE7;color:#16A34A">64</td><td class="sc" style="background:#DCFCE7;color:#16A34A">60</td></tr><tr><td class="sp"><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></td><td class="sc" style="background:#FEE2E2;color:#DC2626">0</td><td class="sc" style="background:#BBF7D0;color:#15803D;box-shadow:inset 0 0 0 2px #22C55E">177</td><td class="sc" style="background:#FEE2E2;color:#DC2626">0</td></tr><tr><td class="sp"><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></td><td class="sc" style="background:#DCFCE7;color:#16A34A">29</td><td class="sc" style="background:#FEE2E2;color:#DC2626;box-shadow:inset 0 0 0 2px #EF4444">106</td><td class="sc" style="background:#DCFCE7;color:#16A34A">0</td></tr></tbody></table><div class="semkey"><span><span class="kd" style="background:#DCFCE7"></span>Sano</span><span><span class="kd" style="background:#FEF3C7"></span>En el límite</span><span><span class="kd" style="background:#FEE2E2"></span>Fuera de meta</span><span><span class="kd" style="background:#BBF7D0;box-shadow:inset 0 0 0 2px #22C55E"></span>Ahorro: meta superada</span><span><span class="kd" style="background:#FEE2E2;box-shadow:inset 0 0 0 2px #EF4444"></span>Excedido</span></div>
+
+<h2>3. Categorías, Logros y Alertas</h2>
+<div class="row"><div class="col" style="flex:1.15">
+  <div class="ctitle" style="text-align:left">Top Categorías del Trimestre</div><table class="t"><thead><tr><th>Categoría</th><th>Pilar</th><th class="num">Frec.</th><th class="num">Total Trim.</th></tr></thead><tbody><tr><td><b>Arriendo</b></td><td><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></td><td class="num">3 ops</td><td class="num">$2.100.000</td></tr><tr><td><b>Tarjeta Visa</b></td><td><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></td><td class="num">3 ops</td><td class="num">$900.000</td></tr><tr><td><b>Servicios</b></td><td><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></td><td class="num">6 ops</td><td class="num">$340.000</td></tr><tr><td><b>Meta viaje</b></td><td><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></td><td class="num">1 ops</td><td class="num">$280.000</td></tr><tr><td><b>Restaurantes</b></td><td><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></td><td class="num">3 ops</td><td class="num">$258.000</td></tr><tr><td><b>Fondo emergencia</b></td><td><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></td><td class="num">1 ops</td><td class="num">$250.000</td></tr><tr><td><b>Supermercado</b></td><td><span class="pill" style="background:#FFFBEB;color:#B45309">Varios</span></td><td class="num">2 ops</td><td class="num">$207.000</td></tr></tbody></table></div>
+  <div class="col"><div class="ctitle" style="text-align:left">Balance del Trimestre</div><div class="muro logro"><div class="mtag">LOGRO</div><div class="mtt">Superávit del trimestre</div><div class="mtb">Cerraste con $3.728.000 sin comprometer (43.9% del ingreso).</div></div><div class="muro logro"><div class="mtag">LOGRO</div><div class="mtt">Cobertura sana</div><div class="mtb">Tus ingresos cubrieron 1.78× tus gastos del trimestre.</div></div><div class="muro alerta"><div class="mtag">ALERTA</div><div class="mtt">Vigila Ocio</div><div class="mtb">Se pasó del presupuesto en 1 de 3 meses del trimestre.</div></div><div class="muro alerta"><div class="mtag">ALERTA</div><div class="mtt">Mes pico</div><div class="mtb">Febrero concentró el mayor gasto ($2.340.000).</div></div></div></div>
+<h2>4. Plan de Acción · Próximos 3 Meses</h2>
+<div class="reco"><div class="rt">1. Ajusta el pilar que se disparó</div><div class="rb">Revisa Ocio: sube su presupuesto o recorta el gasto para el próximo trimestre.</div></div><div class="reco"><div class="rt">2. Sostén el ahorro</div><div class="rb">Mantén el aporte mensual (~$176.667) para no perder ritmo.</div></div><div class="reco"><div class="rt">3. Aprovecha el superávit</div><div class="rb">Destina parte de los $3.728.000 libres a tus metas o inversión.</div></div>
+<div class="foot">Informe trimestral generado automáticamente para <b>Luis Daniel MartÃ­nez</b> · ORUS Finanzas ·
+Enero–Marzo 2026 · 30 transacciones (27 gastos + 3 ingresos)</div>
+</body></html>

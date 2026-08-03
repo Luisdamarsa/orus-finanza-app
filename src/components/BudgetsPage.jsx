@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { PILLARS, ALL_CATS } from "../constants";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import { usePopup } from "../services/PopupService";
 import { useCategories } from "../hooks/useCategories";
 import { useBudgets } from "../hooks/useBudgets";
@@ -9,8 +10,13 @@ import { CheckmarkIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { rowStyles, buttonStyles, getClayShadow } from "../utils/clayStyles";
 
-export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, onSaveSuccess, categories: categoriesFromProps, editPillarBudget, editCategoryBudget }) {
+export default function BudgetsPage({ onBack, onSave, initialBudgets, onSaveSuccess, categories: categoriesFromProps, editPillarBudget, editCategoryBudget }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+  const tokens = isDark ? DARK : LIGHT;
   // 🆕 Usar servicios/hooks independientes
   const popup = usePopup();
   // Si viene como prop, usarla; si no, crear instancia propia (retrocompatibilidad)
@@ -18,9 +24,14 @@ export default function BudgetsPage({ isDark, onBack, onSave, initialBudgets, on
   const categories = categoriesFromProps || categoriesFromHook;
   const { categoryBudgets, handleCategoryBudgetChange, updateWithNewCategories } = useBudgets();
 
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
 
   // Estado para los presupuestos editados (del pilar y categorías)
   const [editedBudgets, setEditedBudgets] = useState(initialBudgets || {});

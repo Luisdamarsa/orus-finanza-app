@@ -17,7 +17,6 @@ export default function AutomatizacionesScreen({
   return (
     <ScreenShell bg={t.bg}>
       <AutomatizacionesPage
-        isDark={isDark}
         onBack={() => setScreen("settings")}
         onPermissions={onPermissions}
         microphoneEnabled={microphoneEnabled}
@@ -27,6 +26,7 @@ export default function AutomatizacionesScreen({
         iosShortcutsEnabled={iosShortcutsEnabled}
         setIosShortcutsEnabled={setIosShortcutsEnabled}
         onOpenAccessibilitySettings={onOpenAccessibilitySettings}
+        setScreen={setScreen}
       />
     </ScreenShell>
   );

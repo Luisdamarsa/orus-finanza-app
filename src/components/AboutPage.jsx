@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { cardStyles, getClayShadow } from "../utils/clayStyles";
+import { getStaggerDelay } from "../constants/animations";
 
 /**
  * AboutPage.jsx — "Acerca de ORUS Finanzas".
@@ -36,7 +40,10 @@ function arcPath(cx, cy, r, startDeg, endDeg) {
   return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 }
 
-export default function AboutPage({ isDark, onBack }) {
+export default function AboutPage({ onBack }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+
   const pressBack = usePress();
   const containerRef = useRef(null);
 
@@ -60,10 +67,22 @@ export default function AboutPage({ isDark, onBack }) {
     return () => io.disconnect();
   }, []);
 
-  const t = isDark
-    ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99" };
-  const card = { background: t.card, border: `1px solid ${t.border}`, borderRadius: 14, padding: 14, marginTop: 14 };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
+  // 🆕 Tarjeta con gradiente y sombra clay
+  const card = {
+    ...cardStyles(tokens, isDark),
+    padding: 14,
+    marginTop: 14,
+    borderRadius: RADIUS.lg,
+  };
   const h = (icon, txt) => (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
       <span style={{ fontSize: 18 }}>{icon}</span>

@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
 import PageLayout from "./PageLayout";
 import { userStorage } from "../utils/userStorage";
 import { CURRENCIES, LANGUAGES } from "../constants";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { inputStyles, getClayShadow, cardStyles } from "../utils/clayStyles";
+import { getStaggerDelay } from "../constants/animations";
 
 /**
  * PreferencesPage.jsx — "Preferencias".
@@ -10,7 +14,10 @@ import { CURRENCIES, LANGUAGES } from "../constants";
  * (Idioma y moneda vivían antes en Perfil.) Persisten en userStorage.
  * Las secciones entran desde abajo al montar (reveal por scroll). Ruteo en ScreenRouter.
  */
-export default function PreferencesPage({ isDark, onBack, setTheme }) {
+export default function PreferencesPage({ onBack }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark, setIsDark } = useTheme();
+  const setTheme = setIsDark; // Alias para compatibilidad
   const pressBack = usePress();
   const containerRef = useRef(null);
 
@@ -31,9 +38,16 @@ export default function PreferencesPage({ isDark, onBack, setTheme }) {
     return () => io.disconnect();
   }, []);
 
-  const t = isDark
-    ? { bg: "#000000", card: "#141420", border: "#23233a", text: "#F0EEFF", sub: "#7B7A99", inputBg: "#1E1E2E" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#7B7A99", inputBg: "#F1F0FF" };
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+    inputBg: tokens.inputBg,
+  };
 
   const chooseCurrency = (v) => { setCurrency(v); userStorage.setCurrency(v); setCurrencyOpen(false); };
   const chooseLanguage = (v) => { setLanguage(v); userStorage.setLanguage(v); setLanguageOpen(false); };
@@ -43,34 +57,50 @@ export default function PreferencesPage({ isDark, onBack, setTheme }) {
 
   // Selector genérico (dropdown) reutilizado para idioma y moneda
   const Dropdown = ({ label, options, value, open, setOpen, onChoose }) => (
-    <div>
-      <div style={{ fontSize: 11, fontWeight: 700, color: t.sub, textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{ width: "100%", padding: "10px 14px", borderRadius: 12, border: `1px solid ${t.border}`, background: t.inputBg, color: t.text, fontSize: 13.5, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", textAlign: "left" }}>
-        <span>{options.find((o) => o.value === value)?.label || value}</span>
-        <span style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: t.sub, fontSize: 11 }}>▼</span>
-      </button>
-      {open && (
-        <div style={{ marginTop: 6, borderRadius: 12, border: `1px solid ${t.border}`, background: t.card, overflow: "hidden" }}>
-          {options.map((o) => {
-            const active = value === o.value;
-            return (
-              <button
-                key={o.value}
-                onClick={() => onChoose(o.value)}
-                style={{ width: "100%", padding: "10px 14px", border: "none", borderBottom: o !== options[options.length - 1] ? `1px solid ${t.border}` : "none", background: active ? (isDark ? "#252540" : "#F0EFF8") : "transparent", color: active ? "#9B6DFF" : t.text, fontSize: 13.5, fontWeight: active ? 700 : 600, cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between" }}>
-                <span>{o.label}</span>
-                {active && <span style={{ color: "#9B6DFF" }}>✓</span>}
-              </button>
-            );
-          })}
-        </div>
-      )}
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <div style={{ fontSize: 13.5, fontWeight: 700, color: t.text }}>{label}</div>
+      <div style={{ flex: 1 }}>
+        <button
+          onClick={() => setOpen(!open)}
+          style={{
+            width: "100%",
+            borderRadius: RADIUS.md,
+            ...inputStyles(tokens, isDark),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            textAlign: "left",
+          }}>
+          <span>{options.find((o) => o.value === value)?.label || value}</span>
+          <span style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: t.sub, fontSize: 11 }}>▼</span>
+        </button>
+        {open && (
+          <div style={{ marginTop: 6, borderRadius: 12, border: `1px solid ${t.border}`, background: t.card, overflow: "hidden" }}>
+            {options.map((o) => {
+              const active = value === o.value;
+              return (
+                <button
+                  key={o.value}
+                  onClick={() => onChoose(o.value)}
+                  style={{ width: "100%", padding: "10px 14px", border: "none", borderBottom: o !== options[options.length - 1] ? `1px solid ${t.border}` : "none", background: active ? (isDark ? "#252540" : "#F0EFF8") : "transparent", color: active ? "#9B6DFF" : t.text, fontSize: 13.5, fontWeight: active ? 700 : 600, cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between" }}>
+                  <span>{o.label}</span>
+                  {active && <span style={{ color: "#9B6DFF" }}>✓</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 
-  const card = { background: t.card, border: `1px solid ${t.border}`, borderRadius: 16, padding: 16, marginTop: 14 };
+  // 🆕 Tarjeta con gradiente y sombra clay
+  const card = {
+    ...cardStyles(tokens, isDark),
+    padding: 16,
+    marginTop: 14,
+    borderRadius: RADIUS.lg,
+  };
 
   return (
     <PageLayout

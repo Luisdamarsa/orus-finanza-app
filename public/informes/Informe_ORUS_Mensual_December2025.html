@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Informe Mensual Diciembre 2025 · Luis Daniel MartÃ­nez</title><style>
+/* A4 page simulation for screen viewing */
+html { background:#ccc; padding:15px; }
+body { width:210mm; margin:0 auto 20mm; padding:9mm 11mm 11mm 11mm;
+  font-family:Helvetica,Arial,sans-serif; color:#1A1830; font-size:8.7pt; line-height:1.4;
+  background:white; box-shadow:0 0 15px rgba(0,0,0,0.2);
+  display:flex; flex-direction:column; position:relative; min-height:297mm; }
+
+/* Print styles */
+@page { size:A4; margin:9mm 11mm 11mm 11mm; }
+@media print {
+  html { background:white; padding:0; }
+  body { width:100%; height:auto; margin:0; box-shadow:none; padding:0; }
+}
+
+* { box-sizing:border-box; }
+.pageb { page-break-before:always; }
+h1 { font-size:16.5pt; margin:0; letter-spacing:.2px; white-space:nowrap; }
+h2 { font-size:12.5pt; margin:10px 0 5px; padding-bottom:4px; border-bottom:2px solid #E5E3F5; }
+.sub { color:#7B7A99; font-size:9pt; margin-top:3px; }
+p { margin:6px 0; } b { color:#1A1830; }
+.header { display:flex; justify-content:space-between; align-items:flex-start;
+  background:#F5F3FF; border-left:5px solid #9B6DFF; border-radius:12px; padding:16px 18px; }
+.header .l { display:flex; align-items:center; gap:14px; }
+.logobox { width:80px; height:80px; background:#fff; border:1px solid #E5E3F5; border-radius:14px;
+  display:flex; align-items:center; justify-content:center; flex:0 0 80px; }
+.header .r { text-align:right; }
+.uname { font-weight:bold; font-size:11pt; }
+.chip { display:inline-block; background:#EDE9FB; color:#6D28D9; border-radius:8px;
+  padding:3px 10px; font-size:8pt; margin-top:6px; font-weight:bold; }
+.pub { color:#A9A5BC; font-size:7.6pt; margin-top:10px; white-space: nowrap; }
+.kpis { display:flex; gap:10px; margin-top:10px; }
+.kpi { flex:1; border:1px solid #E5E3F5; border-radius:12px; padding:8px 12px; background:#fff; }
+.kpi .kl { font-size:7.4pt; color:#7B7A99; font-weight:bold; letter-spacing:.4px; text-transform:uppercase; }
+.kpi .kv { font-size:14pt; font-weight:bold; margin:2px 0; }
+.kpi .ks { font-size:7.4pt; color:#A9A5BC; }
+.kpi.g .kv { color:#16A34A; } .kpi.r .kv { color:#DC2626; } .kpi.p .kv { color:#7C3AED; }
+.healthband { display:flex; align-items:center; gap:16px; margin-top:10px;
+  background:linear-gradient(90deg,#F5F3FF,#F0FDF4); border:1px solid #E5E3F5; border-radius:12px; padding:9px 16px; }
+.hscore { flex:0 0 auto; display:flex; align-items:center; gap:10px; padding-right:16px; border-right:1px solid #E5E3F5; }
+.hnum { font-size:30pt; font-weight:bold; color:#9B6DFF; line-height:1; white-space:nowrap; }
+.hden { font-size:13pt; color:#A9A5BC; font-weight:bold; }
+.hcap { font-size:8.5pt; font-weight:bold; color:#1A1830; }
+.hbars { flex:1 1 auto; min-width:0; }
+.htitle { font-size:7.2pt; color:#A9A5BC; font-weight:bold; text-transform:uppercase; letter-spacing:.4px; margin-bottom:3px; }
+.hmini { display:flex; align-items:center; gap:10px; margin:4px 0; }
+.hml { flex:0 0 178px; width:178px; font-size:7.8pt; color:#7B7A99; white-space:nowrap; }
+.htrack { flex:1 1 auto; min-width:46px; height:10px; background:#EFEDF7; border-radius:6px; overflow:hidden; }
+.hfill { height:100%; background:#9B6DFF; border-radius:6px; min-width:2px; }
+.hmv { flex:0 0 42px; width:42px; text-align:right; font-weight:bold; font-size:8.5pt; color:#9B6DFF; }
+.hpts { font-size:6.5pt; color:#A9A5BC; font-weight:normal; margin-left:2px; }
+.hverdict { flex:0 0 150px; padding-left:14px; border-left:1px solid #E5E3F5; }
+.hvbig { font-size:12pt; font-weight:bold; color:#16A34A; }
+.hvsub { font-size:7.6pt; color:#7B7A99; }
+.mompanel { background:#FAFAFE; border:1px solid #E5E3F5; border-radius:10px; padding:9px 12px; }
+.momtitle { font-size:8.4pt; font-weight:bold; color:#1A1830; margin-bottom:6px; }
+.mom { display:flex; align-items:flex-start; gap:7px; margin:5px 0; }
+.mtxt { flex:1; } .mml { font-size:7.3pt; color:#A9A5BC; } .mmv { font-size:8pt; color:#4A4860; }
+.tnote, .dnote { font-size:7pt; color:#A9A5BC; margin-top:5px; line-height:1.35; }
+.dnote { text-align:center; padding:0 4px; }
+.row { display:flex; gap:16px; align-items:flex-start; }
+.col { flex:1; } .col.narrow { flex:0 0 190px; text-align:center; }
+table.t { width:100%; border-collapse:collapse; font-size:8.3pt; }
+table.t th { background:#F1F0F8; color:#4A4860; text-align:left; padding:7px 8px; font-size:7.6pt;
+  text-transform:uppercase; letter-spacing:.3px; border-bottom:1px solid #E5E3F5; }
+table.t td { padding:6px 8px; border-bottom:1px solid #EFEDF7; vertical-align:middle; }
+table.t .num { text-align:right; white-space:nowrap; }
+table.t .rules { text-align:center; font-weight:bold; color:#4A4860; background:#FAFAFE; vertical-align:middle; }
+.cmt { color:#7B7A99; font-size:7.8pt; } .pico { color:#7B7A99; font-size:7.8pt; }
+tr.tot td { font-weight:bold; background:#F0FDF4; border-top:1px solid #D6F5E3; }
+.pill { display:inline-block; padding:2px 9px; border-radius:8px; font-weight:bold; font-size:7.8pt; }
+.badge { display:inline-block; background:#DCFCE7; color:#16A34A; padding:2px 9px; border-radius:7px; font-weight:bold; font-size:7.6pt; }
+.badge.blue { background:#EFF6FF; color:#2563EB; }
+.pos { color:#16A34A; font-weight:bold; } .warnv { color:#2563EB; font-weight:bold; } .neu { color:#4A4860; }
+.donutwrap { position:relative; width:150px; height:150px; margin:2px auto 0; }
+.dcenter { position:absolute; top:0; left:0; width:150px; height:150px; display:flex;
+  flex-direction:column; align-items:center; justify-content:center; }
+.dlabel { font-size:7.5pt; color:#A9A5BC; letter-spacing:1px; }
+.damount { font-size:12.5pt; font-weight:bold; color:#1A1830; }
+.ctitle { font-size:8pt; font-weight:bold; color:#4A4860; text-align:center; margin-bottom:2px; }
+.legend { display:flex; flex-wrap:wrap; gap:5px 10px; justify-content:center; margin-top:8px; }
+.legend.sm { font-size:7.6pt; }
+.lg { font-size:7.8pt; color:#4A4860; white-space:nowrap; }
+.dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:3px; vertical-align:middle; }
+.chart { margin-top:6px; }
+.concl { border:1px solid #E5E3F5; background:#FAFAFE; border-radius:10px; padding:9px 14px; margin-top:8px; font-size:8.4pt; }
+table.sem { border-collapse:separate; border-spacing:3px; width:100%; font-size:7.6pt; margin-top:2px; }
+table.sem th.sm { padding:3px 0; text-align:center; color:#7B7A99; font-size:7pt; font-weight:bold; }
+table.sem td.sp { padding:0 6px 0 0; }
+table.sem td.sc { text-align:center; font-weight:bold; padding:7px 0; border-radius:5px; }
+.semkey { display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; font-size:7.4pt; color:#7B7A99; align-items:center; }
+.kd { display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:3px; vertical-align:middle; }
+.semnote { color:#A9A5BC; }
+.bchg { font-size:7.5pt; color:#6D28D9; margin-top:6px; background:#F5F3FF; border:1px solid #E5E3F5; border-radius:7px; padding:5px 10px; line-height:1.4; }
+.logro { background:#F0FDF4; border-left:3px solid #86EFAC; border-radius:8px; padding:8px 11px; margin-bottom:7px; }
+.lgt { font-weight:bold; font-size:8.6pt; } .lgb { color:#4A4860; font-size:7.9pt; margin-top:2px; }
+.mrow { display:flex; align-items:center; gap:9px; margin:4px 0; }
+.mlbl { width:64px; font-size:8pt; font-weight:bold; }
+.mtrack { flex:1; height:12px; background:#EFEDF7; border-radius:6px; overflow:hidden; }
+.mfill { height:100%; border-radius:6px; }
+.mval { width:80px; text-align:right; font-size:7.8pt; color:#7B7A99; }
+.mnote { font-size:7.6pt; color:#A9A5BC; margin-top:7px; }
+.reco { background:#F5F3FF; border-left:4px solid #9B6DFF; border-radius:8px; padding:9px 13px; margin-bottom:8px; }
+.rt { font-weight:bold; font-size:9pt; } .rb { color:#4A4860; font-size:8.2pt; margin-top:3px; }
+.foot { margin-top:auto; text-align:center; color:#A9A5BC; font-size:7.6pt; padding-top:8px; border-top:1px solid #E5E3F5; background:white; display:block; }
+@page :last { margin-bottom:11mm; }
+@page :last .foot { display:block; }
+.secintro { color:#4A4860; font-size:8.5pt; margin:3px 0 6px; }
+
+/* A4 page simulation for screen viewing */
+html { background:#ccc; padding:15px; }
+body { width:210mm; margin:0 auto 20mm; padding:9mm 11mm 11mm 11mm;
+  background:white; box-shadow:0 0 15px rgba(0,0,0,0.2);
+  display:flex; flex-direction:column; position:relative; min-height:297mm; }
+
+/* Print styles */
+@page { size:A4; margin:9mm 11mm 11mm 11mm; }
+@media print {
+  html { background:white; padding:0; }
+  body { width:100%; height:auto; margin:0; box-shadow:none; padding:0; }
+}
+h2 { font-size:12.5pt; margin:10px 0 5px; padding-bottom:4px; border-bottom:2px solid #E5E3F5; }
+.kpi { padding:8px 12px; border-radius:12px; }
+.kpi .kv { font-size:14pt; }
+.healthband { margin-top:10px; margin-bottom:10px; padding:9px 16px; border-radius:12px; }
+.cbars { margin-top:10px; margin-bottom:10px; border:1px solid #E5E3F5; border-radius:12px; padding:8px 16px; background:#FAFAFE; }
+.cbtit { font-size:7.5pt; font-weight:bold; color:#4A4860; margin-bottom:4px; }
+.cbar { display:flex; align-items:center; gap:8px; margin:3px 0; }
+.cblbl { flex:0 0 56px; font-size:7.8pt; }
+.cbtrack { position:relative; flex:1; height:11px; background:#EFEDF7; border-radius:5px; overflow:hidden; display:flex; }
+.cbseg { height:100%; }
+.cblim { position:absolute; top:0; bottom:0; width:1.5px; background:#1A1830; opacity:.45; }
+.cbval { flex:0 0 40px; text-align:right; font-weight:bold; font-size:7.8pt; }
+.cbnote { font-size:6.8pt; color:#A9A5BC; margin-top:4px; line-height:1.3; }
+.cmp2 { display:flex; align-items:stretch; gap:12px; border:1px solid #E5E3F5; border-radius:10px; padding:8px 12px; margin-top:6px; margin-bottom:6px; }
+.cmp2a { flex:0 0 auto; text-align:center; padding-right:4px; }
+.bigd { font-size:13pt; margin:1px 0; }
+.bigbase { font-size:12.5pt; font-weight:bold; color:#1A1830; margin:1px 0; }
+.basenote { flex:1; font-size:7.5pt; color:#7B7A99; line-height:1.4; align-self:center; padding-left:2px; }
+.cmpsub { font-size:7.6pt; color:#7B7A99; } .trend { font-size:8pt; font-weight:bold; margin-top:3px; }
+.cmp2b { display:flex; flex:1; justify-content:space-around; align-items:center; }
+.cmpk { text-align:center; display:flex; flex-direction:column; align-items:center; }
+.ck { font-size:7pt; color:#7B7A99; } .cv { font-size:9pt; margin-top:3px; white-space:nowrap; }
+.cmpdiv { flex:0 0 1px; width:1px; background:#E5E3F5; align-self:stretch; }
+.dz { color:#A9A5BC; font-weight:bold; }
+.al { background:#FEF6EE; border-left:2px solid #FDBA74; border-radius:6px; padding:4px 9px; margin-bottom:3px; }
+.alt { font-weight:bold; font-size:8.4pt; color:#C2560C; } .alb { color:#4A4860; font-size:7.6pt; margin-top:0.5px; }
+.okbox { background:#F0FDF4; border-left:2px solid #86EFAC; border-radius:6px; padding:6px 9px; font-size:8pt; color:#16A34A; font-weight:bold; }
+.spikes { margin:3px 0 4px; font-size:7.6pt; color:#4A4860; }
+.spktit { font-weight:bold; color:#4A4860; font-size:7.4pt; }
+.spk { display:inline-block; background:#FEF2F2; border-radius:5px; padding:1px 6px; margin:1px 3px 1px 0; font-size:7.4pt; }
+.daysrow { font-size:7.6pt; color:#4A4860; margin-top:4px; margin-bottom:6px; }
+.day { display:inline-block; margin-right:10px; }
+.reco { background:#F5F3FF; border-left:3px solid #9B6DFF; border-radius:6px; padding:5px 10px; margin-bottom:3px; }
+.rt { font-weight:bold; font-size:8.8pt; } .rb { color:#4A4860; font-size:8pt; margin-top:2px; }
+.foot { margin-top:auto; text-align:center; color:#A9A5BC; font-size:7.6pt; padding-top:8px; border-top:1px solid #E5E3F5; background:white; display:block; }
+.kpi.g .kv { color:#16A34A; }
+</style></head><body>
+<div class="header"><div class="l"><div class="logobox"><svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+  <!-- Fijos 35% (Azul) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#93C5FD" stroke-width="48" stroke-linecap="round" stroke-dasharray="329.87 942.48" stroke-dashoffset="0" transform="rotate(-90 200 200)"/>
+  <!-- Deuda 15% (Rojo) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#FCA5A5" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-329.87" transform="rotate(-90 200 200)"/>
+  <!-- Ahorro 20% (Verde) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#86EFAC" stroke-width="48" stroke-linecap="round" stroke-dasharray="188.50 942.48" stroke-dashoffset="-471.24" transform="rotate(-90 200 200)"/>
+  <!-- Ocio 15% (Púrpura) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#C4B5FD" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-659.74" transform="rotate(-90 200 200)"/>
+  <!-- Varios 15% (Amarillo) -->
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#FDE68A" stroke-width="48" stroke-linecap="round" stroke-dasharray="141.37 942.48" stroke-dashoffset="-801.11" transform="rotate(-90 200 200)"/>
+  <!-- Centro blanco -->
+  <circle cx="200" cy="200" r="80" fill="white"/>
+  <!-- ORUS texto -->
+  <text x="200" y="230" font-size="80" font-weight="800" fill="#9B6DFF" text-anchor="middle">ORUS</text>
+</svg></div>
+  <div><h1>INFORME MENSUAL</h1><div class="sub">Tu mes en números</div></div></div>
+  <div class="r"><div class="uname">Luis Daniel MartÃ­nez</div><div class="chip">Mes: Dic 2025</div>
+    <div class="pub">Publicado: 1 de diciembre de 2025 · Fuente: Base de datos ORUS</div></div></div>
+
+<h2>1. Foto del Mes</h2>
+<div class="row" style="gap:10px;align-items:stretch">
+  <div class="kpi" style="flex:1"><div class="kl">Ingresos</div><div class="kv">$2.950.000</div><div class="ks">del mes</div></div>
+  <div class="kpi r" style="flex:1"><div class="kl">Egresos</div><div class="kv">$2.325.000</div><div class="ks">79% del ingreso</div></div>
+  <div class="kpi g" style="flex:1"><div class="kl">Ahorro Formal</div><div class="kv">$380.000</div><div class="ks">Meta mes: $0.30M</div></div>
+  <div class="kpi g" style="flex:1"><div class="kl">Saldo del Mes</div><div class="kv">$625.000</div><div class="ks">te sobró</div></div>
+</div>
+<div class="healthband"><div class="hscore"><div class="hnum" style="color:#16A34A">88<span class="hden">/100</span></div><div class="hcap">Índice de Salud<br>del Mes</div></div><div class="hbars"><div class="htitle">Componentes del puntaje (0–100)</div><div class="hmini"><div class="hml">Tasa de ahorro efectiva (34.1%)</div><div class="htrack"><div class="hfill" style="width:100%"></div></div><div class="hmv">100<span class="hpts">pts</span></div></div><div class="hmini"><div class="hml">Cumplimiento de presupuesto (100%)</div><div class="htrack"><div class="hfill" style="width:100%"></div></div><div class="hmv">100<span class="hpts">pts</span></div></div><div class="hmini"><div class="hml">Índice de cobertura (1.27×)</div><div class="htrack"><div class="hfill" style="width:54%"></div></div><div class="hmv">54<span class="hpts">pts</span></div></div></div><div class="hverdict"><div class="hvbig" style="color:#16A34A">Excelente</div><div class="hvsub">Tu mes en números — revisa las alertas y actúa.</div></div></div>
+<div class="cbars"><div class="cbtit">Cumplimiento de presupuesto por pilar</div><div class="cbar"><div class="cblbl"><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></div><div class="cbtrack"><div class="cbseg" style="width:73.7%;background:#FBBF24"></div><div class="cblim" style="left:96.2%"></div></div><div class="cbval" style="color:#B45309">77%</div></div><div class="cbar"><div class="cblbl"><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></div><div class="cbtrack"><div class="cbseg" style="width:38.5%;background:#FBBF24"></div><div class="cblim" style="left:40.1%"></div></div><div class="cbval" style="color:#B45309">96%</div></div><div class="cbar"><div class="cblbl"><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></div><div class="cbtrack"><div class="cbseg" style="width:30.8%;background:#FBBF24"></div><div class="cblim" style="left:32.1%"></div></div><div class="cbval" style="color:#B45309">96%</div></div><div class="cbar"><div class="cblbl"><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></div><div class="cbtrack"><div class="cbseg" style="width:24.0%;background:#22C55E"></div><div class="cbseg" style="width:6.4%;background:#16A34A"></div><div class="cblim" style="left:24.0%"></div></div><div class="cbval" style="color:#16A34A">127%</div></div>
+  <div class="cbnote"><b>Escala común</b> en pesos · la línea de cada pilar es su presupuesto · lo que la cruza es <b>sobregasto</b> (rojo) · en Ahorro es positivo (verde)</div></div>
+
+<h2>2. Comparativa vs. Promedio (últimos 6 meses)</h2>
+<div class="cmp2"><div class="cmp2a"><div class="ck">Gasto del mes vs. promedio</div><div class="bigd"><span style="color:#DC2626;font-weight:bold">▲ 19%</span></div><div class="cmpsub">$2.325.000 vs. $1.960.500 normal</div><div class="trend" style="color:#DC2626">↑ por encima de lo normal</div></div><div class="cmpdiv"></div><div class="cmp2b"><div class="cmpk"><div class="ck"><span class="pill" style="background:#EFF6FF;color:#2563EB">Fijos</span></div><div class="cv"><span style="color:#DC2626;font-weight:bold">▲ 7%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#FEF2F2;color:#DC2626">Deuda</span></div><div class="cv"><span style="color:#DC2626;font-weight:bold">▲ 12%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#F0FDF4;color:#16A34A">Ahorro</span></div><div class="cv"><span style="color:#16A34A;font-weight:bold">▲ 26%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#F5F3FF;color:#7C3AED">Ocio</span></div><div class="cv"><span style="color:#DC2626;font-weight:bold">▲ 69%</span></div></div><div class="cmpk"><div class="ck"><span class="pill" style="background:#FFFBEB;color:#B45309">Varios</span></div><div class="cv"><span style="color:#DC2626;font-weight:bold">▲ 15%</span></div></div></div></div>
+
+<h2>3. Alertas Tácticas</h2>
+<div class="al"><div class="alt">Pico en Restaurantes</div><div class="alb">$220.000 vs. $82.800 de promedio (+166%).</div></div>
+<div class="spikes"><span class="spktit">Picos de categoría:</span> <span class="spk">Restaurantes <b style="color:#DC2626">+166%</b></span></div>
+<div class="daysrow"><span class="spktit">Días de mayor gasto:</span> <span class="day">1 Dic · <b>$700.000</b></span><span class="day">12 Dic · <b>$480.000</b></span><span class="day">20 Dic · <b>$380.000</b></span></div>
+
+<h2>4. Recomendaciones para el Próximo Mes</h2>
+<div class="reco"><div class="rt">1. Frena el pilar disparado</div><div class="rb">Recorta el gasto del pilar más excedido para volver al presupuesto el próximo mes.</div></div><div class="reco"><div class="rt">2. Cubre el saldo</div><div class="rb">Si cerraste en negativo, cúbrelo con liquidez antes de que arrastre al mes siguiente.</div></div><div class="reco"><div class="rt">3. Sostén lo que va bien</div><div class="rb">Mantén los pilares dentro de meta; no toques lo que ya funciona.</div></div>
+<div class="foot">Informe mensual · <b>Luis Daniel MartÃ­nez</b> · ORUS Finanzas · Diciembre 2025 · 12 gastos registrados</div>
+</body></html>

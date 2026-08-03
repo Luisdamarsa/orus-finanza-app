@@ -2,18 +2,34 @@ import { useState } from "react";
 import { fmt, groupByDate } from "../utils/formatters";
 import { METHOD_META } from "../constants";
 import CatBar from "./CatBar";
+import { useTheme } from "../hooks/useTheme";
+import { DARK, LIGHT, RADIUS } from "../constants/tokens";
+import { rowStyles, getClayShadow } from "../utils/clayStyles";
 
 /**
  * PillarDetailPage.jsx
  * Detalle de un pilar (gasto, presupuesto, categorías y movimientos).
  * Extraído de App.jsx (RS-2) — comportamiento idéntico.
  */
-export default function PillarDetailPage({ pillar, onBack, isDark, transactions }) {
+export default function PillarDetailPage({ pillar, onBack, transactions }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark } = useTheme();
+  const tokens = isDark ? DARK : LIGHT;
+
   const [expandCategories, setExpandCategories] = useState(true);
   const hasBudget = pillar.budget != null && pillar.budget > 0;
   const pc = hasBudget ? Math.round((pillar.spent / pillar.budget) * 100) : null;
   const over = hasBudget && pc >= 100;
-  const t = isDark ? { bg: "#0a0a0f", header: "#141420", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" } : { bg: "#FFFFFF", header: "#FFFFFF", card: "#F8F7FF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+
+  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
+  const t = {
+    bg: tokens.bg,
+    header: tokens.bg,
+    card: tokens.surfaceFlat,
+    border: tokens.border,
+    text: tokens.text,
+    sub: tokens.sub,
+  };
   const pillarTxs = (transactions || []).filter(tx => tx.pillar === pillar.id).sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
   const groups = groupByDate(pillarTxs);
 

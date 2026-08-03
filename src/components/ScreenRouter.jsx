@@ -15,6 +15,12 @@ import PermissionsPage from "./PermissionsPage";
 import SubscriptionPage from "./SubscriptionPage";
 import PreferencesPage from "./PreferencesPage";
 import AutomatizacionesScreen from "./AutomatizacionesScreen";
+import NotificationsSetupPage from "./NotificationsSetupPage";
+import ShortcutsSetupPage from "./ShortcutsSetupPage";
+import ReportsPage from "./ReportsPage";
+import MyReportsPage from "./MyReportsPage";
+import LoginPage from "./LoginPage";
+import OnboardingPage from "./OnboardingPage";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -108,7 +114,7 @@ export default function ScreenRouter({
   if (screen === "about") {
     return (
       <ScreenShell bg={t.bg}>
-        <AboutPage isDark={isDark} onBack={() => setScreen("settings")} />
+        <AboutPage onBack={() => setScreen("settings")} />
       </ScreenShell>
     );
   }
@@ -117,7 +123,7 @@ export default function ScreenRouter({
     const backTarget = previousScreen === "automatizaciones" ? "automatizaciones" : "settings";
     return (
       <ScreenShell bg={t.bg}>
-        <PermissionsPage isDark={isDark} onBack={() => setScreen(backTarget)} onOpenPrivacy={() => setScreen("privacy-perms")} />
+        <PermissionsPage onBack={() => setScreen(backTarget)} onOpenPrivacy={() => setScreen("privacy-perms")} />
       </ScreenShell>
     );
   }
@@ -125,7 +131,7 @@ export default function ScreenRouter({
   if (screen === "subscription") {
     return (
       <ScreenShell bg={t.bg}>
-        <SubscriptionPage isDark={isDark} onBack={() => setScreen("settings")} />
+        <SubscriptionPage onBack={() => setScreen("settings")} />
       </ScreenShell>
     );
   }
@@ -133,7 +139,7 @@ export default function ScreenRouter({
   if (screen === "preferences") {
     return (
       <ScreenShell bg={t.bg}>
-        <PreferencesPage isDark={isDark} onBack={() => setScreen("settings")} setTheme={setTheme} />
+        <PreferencesPage onBack={() => setScreen("settings")} />
       </ScreenShell>
     );
   }
@@ -161,6 +167,98 @@ export default function ScreenRouter({
     return (
       <ScreenShell bg={t.bg}>
         <LegalPage variant="privacy" isDark={isDark} onBack={() => setScreen("permissions")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "notifications-setup") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <NotificationsSetupPage
+          isDark={isDark}
+          onBack={() => setScreen("automatizaciones")}
+          notificationListenerEnabled={notificationListenerEnabled}
+          setNotificationListenerEnabled={setNotificationListenerEnabled}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "shortcuts-setup") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <ShortcutsSetupPage
+          isDark={isDark}
+          onBack={() => setScreen("automatizaciones")}
+          iosShortcutsEnabled={iosShortcutsEnabled}
+          setIosShortcutsEnabled={setIosShortcutsEnabled}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "reports") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <ReportsPage
+          onBack={() => setScreen("settings")}
+          onNavigate={(dest) => {
+            if (dest === "reports-history") setScreen("my-reports");
+            else setScreen(dest);
+          }}
+        />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "my-reports") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <MyReportsPage onBack={() => setScreen("reports")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "onboarding") {
+    return (
+      <ScreenShell bg="#000000">
+        <OnboardingPage setScreen={setScreen} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "login") {
+    return (
+      <ScreenShell bg="#000000">
+        <LoginPage setScreen={setScreen} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "about-login") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <AboutPage isDark={isDark} onBack={() => setScreen("login")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "legal") {
+    return (
+      <ScreenShell bg={t.bg}>
+        <LegalPage variant="terms" isDark={isDark} onBack={() => setScreen("login")} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "forgot-password") {
+    // TODO: Crear pantalla de recuperación de contraseña
+    return (
+      <ScreenShell bg={t.bg}>
+        <div style={{ padding: 20, color: t.text }}>
+          <button onClick={() => setScreen("login")} style={{ cursor: "pointer" }}>← Volver al inicio</button>
+          <p style={{ marginTop: 20 }}>Pantalla de recuperación de contraseña (próximamente)</p>
+        </div>
       </ScreenShell>
     );
   }

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { DAY_PILLAR_COLOR } from "../constants";
+import { useTheme } from "../hooks/useTheme";
+import { getPillarColor } from "../utils/colorUtils";
+import { RADIUS } from "../constants/tokens";
 
 /**
  * PillarTagsBar.jsx
@@ -22,8 +24,10 @@ export default function PillarTagsBar({
   filteredPillar,
   setFilteredPillar,
   setFilterType,
-  isDark,
+  isDark, // Aún recibido como prop para compatibilidad
 }) {
+  // 🆕 Tema desde ThemeContext
+  const { isDark: isDarkTheme } = useTheme();
   // 🆕 Estado para trackear qué tag está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 
@@ -32,7 +36,8 @@ export default function PillarTagsBar({
       {/* Tags de pilares */}
       {PILLARS.map((p, i) => {
         const isFiltered = filteredPillar === p.id;
-        const c = isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color); // 🆕 color según tema
+        // 🆕 Color dinámico del pilar según tema
+        const c = getPillarColor(p.id, isDarkTheme);
         const isPressing = pressingId === p.id; // 🆕 Verificar si este tag está siendo presionado
         if (isPressing) console.log("🎯 RENDERING TAG PRESSED:", p.id, "isPressing:", isPressing);
 
@@ -77,19 +82,18 @@ export default function PillarTagsBar({
               alignItems: "center",
               justifyContent: "center",
               padding: "6px 2px",
-              borderRadius: 9,
+              borderRadius: 10,
               border: "none",
               cursor: "pointer",
-              background: isFiltered ? c + "33" : c + "1A",
-              outline: isFiltered ? `1.5px solid ${c}BB` : `1px solid ${c}44`,
-              transform: isPressing ? "scale(0.88) translateY(0.5px)" : "scale(1) translateY(0)", // 🆕 Se empequeñece más al presionar
-              opacity: isPressing ? 0.5 : 1, // 🆕 Opacidad más baja al presionar
-              boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none", // 🆕 Sombra inset al presionar
-              transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)", // 🆕 Transición suave
+              background: isFiltered ? c + "24" : "rgba(" + parseInt(c.slice(1, 3), 16) + "," + parseInt(c.slice(3, 5), 16) + "," + parseInt(c.slice(5, 7), 16) + ",0.14)",
+              transform: isPressing ? "scale(0.88) translateY(0.5px)" : "scale(1) translateY(0)",
+              opacity: isPressing ? 0.5 : 1,
+              boxShadow: isPressing ? "inset 0 2px 4px rgba(0, 0, 0, 0.3)" : "none",
+              transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            <div style={{ fontSize: 10, fontWeight: 800, color: c }}>{p.label}</div>
-            <div style={{ fontSize: 10, fontWeight: 600, color: c, opacity: 0.8 }}>{chipPcts[i]}%</div>
+            <div style={{ fontSize: 9, fontWeight: 800, color: "#F5F3FF" }}>{p.label}</div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: c }}>{chipPcts[i]}%</div>
           </button>
         );
       })}
