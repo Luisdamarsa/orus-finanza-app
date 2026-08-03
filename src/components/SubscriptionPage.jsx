@@ -1,52 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
-import PageLayout from "./PageLayout";
 import { userStorage } from "../utils/userStorage";
 import { DARK, LIGHT } from "../constants/tokens";
 
-/**
- * SubscriptionPage.jsx — "Mi Plan".
- * Presenta los 3 planes de ORUS (Free / Plus / Pro) con sus beneficios.
- * Precios en USD (universal). Las tarjetas aparecen desde abajo al entrar en pantalla
- * (reveal por scroll) y están COLAPSADAS: se ve nombre + descripción + precio + botón;
- * al tocar la tarjeta (menos el botón) se despliegan todas las características.
- * Mismo formato que las demás (PageLayout). Extraída — ruteo en ScreenRouter.
- */
-
-const USD_TO_COP = 3300; // ref. 20 jul 2026
+const USD_TO_COP = 3300;
 const cop = (usd) => "≈ $" + Math.round((usd * USD_TO_COP) / 100) * 100 + " COP/mes";
 
-// Donut de ORUS (símbolo) — mismos pilares/colores del dashboard
-const DONUT = [
-  { c: "#93C5FD", pct: 30 },
-  { c: "#FCA5A5", pct: 20 },
-  { c: "#86EFAC", pct: 15 },
-  { c: "#C4B5FD", pct: 20 },
-  { c: "#FDE68A", pct: 15 },
-];
-function polar(cx, cy, r, deg) {
-  const a = ((deg - 90) * Math.PI) / 180;
-  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
-}
-function arcPath(cx, cy, r, s, e) {
-  const [x1, y1] = polar(cx, cy, r, s);
-  const [x2, y2] = polar(cx, cy, r, e);
-  const large = e - s > 180 ? 1 : 0;
-  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
-}
-function DonutIcon({ size = 26 }) {
-  const cx = size / 2, cy = size / 2, r = size / 2 - 3;
-  let cursor = 0;
+// Donut real de ORUS (mismo del login)
+function DonutIcon({ size = 18 }) {
+  const segments = [
+    { color: "#93C5FD", start: 0, pct: 30 },
+    { color: "#FCA5A5", start: 30, pct: 20 },
+    { color: "#86EFAC", start: 50, pct: 15 },
+    { color: "#C4B5FD", start: 65, pct: 20 },
+    { color: "#FDE68A", start: 85, pct: 15 },
+  ];
+
+  const paths = segments.map((seg) => {
+    const startAngle = (seg.start * 360) / 100 - 90;
+    const endAngle = ((seg.start + seg.pct) * 360) / 100 - 90;
+    const rad1 = (startAngle * Math.PI) / 180;
+    const rad2 = (endAngle * Math.PI) / 180;
+    const cx = size / 2, cy = size / 2, r = size / 2 - 2;
+    const x1 = cx + r * Math.cos(rad1);
+    const y1 = cy + r * Math.sin(rad1);
+    const x2 = cx + r * Math.cos(rad2);
+    const y2 = cy + r * Math.sin(rad2);
+    const large = seg.pct > 50 ? 1 : 0;
+    return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+  });
+
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {DONUT.map((s, i) => {
-        const sweep = s.pct * 3.6;
-        const start = cursor;
-        const end = cursor + sweep - 8;
-        cursor += sweep;
-        return <path key={i} d={arcPath(cx, cy, r, start, end)} stroke={s.c} strokeWidth={4} fill="none" strokeLinecap="round" />;
-      })}
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }}>
+      {segments.map((seg, i) => (
+        <path key={i} d={paths[i]} fill={seg.color} />
+      ))}
     </svg>
   );
 }
@@ -60,9 +49,9 @@ const PLANS = [
     tagline: "Empieza a tomar el control, sin pagar nada.",
     features: [
       { t: "Registro manual y por voz", ok: true },
-      { t: "Hasta 10 movimientos al día", ok: true, note: "desbloquea +5 viendo un anuncio" },
+      { t: "Hasta 10 movimientos al día — desbloquea +5 viendo un anuncio", ok: true, highlight: true },
       { t: "Categorías y presupuestos básicos", ok: true },
-      { t: "Con anuncios", ok: true, muted: true },
+      { t: "Con anuncios", ok: true },
       { t: "Lectura automática (correo / notificaciones)", ok: false },
       { t: "Asistente de IA", ok: false },
     ],
@@ -71,10 +60,12 @@ const PLANS = [
     id: "plus",
     name: "ORUS Plus",
     icon: "⭐",
+    iconColor: "#F5B93D",
     tint: "#93C5FD",
     price: 2.99,
     tagline: "Que la app registre por ti. Sin escribir, sin anuncios.",
-    highlight: true, // el más popular
+    highlight: true,
+    accentColor: "#8B5CF6",
     perks: ["Sin anuncios", "Lectura automática por correo", "IA que categoriza tus gastos"],
     reviews: [
       { name: "Camila R.", stars: 5, text: "Dejé de anotar todo a mano. Llegan mis gastos solos y ya no veo anuncios. Vale cada peso." },
@@ -101,63 +92,46 @@ const PLANS = [
     price: 5.99,
     tagline: "Tu asistente financiero con IA. Solo o en equipo.",
     gold: true,
-    badge: "MÁS COMPLETO",
-    perks: ["Asistente de IA para tus finanzas", "Informes mensuales y anuales", "Workspaces compartidos"],
+    accentColor: "#F5B93D",
+    perks: ["Todo lo del plan Plus", "Asistente de IA para tus finanzas", "Informes automáticos con tips y alertas"],
     reviews: [
-      { name: "Daniela S.", stars: 5, text: "El asistente de IA me dice en qué estoy gastando de más. Es como tener un contador en el bolsillo." },
-      { name: "Juan Felipe", stars: 5, text: "Comparto un workspace con mi novia para los gastos de la casa. Nos organizó la vida." },
-      { name: "Mariana G.", stars: 5, text: "Los informes anuales son oro para mi negocio. Ahora sé exactamente cómo me fue el año." },
+      { name: "Jorge T.", stars: 5, text: "El asistente de IA me dice en qué estoy gastando de más. Es como tener un contador en el bolsillo." },
+      { name: "Natalia G.", stars: 5, text: "Comparto un workspace con mi novia para los gastos de la casa. Nos organizó la vida." },
+      { name: "Simón A.", stars: 4, text: "Los informes anuales son oro para mi negocio. Ahora sé exactamente cómo me fue el año." },
     ],
     features: [
       { t: "Todo lo del plan Plus", ok: true },
-      { t: "Asistente de IA: pregúntale sobre tus finanzas", ok: true, note: "hasta 100 consultas/mes" },
+      { t: "Asistente de IA: pregúntale sobre tus finanzas — hasta 100 consultas/mes", ok: true, highlight: true },
       { t: "Análisis inteligente de tus finanzas", ok: true },
       { t: "Informes mensuales y anuales completos", ok: true },
-      { t: "Workspaces compartidos", ok: true, note: "pareja, amigos o tu negocio" },
+      { t: "Workspaces compartidos — pareja, amigos o tu negocio", ok: true, highlight: true },
       { t: "Categorización por IA (sin límite)", ok: true },
     ],
   },
 ];
 
-// Componente reutilizable para botón de plan
-const PlanButton = ({ plan, onSelect, t }) => {
-  const planPress = usePress();
-  return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      {...planPress.handlers}
-      style={{
-        width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
-        background: plan.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (plan.highlight ? "#9B6DFF" : t.text),
-        color: plan.gold ? "#3D2B00" : (plan.highlight ? "#fff" : t.bg),
-        fontSize: 13.5, fontWeight: plan.gold ? 800 : 700, cursor: "pointer",
-        boxShadow: plan.gold ? "0 2px 10px rgba(224,169,62,0.4)" : "none",
-        border: "none",
-        ...planPress.getPressStyle({ opacity: 0.85, scale: 0.98 }),
-      }}
-    >
-      Elegir {plan.name}
-    </button>
-  );
-};
-
 export default function SubscriptionPage({ onBack }) {
-  // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
-
   const pressBack = usePress();
+  const pressContinue = usePress();
+  const pressCancel = usePress();
   const containerRef = useRef(null);
-  // Plan activo del usuario (desde userStorage). Ej: "FREE" -> "free"
   const [currentPlan, setCurrentPlan] = useState(() => userStorage.getSubscription().toLowerCase());
-  const [selected, setSelected] = useState(null);
-  const [confirming, setConfirming] = useState(null); // id del plan en pantalla de confirmación
-  const [payHint, setPayHint] = useState(false); // aviso "aquí se abrirá el pago" (placeholder dev)
-  const [expanded, setExpanded] = useState(() => userStorage.getSubscription().toLowerCase()); // abre el plan activo
+  const [expanded, setExpanded] = useState(() => userStorage.getSubscription().toLowerCase());
+  const [confirming, setConfirming] = useState(null);
 
-  // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    text: tokens.text,
+    sub: tokens.sub,
+    muted: tokens.muted,
+    surface: "linear-gradient(155deg,#211d2c 0%,#141220 100%)",
+    raised: "linear-gradient(155deg,#262231 0%,#17151f 100%)",
+    shadowLg: "0 20px 40px -16px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+    shadowSm: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+  };
+
   useEffect(() => {
     const root = containerRef.current;
     if (!root) return;
@@ -167,302 +141,385 @@ export default function SubscriptionPage({ onBack }) {
     );
     root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [confirming]); // re-adjunta el observer al volver de la confirmación (si no, las tarjetas quedan invisibles)
-
-  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
-  const tokens = isDark ? DARK : LIGHT;
-  const t = {
-    bg: tokens.bg,
-    card: tokens.surfaceFlat,
-    border: tokens.border,
-    text: tokens.text,
-    sub: tokens.sub,
-  };
+  }, [confirming]);
 
   const toggle = (id) => setExpanded((cur) => (cur === id ? null : id));
 
-  const confirmChange = (id) => {
-    userStorage.setSubscription(id.toUpperCase()); // cambia la suscripción del usuario
-    setCurrentPlan(id);
-    setExpanded(id);
-    setSelected(id);
-    setConfirming(null);
-  };
-
-  const Stars = ({ n }) => (
-    <span style={{ color: "#F5C451", fontSize: 11, letterSpacing: 1 }}>
-      {"★".repeat(n)}<span style={{ color: t.border }}>{"★".repeat(5 - n)}</span>
-    </span>
-  );
-
-  // Pantalla de CONFIRMACIÓN (antes de aplicar / pagar)
-  const cp = confirming ? PLANS.find((x) => x.id === confirming) : null;
-  if (cp) {
-    const closeConfirm = () => { setConfirming(null); setPayHint(false); };
-    const accent = cp.gold ? "#E0A93E" : cp.highlight ? "#9B6DFF" : t.text;
+  // PANTALLA DE CONFIRMACIÓN
+  const confirmPlan = confirming ? PLANS.find((x) => x.id === confirming) : null;
+  if (confirmPlan) {
     return (
-      <PageLayout
-        key="confirm-plan"
-        isDark={isDark}
-        onBack={closeConfirm}
-        pressBack={pressBack}
-        title={
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-            <span style={{ fontSize: 18 }}>💎</span>CONFIRMAR PLAN
+      <div style={{ position: "absolute", inset: 0, overflowY: "auto", padding: "26px 22px 50px", background: "#000000", fontFamily: "Manrope" }}>
+        {/* HEADER */}
+        <button
+          onClick={() => setConfirming(null)}
+          {...pressBack.handlers}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "none",
+            border: "none",
+            color: "#8B87A3",
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: "pointer",
+            padding: "6px 0",
+            fontFamily: "Manrope",
+          }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+          Atrás
+        </button>
+
+        {/* TÍTULO CON GRADIENTE */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 18 }}>
+          <span style={{ fontSize: 17 }}>💎</span>
+          <span style={{
+            fontSize: 17,
+            fontWeight: 800,
+            letterSpacing: "0.3px",
+            textTransform: "uppercase",
+            background: "linear-gradient(90deg,#7DD3FC,#B18CFF)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}>
+            Confirmar Plan
           </span>
-        }
-      >
+        </div>
+
         <style>{`
           .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
           .reveal.in{opacity:1;transform:none;}
         `}</style>
-        <div ref={containerRef} style={{ textAlign: "left" }}>
-          {/* Resumen del plan */}
-          <div className="reveal" style={{ background: t.card, border: `2px solid ${accent}`, borderRadius: 16, padding: 16 }}>
+
+        <div ref={containerRef}>
+          {/* TARJETA RESUMEN */}
+          <div className="reveal" style={{
+            marginTop: 18,
+            borderRadius: 20,
+            background: t.surface,
+            border: `1.5px solid ${confirmPlan.accentColor}`,
+            boxShadow: t.shadowLg,
+            padding: 16,
+          }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: cp.tint + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21, flexShrink: 0 }}>
-                {cp.id === "free" ? <DonutIcon size={28} /> : cp.icon}
+              <div style={{ width: 34, height: 34, borderRadius: 11, background: t.raised, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ fontSize: 20, color: confirmPlan.iconColor || "inherit" }}>{confirmPlan.icon}</span>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <b style={{ fontSize: 17, color: t.text }}>{cp.name}</b>
-                <div style={{ fontSize: 11.5, color: t.sub, marginTop: 2 }}>{cp.tagline}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "14.5px", fontWeight: 800, color: t.text }}>{confirmPlan.name}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 2, lineHeight: 1.3 }}>{confirmPlan.tagline}</div>
               </div>
             </div>
-            <div style={{ marginTop: 12 }}>
-              {cp.price === 0
-                ? <span style={{ fontSize: 22, fontWeight: 800, color: t.text }}>Gratis</span>
-                : <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}>
-                    <span style={{ fontSize: 22, fontWeight: 800, color: t.text }}>${cp.price}</span>
-                    <span style={{ fontSize: 12, color: t.sub, fontWeight: 600 }}>USD/mes</span>
-                    <span style={{ fontSize: 10, color: t.sub, marginLeft: 6 }}>{cop(cp.price)}</span>
-                  </span>}
+
+            {/* PRECIO */}
+            <div style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 8 }}>
+              <span style={{ fontSize: 24, fontWeight: 800, color: t.text }}>${confirmPlan.price}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: t.sub }}>USD/mes</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#5F5C74" }}>{cop(confirmPlan.price)}</span>
             </div>
           </div>
 
-          {/* Ventajas destacadas */}
-          {cp.perks && (
-            <div className="reveal" style={{ marginTop: 16, transitionDelay: "0.08s" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8 }}>Lo que obtienes</div>
-              {cp.perks.map((perk, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-                  <span style={{ color: accent, fontWeight: 800, fontSize: 13 }}>✓</span>
-                  <span style={{ fontSize: 12.5, color: t.text, lineHeight: 1.4 }}>{perk}</span>
+          {/* LO QUE OBTIENES */}
+          <div className="reveal" style={{ marginTop: 22, transitionDelay: "0.08s" }}>
+            <div style={{ fontSize: "12.5px", fontWeight: 800, color: t.text, marginBottom: 10 }}>Lo que obtienes</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+              {confirmPlan.perks.map((perk, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86EFAC" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span style={{ fontSize: "12.5px", fontWeight: 600, color: t.text }}>{perk}</span>
                 </div>
               ))}
             </div>
-          )}
+          </div>
 
-          {/* Reseñas */}
-          {cp.reviews && (
-            <div style={{ marginTop: 18 }}>
-              <div className="reveal" style={{ fontSize: 12.5, fontWeight: 700, color: t.text, marginBottom: 8, transitionDelay: "0.16s" }}>Lo que dicen quienes lo usan</div>
-              {cp.reviews.map((r, i) => (
-                <div key={i} className="reveal" style={{ background: t.card, border: `1px solid ${t.border}`, borderRadius: 12, padding: 12, marginBottom: 8, transitionDelay: `${0.22 + i * 0.1}s` }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-                    <b style={{ fontSize: 12, color: t.text }}>{r.name}</b>
-                    <Stars n={r.stars} />
+          {/* RESEÑAS */}
+          <div className="reveal" style={{ marginTop: 22, transitionDelay: "0.16s" }}>
+            <div style={{ fontSize: "12.5px", fontWeight: 800, color: t.text, marginBottom: 10 }}>Lo que dicen quienes lo usan</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {confirmPlan.reviews.map((r, i) => (
+                <div key={i} className="reveal" style={{
+                  padding: "13px 14px",
+                  borderRadius: 16,
+                  background: t.surface,
+                  boxShadow: t.shadowSm,
+                  transitionDelay: `${0.22 + i * 0.1}s`,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: "12.5px", fontWeight: 800, color: t.text }}>{r.name}</span>
+                    <span style={{ fontSize: 11, color: "#F5B93D", letterSpacing: 1 }}>
+                      {"★".repeat(r.stars)}<span style={{ opacity: 0.3 }}>{"★".repeat(5 - r.stars)}</span>
+                    </span>
                   </div>
-                  <div style={{ fontSize: 11.5, color: t.sub, lineHeight: 1.5 }}>“{r.text}”</div>
+                  <div style={{ fontSize: "11.5px", fontWeight: 600, color: t.sub, marginTop: 6, lineHeight: 1.5 }}>
+                    "{r.text}"
+                  </div>
                 </div>
               ))}
-              <div style={{ fontSize: 9, color: t.sub, fontStyle: "italic", marginTop: 2 }}>Reseñas de ejemplo.</div>
+              <div style={{ fontSize: "9.5px", fontWeight: 600, color: "#5F5C74", marginTop: 8 }}>Reseñas de ejemplo.</div>
             </div>
-          )}
+          </div>
 
-          {/* Botones */}
+          {/* BOTONES */}
           <button
             className="reveal"
-            onClick={() => { if (cp.price === 0) confirmChange(cp.id); else setPayHint(true); }}
+            onClick={() => setConfirming(null)}
+            {...pressContinue.handlers}
             style={{
-              width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "none", transitionDelay: "0.5s",
-              background: cp.gold ? "linear-gradient(135deg, #F5C451, #E0A93E)" : (cp.highlight ? "#9B6DFF" : (cp.id === "free" ? "#22C55E" : t.text)),
-              color: cp.gold ? "#3D2B00" : (cp.id === "free" || cp.highlight ? "#fff" : t.bg),
-              fontSize: 14, fontWeight: 800, cursor: "pointer",
-              transition: "all 0.15s ease",
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.opacity = "0.85";
-              e.currentTarget.style.transform = "scale(0.98)";
-              console.log(`💳 SubscriptionPage: Botón 'Continuar con ${cp.name}' PRESIONADO`);
-            }}
-            onMouseUp={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "scale(1)";
-              console.log(`💳 SubscriptionPage: Botón 'Continuar con ${cp.name}' SOLTADO`);
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            {cp.price === 0 ? "Cambiar a ORUS Free" : `Continuar con ${cp.name}`}
+              width: "100%",
+              padding: 15,
+              borderRadius: 16,
+              border: "none",
+              fontSize: "13.5px",
+              fontWeight: 800,
+              marginTop: 22,
+              fontFamily: "Manrope",
+              cursor: "pointer",
+              background: confirmPlan.id === "plus" ? "linear-gradient(155deg,#B18CFF,#8B5CF6)" : "linear-gradient(155deg,#FBBF54,#F5B93D)",
+              color: confirmPlan.id === "plus" ? "#fff" : "#241a02",
+              transitionDelay: "0.5s",
+              ...pressContinue.getPressStyle({ scale: 0.97 }),
+            }}>
+            Continuar con {confirmPlan.name}
           </button>
+
           <button
             className="reveal"
-            onClick={closeConfirm}
-            style={{ width: "100%", marginTop: 10, padding: "11px 0", borderRadius: 14, border: `1.5px solid ${t.border}`, background: "transparent", color: t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer", transitionDelay: "0.56s" }}
-          >
+            onClick={() => setConfirming(null)}
+            {...pressCancel.handlers}
+            style={{
+              width: "100%",
+              padding: 14,
+              borderRadius: 16,
+              border: "none",
+              fontSize: 13,
+              fontWeight: 700,
+              marginTop: 10,
+              fontFamily: "Manrope",
+              cursor: "pointer",
+              background: t.raised,
+              color: t.sub,
+              transitionDelay: "0.56s",
+            }}>
             Cancelar
           </button>
-          {cp.price !== 0 && !payHint && (
-            <div style={{ fontSize: 10, color: t.sub, textAlign: "center", marginTop: 10, paddingBottom: 10, lineHeight: 1.5 }}>
-              🔒 El pago se procesará de forma segura por tu tienda (App Store / Google Play). Cancela cuando quieras.
-            </div>
-          )}
-          {cp.price !== 0 && payHint && (
-            <div style={{ fontSize: 11.5, color: t.text, textAlign: "center", marginTop: 12, paddingBottom: 10, lineHeight: 1.5, background: "#9B6DFF18", border: `1px solid #9B6DFF55`, borderRadius: 12, padding: 12 }}>
-              🔒 Aquí se abrirá el pago de tu tienda (App Store / Google Play).
-              <br /><b style={{ color: "#9B6DFF" }}>Próximamente.</b>
-            </div>
-          )}
+
+          {/* FOOTER */}
+          <div className="reveal" style={{ fontSize: 10, fontWeight: 600, color: "#5F5C74", marginTop: 16, lineHeight: 1.5, textAlign: "center", transitionDelay: "0.62s" }}>
+            🔒 El pago se procesará de forma segura por tu tienda (App Store / Google Play). Cancela cuando quieras.
+          </div>
         </div>
-      </PageLayout>
+      </div>
     );
   }
 
+  // PANTALLA DE LISTA DE PLANES
   return (
-    <PageLayout
-      key="plan-list"
-      isDark={isDark}
-      onBack={onBack}
-      pressBack={pressBack}
-      title={
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-          <span style={{ fontSize: 18 }}>💎</span>MI PLAN
-        </span>
-      }
-    >
-      <style>{`
-        .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
-        .reveal.in{opacity:1;transform:none;}
-      `}</style>
+    <div style={{ position: "absolute", inset: 0, overflowY: "auto", padding: "26px 22px 50px", background: "#000000", fontFamily: "Manrope" }}>
+      {/* HEADER - BOTÓN ATRÁS */}
+      <button
+        onClick={onBack}
+        {...pressBack.handlers}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          background: "none",
+          border: "none",
+          color: "#8B87A3",
+          fontWeight: 700,
+          fontSize: 13,
+          cursor: "pointer",
+          padding: "6px 0",
+          fontFamily: "Manrope",
+        }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+        Atrás
+      </button>
 
-      <div ref={containerRef} style={{ textAlign: "left" }}>
-        <div style={{ fontSize: 12.5, color: t.sub, lineHeight: 1.6, marginBottom: 6 }}>
-          Elige el plan que se ajuste a ti. Puedes empezar gratis y cambiar cuando quieras.
-        </div>
+      {/* TÍTULO "MI PLAN" */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 10 }}>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 3h12l3 6-9 12L3 9z" />
+          <path d="M9 3l3 6 3-6M3 9h18" />
+        </svg>
+        <span style={{ fontSize: 18, fontWeight: 800, color: t.text, letterSpacing: "0.3px", textTransform: "uppercase" }}>
+          Mi Plan
+        </span>
+      </div>
+
+      {/* SUBTÍTULO */}
+      <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#8B87A3", textAlign: "center", lineHeight: 1.5, marginTop: 8 }}>
+        Elige el plan que se ajuste a ti. Puedes empezar gratis y cambiar cuando quieras.
+      </div>
+
+      {/* TARJETAS DE PLAN */}
+      <div ref={containerRef} style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 22 }}>
+        <style>{`
+          .reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;}
+          .reveal.in{opacity:1;transform:none;}
+        `}</style>
 
         {PLANS.map((p, i) => {
           const isOpen = expanded === p.id;
           const isCurrent = currentPlan === p.id;
-          const border = p.highlight ? "#9B6DFF" : t.border;
+
+          let borderStyle = "1px solid rgba(255,255,255,0.07)";
+          if (p.id === "plus") borderStyle = "1.5px solid #8B5CF6";
+          if (p.id === "pro") borderStyle = "1.5px solid rgba(245,185,61,0.5)";
+
           return (
             <div
               key={p.id}
               className="reveal"
               onClick={() => toggle(p.id)}
               style={{
-                background: t.card,
-                border: `${p.highlight ? 2 : 1}px solid ${border}`,
-                borderRadius: 16,
-                padding: 16,
-                marginTop: 14,
-                transitionDelay: `${i * 0.1}s`,
+                borderRadius: 22,
+                background: t.surface,
+                boxShadow: t.shadowLg,
+                padding: isOpen && (p.highlight || p.gold) ? "20px 18px 18px" : "18px",
                 position: "relative",
                 cursor: "pointer",
-              }}
-            >
+                border: borderStyle,
+                transitionDelay: `${i * 0.1}s`,
+              }}>
+              {/* TAG FLOTANTE */}
               {p.highlight && (
-                <span style={{ position: "absolute", top: -9, left: 16, background: "#9B6DFF", color: "#fff", fontSize: 9, fontWeight: 800, padding: "2px 9px", borderRadius: 10, letterSpacing: 0.5 }}>
+                <span style={{ position: "absolute", top: -11, left: 18, background: "#8B5CF6", color: "#fff", fontSize: "9.5px", fontWeight: 800, padding: "4px 12px", borderRadius: 20, textTransform: "uppercase" }}>
                   MÁS POPULAR
                 </span>
               )}
-
-              {/* Encabezado del plan */}
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: p.tint + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
-                  {p.id === "free" ? <DonutIcon size={26} /> : p.icon}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-                    <b style={{ fontSize: 16, color: t.text }}>{p.name}</b>
-                    {p.badge && (
-                      <span style={{ fontSize: 9, fontWeight: 800, color: "#5A3E00", background: "linear-gradient(135deg, #F5C451, #E0A93E)", padding: "2px 8px", borderRadius: 8, letterSpacing: 0.3, boxShadow: "0 1px 4px rgba(224,169,62,0.45)" }}>✦ {p.badge}</span>
-                    )}
-                    {isCurrent && (
-                      <span style={{ fontSize: 9, fontWeight: 700, color: "#22C55E", background: "#22C55E22", padding: "1px 7px", borderRadius: 8 }}>PLAN ACTUAL</span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: 11.5, color: t.sub, lineHeight: 1.45, marginTop: 2 }}>{p.tagline}</div>
-                </div>
-                {/* Flechita para desplegar */}
-                <span style={{ flexShrink: 0, marginTop: 2, color: t.sub, transition: "transform 0.25s ease", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-flex" }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+              {p.gold && (
+                <span style={{ position: "absolute", top: -11, left: 18, background: "#F5B93D", color: "#fff", fontSize: "9.5px", fontWeight: 800, padding: "4px 12px", borderRadius: 20, textTransform: "uppercase" }}>
+                  + MÁS COMPLETO
                 </span>
-              </div>
-
-              {/* Precio */}
-              <div style={{ marginTop: 12, marginBottom: 4 }}>
-                {p.price === 0 ? (
-                  <span style={{ fontSize: 24, fontWeight: 800, color: t.text }}>Gratis</span>
-                ) : (
-                  <span style={{ display: "inline-flex", alignItems: "baseline", gap: 4, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 24, fontWeight: 800, color: t.text }}>${p.price}</span>
-                    <span style={{ fontSize: 12, color: t.sub, fontWeight: 600 }}>USD/mes</span>
-                    <span style={{ fontSize: 10, color: t.sub, marginLeft: 6 }}>{cop(p.price)}</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Lista de beneficios (solo si está desplegada) */}
-              {isOpen && (
-                <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
-                  {p.features.map((f, j) => (
-                    <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                      <span style={{ fontSize: 12, lineHeight: 1.4, flexShrink: 0, color: f.ok ? "#22C55E" : "#FCA5A5", fontWeight: 700 }}>
-                        {f.ok ? "✓" : "✕"}
-                      </span>
-                      <span style={{ fontSize: 12, lineHeight: 1.4, color: f.ok ? (f.muted ? t.sub : t.text) : t.sub, opacity: f.ok ? 1 : 0.6 }}>
-                        {f.t}
-                        {f.note && <span style={{ color: t.sub, fontStyle: "italic" }}> — {f.note}</span>}
-                      </span>
-                    </div>
-                  ))}
-                </div>
               )}
 
-              {/* Botón de acción (no expande la tarjeta) */}
-              {isCurrent ? (
-                <button
+              {/* HEADER PLAN */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
+                  {/* ÍCONO */}
+                  <div style={{ width: 34, height: 34, borderRadius: 11, background: t.raised, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {p.id === "free" ? (
+                      <DonutIcon size={18} />
+                    ) : (
+                      <span style={{ fontSize: 20, color: p.iconColor || "inherit" }}>{p.icon}</span>
+                    )}
+                  </div>
+
+                  {/* NOMBRE + BADGE */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: "14.5px", fontWeight: 800, color: t.text }}>{p.name}</span>
+                      {isCurrent && (
+                        <span style={{ fontSize: "8.5px", fontWeight: 800, color: "#86EFAC", background: "rgba(134,239,172,0.16)", padding: "2px 8px", borderRadius: 8 }}>
+                          PLAN ACTUAL
+                        </span>
+                      )}
+                    </div>
+                    {/* TAGLINE */}
+                    <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, marginTop: 2, lineHeight: 1.3 }}>
+                      {p.tagline}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CHEVRON */}
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   style={{
-                    width: "100%", marginTop: 14, padding: "11px 0", borderRadius: 12,
-                    border: `1.5px solid ${t.border}`,
-                    background: "transparent",
                     color: t.sub,
-                    fontSize: 13.5, fontWeight: 700, cursor: "default",
-                  }}
-                >
-                  Tu plan actual
-                </button>
-              ) : (
-                <PlanButton
-                  plan={p}
-                  onSelect={() => {
-                    setPayHint(false);
-                    setConfirming(p.id);
-                  }}
-                  t={t}
-                />
+                    transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.25s ease",
+                    flexShrink: 0,
+                  }}>
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+
+              {/* CONTENIDO EXPANDIDO */}
+              {isOpen && (
+                <>
+                  {/* PRECIO */}
+                  <div style={{ marginTop: 16, display: "flex", alignItems: "baseline", gap: 8 }}>
+                    {p.price === 0 ? (
+                      <span style={{ fontSize: 28, fontWeight: 800, color: t.text }}>Gratis</span>
+                    ) : (
+                      <>
+                        <span style={{ fontSize: 28, fontWeight: 800, color: t.text }}>${p.price}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: t.sub }}>USD/mes</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: "#5F5C74" }}>{cop(p.price)}</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* FEATURES */}
+                  <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 9 }}>
+                    {p.features.map((f, j) => (
+                      <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        {f.ok ? (
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86EFAC" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                            <path d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E4574B" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                            <path d="M6 6l12 12M18 6L6 18" />
+                          </svg>
+                        )}
+                        <span style={{ fontSize: 12, fontWeight: 600, color: t.text, fontStyle: f.highlight ? "italic" : "normal" }}>
+                          {f.t}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* BOTÓN CTA */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirming(p.id);
+                    }}
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      borderRadius: 16,
+                      border: "none",
+                      fontSize: "13.5px",
+                      fontWeight: 800,
+                      marginTop: 16,
+                      fontFamily: "Manrope",
+                      cursor: p.id === "free" ? "default" : "pointer",
+                      background: p.id === "free" ? t.raised : p.id === "plus" ? "linear-gradient(155deg,#B18CFF,#8B5CF6)" : "linear-gradient(155deg,#FBBF54,#F5B93D)",
+                      color: p.id === "free" ? t.sub : p.id === "plus" ? "#fff" : "#241a02",
+                      opacity: p.id === "free" ? 0.6 : 1,
+                    }}>
+                    {p.id === "free" ? "Tu plan actual" : `Elegir ${p.name}`}
+                  </button>
+                </>
               )}
             </div>
           );
         })}
-
-        {selected && (
-          <div style={{ fontSize: 11, color: t.sub, textAlign: "center", marginTop: 12, lineHeight: 1.5 }}>
-            {selected === "free"
-              ? <>Cambiaste tu plan a <b style={{ color: "#22C55E" }}>ORUS Free</b>.</>
-              : <>✅ Tu plan es ahora <b style={{ color: "#9B6DFF" }}>{PLANS.find((x) => x.id === selected).name}</b>. <span style={{ fontStyle: "italic" }}>El cobro real se activará próximamente.</span></>}
-          </div>
-        )}
-
-        <div style={{ fontSize: 10.5, color: t.sub, textAlign: "center", marginTop: 20, paddingBottom: 10, lineHeight: 1.5 }}>
-          Precios en USD. El valor en COP es una referencia y puede variar con la tasa de cambio.
-          Cancela cuando quieras.
-        </div>
       </div>
-    </PageLayout>
+
+      {/* FOOTER */}
+      <div style={{ fontSize: 10, fontWeight: 600, color: "#5F5C74", textAlign: "center", marginTop: 18, lineHeight: 1.5 }}>
+        Precios en USD. El valor en COP es una referencia y puede variar con la tasa de cambio. Cancela cuando quieras.
+      </div>
+    </div>
   );
 }

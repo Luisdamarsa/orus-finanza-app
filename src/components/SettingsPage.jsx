@@ -43,7 +43,7 @@ export default function SettingsPage({
     { id: "perfil", label: "Perfil", iconKey: "perfil", badgeBg: "rgba(155,109,255,0.16)", badgeColor: "#9B6DFF", onClick: onProfile },
     { id: "categorias", label: "Categorías", iconKey: "categorias", badgeBg: "rgba(253,230,138,0.16)", badgeColor: "#FDE68A", onClick: onCategories },
     { id: "presupuestos", label: "Presupuestos", iconKey: "presupuestos", badgeBg: "rgba(253,230,138,0.16)", badgeColor: "#FDE68A", onClick: onBudgets },
-    { id: "ingresos", label: "Mostrar Ingresos", iconKey: "ingresos", badgeBg: "rgba(255,255,255,0.07)", badgeColor: "#8B87A3", isToggle: true },
+    { id: "ingresos", label: "Mostrar Ingresos", iconKey: "ingresos", badgeBg: "rgba(255,255,255,0.07)", badgeColor: "#8B87A3", isToggle: true, onNavigate: onShowIncomes },
     { id: "plan", label: "Mi Plan", iconKey: "plan", badgeBg: "rgba(255,255,255,0.07)", badgeColor: "#8B87A3", onClick: onSubscription },
     { id: "automatizacion", label: "Automatizaciones", iconKey: "automatizacion", badgeBg: "rgba(253,230,138,0.16)", badgeColor: "#FDE68A", onClick: onAutomatizaciones },
     { id: "permisos", label: "Permisos", iconKey: "permisos", badgeBg: "rgba(253,230,138,0.16)", badgeColor: "#FDE68A", onClick: onPermissions },
@@ -91,6 +91,7 @@ export default function SettingsPage({
             return (
               <div
                 key={row.id}
+                onClick={() => row.onNavigate && row.onNavigate()}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -99,8 +100,9 @@ export default function SettingsPage({
                   borderRadius: 16,
                   background: "linear-gradient(155deg,#211d2c 0%,#141220 100%)",
                   boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  cursor: row.onNavigate ? "pointer" : "default",
                 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1 }}>
                   <div
                     style={{
                       width: 32,
@@ -121,7 +123,10 @@ export default function SettingsPage({
 
                 {/* Toggle */}
                 <button
-                  onClick={() => setShowIncomes(!showIncomes)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowIncomes(!showIncomes);
+                  }}
                   onPointerDown={() => setPressingButton(row.id)}
                   onPointerUp={() => setPressingButton(null)}
                   onPointerLeave={() => setPressingButton(null)}
@@ -134,6 +139,7 @@ export default function SettingsPage({
                     position: "relative",
                     cursor: "pointer",
                     transition: "background 0.18s ease",
+                    flexShrink: 0,
                   }}>
                   <span
                     style={{
