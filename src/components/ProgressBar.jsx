@@ -17,7 +17,11 @@
  *   categoryName - Nombre de la categoría a mostrar (opcional)
  *   icon - Ícono a mostrar junto al nombre (opcional, puede ser emoji o componente)
  *   alwaysShowDashedBorder - Si true, muestra borde punteado siempre (para pilares)
+ *   amountText - Monto formateado a mostrar dentro
+ *   percentageText - Porcentaje formateado a mostrar dentro
  */
+import { useRef, useEffect } from 'react';
+
 export default function ProgressBar({
   spent,
   budget = null,
@@ -29,15 +33,20 @@ export default function ProgressBar({
   categoryName = null,
   icon = null,
   alwaysShowDashedBorder = false,
+  amountText = null,
+  percentageText = null,
+  barHeight = 52,
+  isPillar = false,
 }) {
+  const containerRef = useRef(null);
   // 🆕 Grosor del borde punteado (sincronizado en ambos lugares)
   const borderWidth = 2; // px
 
   // 🆕 Factores de compensación para alineación visual de la barra azul
-  // Primera categoría (100%): resta borderWidth * 5.5 = 11px
-  // Otras categorías: resta borderWidth * 3.5 = 7px
-  const FIRST_CATEGORY_REDUCTION_FACTOR = 5.5;
-  const OTHER_CATEGORIES_REDUCTION_FACTOR = 3.5;
+  // Primera categoría (100%): resta borderWidth * 6 = 12px
+  // Otras categorías: resta borderWidth * 4 = 8px
+  const FIRST_CATEGORY_REDUCTION_FACTOR = 6;
+  const OTHER_CATEGORIES_REDUCTION_FACTOR = 4;
 
   // Determinar si tiene presupuesto
   const hasBudget = budget && budget > 0;
@@ -89,32 +98,41 @@ export default function ProgressBar({
     budgetLinePercentage = 0; // Sin línea punteada
   }
 
+  // 🆕 Medir ancho real del contenedor y calcular ancho exacto de la barra en px
+  useEffect(() => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.getBoundingClientRect().width;
+      const barWidthPx = (barFillPercentage / 100) * containerWidth - (showDashedBorder ? 4 : 0);
+      console.log(`[ProgressBar] ${categoryName}: containerWidth=${containerWidth.toFixed(1)}px, barFillPercentage=${barFillPercentage.toFixed(1)}%, barWidthPx=${barWidthPx.toFixed(1)}px, showDashedBorder=${showDashedBorder}`);
+    }
+  }, [categoryName, barFillPercentage, showDashedBorder]);
+
   return (
     <div
+      ref={containerRef}
       style={{
         flex: 1,
         position: "relative",
-        height: 32,
-        maxWidth: "calc(100% - 10px)",
+        height: showDashedBorder ? barHeight - 4 : barHeight,
+        maxWidth: "100%",
+        display: "flex",
+        alignItems: "center",
       }}
     >
       {/* Barra de Progreso - Contenedor clickeable */}
       <div
         onClick={clickable ? onClickBar : undefined}
         style={{
-          width: "100%",
-          height: 32,
+          flex: 1,
+          height: "100%",
           borderRadius: 8,
           display: "flex",
           alignItems: "center",
-          paddingLeft: 10,
-          position: "absolute",
-          top: 0,
-          left: 0,
+          position: "relative",
           overflow: "hidden",
           cursor: isDisabled ? "not-allowed" : (clickable ? "pointer" : "default"),
           transition: "all 0.2s",
-          // Track (parte sin llenar): noche negro; día SIN fondo (el usuario pidió quitar la "sombra gris").
+          // Track (parte sin llenar): noche negro; día SIN fondo
           background: isDark ? "#000000" : "transparent",
           opacity: isDisabled ? 0.5 : 1,
         }}
@@ -125,27 +143,26 @@ export default function ProgressBar({
           if (clickable) e.currentTarget.style.opacity = "1";
         }}
       >
-        {/* Barra de relleno - Siempre mostrar */}
-        {/* 🆕 Cuando showDashedBorder: resta diferente si es primera categoría o no */}
-        <div
-          style={{
-            position: "absolute",
-            left: showDashedBorder ? "1px" : 0,
-            top: showDashedBorder ? "1px" : 0,
-            height: showDashedBorder ? "calc(100% - 2px)" : "100%",
-            width: showDashedBorder
-              ? barFillPercentage > 100
-                ? `calc(${barFillPercentage}% - ${borderWidth * 1.5}px)`  // Sobrepasa: factor menor (3px)
-                : barFillPercentage === 100
-                ? `calc(${barFillPercentage}% - ${borderWidth * FIRST_CATEGORY_REDUCTION_FACTOR}px)`
-                : `calc(${barFillPercentage}% - ${borderWidth * OTHER_CATEGORIES_REDUCTION_FACTOR}px)`
-              : `${barFillPercentage}%`,
-            background: pillarColor,
-            borderRadius: 8,
-            opacity: isSelected ? 1 : 0.6,
-            transition: "width 0.2s, opacity 0.2s",
-          }}
-        />
+        {/* Barra de relleno - Solo si hay presupuesto (para pilares) o siempre (para categorías) */}
+        {(!isPillar || hasBudget) && (
+          <div
+            style={{
+              position: "absolute",
+              left: showDashedBorder ? "1px" : 0,
+              top: showDashedBorder ? "1px" : 0,
+              height: showDashedBorder ? "calc(100% - 4px)" : "100%",
+              width: `${barFillPercentage}%`,
+              background: pillarColor,
+              borderRadius: 8,
+              opacity: isSelected ? 1 : 0.6,
+              transition: "width 0.2s, opacity 0.2s",
+              zIndex: 2,
+              boxSizing: "border-box",
+              maxWidth: "100%",
+              overflow: "hidden",
+            }}
+          />
+        )}
 
         {/* 🆕 Nombre de la categoría - Si se proporciona */}
         {categoryName && (
@@ -162,32 +179,75 @@ export default function ProgressBar({
               display: "flex",
               alignItems: "center",
               gap: 6,
+              paddingLeft: 10,
             }}
           >
             {icon && <span>{icon}</span>}
             {categoryName}
           </span>
         )}
+
+        {/* 🆕 Contenedor Monto + Porcentaje (juntos en dos líneas) */}
+        {amountText && (
+          <div
+            style={{
+              marginLeft: "auto",
+              paddingRight: 10,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 0,
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 800,
+                color: "#ffffff",
+                whiteSpace: "nowrap",
+                lineHeight: 1,
+              }}
+            >
+              {amountText}
+            </span>
+            {percentageText && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#8B87A3",
+                  whiteSpace: "nowrap",
+                  lineHeight: 1,
+                }}
+              >
+                {percentageText}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* 🆕 Borde punteado blanco (solo cuando showDashedBorder) */}
-      {/* Borde llega hasta 100% del contenedor (que ya tiene maxWidth: 100% - 10px) */}
-      {/* borderWidth está sincronizado con la barra azul para compensar visualmente */}
-      {/* 🆕 Resta borderWidth * 2 para que el border no se sobrepase del contenedor */}
+      {/* 🆕 Borde punteado (solo cuando showDashedBorder) */}
+      {/* Llega exactamente al borde útil de la página */}
       {showDashedBorder && (
         <div
           style={{
             position: "absolute",
-            top: 0,
+            top: 1,
             left: 0,
-            width: `calc(${Math.min(budgetLinePercentage, 100)}% - ${borderWidth * 2}px)`,
-            height: 28,
-            // Línea punteada del presupuesto: blanca en noche, oscura en día (si no, invisible en claro).
-            border: `${borderWidth}px dashed ${isDark ? "#FFFFFF" : "#1A1830"}`,
+            width: `${Math.min(budgetLinePercentage, 100)}%`,
+            height: "calc(100% - 4px)",
+            maxWidth: "calc(100% - 2px)",
+            // Línea punteada del presupuesto: nueva color rgba(255,255,255,0.85)
+            border: `${borderWidth}px dashed rgba(255,255,255,0.85)`,
             borderRadius: 8,
             pointerEvents: "none",
-            zIndex: 3,
+            zIndex: 1,
             transition: "width 0.2s",
+            boxSizing: "border-box",
+            overflow: "hidden",
           }}
         />
       )}

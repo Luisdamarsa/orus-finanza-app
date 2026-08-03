@@ -19,8 +19,8 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
   // 🆕 Estado para trackear qué transacción está siendo presionada
   const [pressingTransactionId, setPressingTransactionId] = useState(null);
   const t = isDark
-    ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420" }
-    : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF" };
+    ? { text: "#F0EEFF", sub: "#7B7A99", divider: "#2D2D3A", bg: "#141420", surface: "#1E1E2E", shadowSm: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)", muted: "#5F5C74", raised: "linear-gradient(155deg,#262231,#17151f)" }
+    : { text: "#1A1830", sub: "#9896B0", divider: "#E5E3F5", bg: "#F8F7FF", surface: "#FFFFFF", shadowSm: "0 10px 22px -10px rgba(100,80,200,0.14), inset 0 1px 0 rgba(100,80,200,0.04)", muted: "#9896B0", raised: "linear-gradient(155deg,#ffffff,#f1edfa)" };
 
   // 🆕 Ordenar por fecha+hora DESCENDENTE antes de paginar.
   // Si no, slice(0,15) toma un trozo en el orden del array (no por fecha) y al cargar
@@ -71,7 +71,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                 zIndex: 20,
                 background: isDark ? "#000000" : t.bg,
               }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", letterSpacing: "0.4px" }}>
+              <span style={{ fontSize: 10.5, fontWeight: 700, color: t.sub, letterSpacing: "0.4px" }}>
                 {group.label.toUpperCase()}
               </span>
               <span
@@ -86,7 +86,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
             </div>
 
             {/* Contenedor de transacciones del día */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }} className="transactions-gap">
               {group.items.map((tx, i) => {
               const isIngreso = tx.amount > 0 || tx.pillar === "ingreso";
               const pillar = PILLAR_MAP[tx.pillar] || PILLAR_MAP["varios"];
@@ -105,10 +105,10 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    padding: "11px 14px",
+                    padding: "14px 16px",
                     borderRadius: 16,
-                    background: "#1a1725",
-                    boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                    background: t.surface,
+                    boxShadow: t.shadowSm,
                     position: "relative",
                     zIndex: 0,
                     cursor: onEditTransaction ? "pointer" : "default",
@@ -117,13 +117,13 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                     transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}>
                   {/* Contenedor izquierdo: Ícono + Descripción */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
                     {/* Ícono/Badge */}
                     <div
                       style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 11,
+                        width: 40,
+                        height: 40,
+                        borderRadius: 12,
                         flexShrink: 0,
                         background: isIngreso
                           ? "rgba(134,239,172,0.16)"
@@ -131,7 +131,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 15,
+                        fontSize: 18,
                         color: isIngreso ? "#86EFAC" : pillar.color,
                       }}>
                       {isIngreso ? "💚" : pillar.icon}
@@ -143,7 +143,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                       style={{
                         fontSize: 12.5,
                         fontWeight: 700,
-                        color: "#F5F3FF",
+                        color: t.text,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -156,14 +156,14 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         display: "flex",
                         alignItems: "center",
                         gap: 5,
-                        marginTop: 3,
+                        marginTop: 2,
                       }}>
                       <span
                         style={{
                           fontSize: 9,
                           fontWeight: 700,
-                          color: "#8B87A3",
-                          background: "linear-gradient(155deg,#262231,#17151f)",
+                          color: t.sub,
+                          background: t.raised,
                           padding: "1px 6px",
                           borderRadius: 8,
                         }}>
@@ -231,7 +231,7 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                       {isIngreso ? "+" : "-"}
                       {fmt(Math.abs(tx.amount))}
                     </div>
-                    <div style={{ fontSize: 9, fontWeight: 600, color: "#5F5C74", marginTop: 2 }}>
+                    <div style={{ fontSize: 9, fontWeight: 600, color: t.muted, marginTop: 2 }}>
                       {tx.time}
                     </div>
                   </div>

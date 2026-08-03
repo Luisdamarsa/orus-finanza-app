@@ -1,5 +1,6 @@
 import ProgressBar from "./ProgressBar";
 import { getOverBudgetColor } from "../services/colorService";
+import { fmt } from "../utils/formatters";
 
 /**
  * CategoryProgressBar.jsx
@@ -81,14 +82,7 @@ export default function CategoryProgressBar({
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-      }}
-    >
-      {/* 🆕 Componente ProgressBar - Renderiza las barras (azul + punteada) + nombre */}
+    <div style={{ width: "100%" }}>
       <ProgressBar
         spent={spent}
         budget={budget}
@@ -98,41 +92,10 @@ export default function CategoryProgressBar({
         isSelected={isSelected}
         onClickBar={onClickBar}
         categoryName={categoryName}
+        amountText={fmt(spent)}
+        percentageText={showDashedBorder ? `${Math.round(percentage)}%` : null}
+        alwaysShowDashedBorder={false}
       />
-
-      {/* Info: gasto y presupuesto */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
-          gap: 0,
-          minWidth: 80,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 700,
-            // El monto va sobre el fondo de la página → día: oscuro; noche: como antes.
-            color: isDark ? (isDisabled ? textColor : "#FFFFFF") : "#1A1830",
-          }}
-        >
-          ${spent.toLocaleString("es-CO")}
-        </span>
-        {/* Mostrar porcentaje solo cuando está en modo presupuesto (>50%) */}
-        {showDashedBorder && (
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: getPercentageColor(),
-            }}
-          >
-            {Math.round(percentage)}%
-          </span>
-        )}
-      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
 import ErrorBoundary from "./ErrorBoundary";
+import BackButton from "./BackButton";
 import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 import { getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
@@ -28,14 +29,13 @@ export default function MovimientosPage({
   onEditTransaction, // 🆕 Callback para editar transacción
 }) {
   // 🆕 Hooks para animación de press en botones
-  const pressBack = usePress();
   const pressClearFilter = usePress();
   // 🆕 Estado para trackear qué tag de categoría está siendo presionado (mantener por múltiples tags)
   const [pressingCategoryTag, setPressingCategoryTag] = useState(null);
 
   const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99", raised: "linear-gradient(155deg,#262231 0%,#17151f 100%)" }
+    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0", raised: "linear-gradient(155deg,#ffffff 0%,#f1edfa 100%)" };
 
   // Filtrar transacciones por pilar y período
   // ¿Es un mes específico? (si no: año o "todo el tiempo" → sin presupuestos)
@@ -172,127 +172,73 @@ export default function MovimientosPage({
   }, [groups]);
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", paddingTop: 52, boxSizing: "border-box" }}>
-      {/* Header fijo (top: 52, height: 52) */}
+    <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", paddingTop: 26, boxSizing: "border-box" }}>
+      {/* Header fijo */}
       <div style={{
         flexShrink: 0,
         height: 52,
         background: t.bg,
-        padding: "8px 22px",
+        padding: "6px 22px",
         boxSizing: "border-box",
-        borderBottom: `1px solid ${t.border}`,
         display: "flex",
         alignItems: "center",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              ...pressBack.getPressStyle(),
-            }}>
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>
-            Atrás
-          </span>
-        </div>
+        <BackButton onClick={onBack} />
       </div>
 
-      {/* Sección de Título - Barra del Pilar + Filtros */}
-      {/* position+zIndex: el título pinta ENCIMA del scroll y su fondo opaco tapa el borde de recorte (marginBottom negativo = solape) */}
+      {/* Sección de Título - Barra-cápsula del pilar */}
       <div
         style={{
           flexShrink: 0,
           background: t.bg,
-          padding: "10px 22px",
+          padding: "0px 22px",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          gap: 8,
+          gap: 0,
           position: "relative",
           zIndex: 2,
-          marginBottom: -3,
         }}>
-        {/* 🆕 Barra del pilar usando ProgressBar */}
-        <div
-          className="orus-rise"
-          style={{
-            animationDelay: "0.04s",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}>
-          {budget ? (
-            <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
+        {/* 🆕 Usar ProgressBar que ya tiene la lógica de >100% y sobregiro */}
+        <div style={{ marginBottom: 14 }}>
+          <ErrorBoundary fallback={null} resetKey={selectedPeriod}>
             <ProgressBar
               spent={totalSpent}
               budget={budget}
               maxSpent={Math.max(totalSpent, budget || 0)}
-              pillarColor={pilar.darkColor}
+              pillarColor={pillarDisplayColor}
               isDark={isDark}
               isSelected={false}
               categoryName={pilar.label}
               icon={pilar.icon}
               onClickBar={undefined}
-              alwaysShowDashedBorder={true}
+              alwaysShowDashedBorder={budget ? true : false}
+              amountText={fmt(totalSpent)}
+              isPillar={true}
             />
-            </ErrorBoundary>
-          ) : (
-            // Pilar sin presupuesto → sin barra: solo icono + nombre (el valor va a la derecha).
-            <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 15 }}>{pilar.icon}</span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: t.text }}>{pilar.label}</span>
-            </div>
-          )}
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 800,
-              color: getOverBudgetColor(),
-              textAlign: "right",
-              minWidth: 80,
-            }}>
-            {fmt(totalSpent)}
-          </div>
+          </ErrorBoundary>
         </div>
 
-        {/* Porcentaje */}
+        {/* Porcentaje del presupuesto */}
         {percentage !== null && (
           <div
             className="orus-rise"
             style={{
-              animationDelay: "0.04s",
+              animationDelay: "0.08s",
               fontSize: 11,
               fontWeight: 700,
-              color: getOverBudgetColor(),
+              color: t.sub,
+              textAlign: "center",
+              paddingTop: 0,
+              paddingBottom: 0,
             }}>
             {percentage.toFixed(0)}% del presupuesto
           </div>
         )}
 
-        {/* 🆕 Barra de contexto (misma del Estado 2): este pilar iluminado + % del total. Informativa. */}
+        {/* 🆕 Barra de contexto (mini-barra de referencia) */}
         {contextSegments.length > 0 && (
-          <div className="orus-rise" style={{ marginTop: 4, animationDelay: "0.14s" }}>
+          <div className="orus-rise" style={{ animationDelay: "0.12s" }}>
             <div style={{ pointerEvents: "none" }}>
               <ColorBar
                 segments={contextSegments}
@@ -304,7 +250,7 @@ export default function MovimientosPage({
                 selectedPeriod={selectedPeriod}
               />
             </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: pillarDisplayColor, marginTop: 6, textAlign: "left" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: t.sub, marginTop: 8, textAlign: "left" }}>
               {pctTotal}% del total
             </div>
           </div>
@@ -328,8 +274,8 @@ export default function MovimientosPage({
 
         {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
         {Object.keys(categorySpent).length > 0 && (
-          <div className="orus-rise" style={{ marginBottom: 32, paddingTop: 0, animationDelay: "0.24s" }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: t.sub, marginBottom: 16, textAlign: "left" }}>
+          <div className="orus-rise" style={{ marginBottom: 13, paddingTop: 13, marginTop: 13, animationDelay: "0.24s" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: t.sub, letterSpacing: "0.5px", marginBottom: 18, textAlign: "left", textTransform: "uppercase" }}>
               Categorías
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -374,7 +320,7 @@ export default function MovimientosPage({
                         spent={spent}
                         budget={categoryBudget}
                         maxSpent={maxSpent}
-                        pillarColor={pilar.darkColor}
+                        pillarColor={pillarDisplayColor}
                         pillarId={pilar.id}
                         isDark={isDark}
                         textColor={t.sub}
@@ -409,9 +355,13 @@ export default function MovimientosPage({
               <div
                 style={{
                   fontSize: 12,
-                  fontWeight: 700,
-                  color: t.sub,
+                  fontWeight: 800,
+                  color: "#9B6DFF",
                   textAlign: "center",
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  marginTop: 14,
+                  marginBottom: 14,
                 }}>
                 MOVIMIENTOS
               </div>
@@ -420,11 +370,15 @@ export default function MovimientosPage({
               <div
                 style={{
                   fontSize: 12,
-                  fontWeight: 700,
-                  color: t.sub,
+                  fontWeight: 800,
+                  color: "#9B6DFF",
                   display: "flex",
                   flexDirection: "column",
                   gap: 8,
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  marginTop: 14,
+                  marginBottom: 8,
                 }}>
                 {/* 🆕 Comportamiento condicional según cantidad de filtros */}
                 {selectedCategories.length === 1 ? (

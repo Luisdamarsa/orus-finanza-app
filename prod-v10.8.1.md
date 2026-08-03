@@ -185,6 +185,24 @@ Redesign visual clay exacto de 6 componentes principales:
 
 ---
 
+### 8. TransactionPage.jsx (OVERFLOW FIX)
+**Fix: Botones +/- saliéndose del área útil de la tarjeta**
+
+**Problema:**
+- Línea 359: los botones +/- tenían `marginLeft: 12` muy grande
+- Con montos largos o pantallas pequeñas, los botones se salían del padding derecho (16px) de la tarjeta clay
+- Especialmente visible en tarjetas de transacción con montos de 7+ dígitos
+
+**Solución (iterativa):**
+- **Iteración 1:** Reducido `marginLeft` de 12 → 8 (no suficiente)
+- **Iteración 2:** Reducido `marginLeft` de 8 → 6 + tamaño botones 26 → 24px + fontSize 14 → 13 (mejor, pero aún overflow)
+- **Iteración 3 (FINAL):** Reducido `marginLeft` de 6 → 2 (casi sin margen entre monto y botones)
+- Botones ahora son 24×24px compactos
+
+**Resultado:** Los botones +/- ahora están completamente contenidos dentro del area útil de la tarjeta, sin ningún overflow.
+
+---
+
 ## ESPECIFICACIONES TÉCNICAS
 
 ### Tokens de Diseño
