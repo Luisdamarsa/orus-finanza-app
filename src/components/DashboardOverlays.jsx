@@ -3,6 +3,7 @@ import PeriodSelector from "./PeriodSelectorService";
 import ErrorBoundary from "./ErrorBoundary";
 import FloatingActionButtons from "./FloatingActionButtons";
 import PillarBarsPopup from "./PillarBarsPopup";
+import SaldoCard from "./SaldoCard";
 import UpdateBalanceModal from "./UpdateBalanceModal";
 import VoiceCapture from "./VoiceCapture";
 import { useDashboard } from "../contexts/DashboardContext";
@@ -88,20 +89,31 @@ export default function DashboardOverlays() {
 
       {/* Popups */}
       {showPillarBars && selectedPillarDetail && (
-        <PillarBarsPopup
-          pillar={selectedPillarDetail}
-          categories={categories}
-          onClose={() => { setShowPillarBars(false); setActiveId(null); }}
-          onViewMovements={() => {
-            setShowPillarBars(false);
-            setActiveId(null); // Resetear la tarjeta seleccionada al abrir movimientos
-            setSelectedPillarForMovements(selectedPillarDetail);
-            setScreen("movimientos");
-          }}
-          isDark={isDark}
-          transactions={transactions}
-          selectedPeriod={selectedPeriod}
-        />
+        <>
+          {/* Si es Saldo, usar SaldoCard en lugar de PillarBarsPopup */}
+          {selectedPillarDetail.id === "saldo" ? (
+            <SaldoCard
+              isDark={isDark}
+              saldo={saldo}
+              onClose={() => { setShowPillarBars(false); setActiveId(null); }}
+            />
+          ) : (
+            <PillarBarsPopup
+              pillar={selectedPillarDetail}
+              categories={categories}
+              onClose={() => { setShowPillarBars(false); setActiveId(null); }}
+              onViewMovements={() => {
+                setShowPillarBars(false);
+                setActiveId(null); // Resetear la tarjeta seleccionada al abrir movimientos
+                setSelectedPillarForMovements(selectedPillarDetail);
+                setScreen("movimientos");
+              }}
+              isDark={isDark}
+              transactions={transactions}
+              selectedPeriod={selectedPeriod}
+            />
+          )}
+        </>
       )}
 
       {showUpdateBalance && (

@@ -7,11 +7,13 @@
 
 ## RESUMEN DE CAMBIOS
 
-Redesign visual clay exacto de 4 componentes principales:
+Redesign visual clay exacto de 6 componentes principales:
 1. **SettingsPage.jsx** — 10 SVG icons con especificaciones exactas
 2. **ProfilePage.jsx** — Página de Perfil con tarjeta editable + FAB flotante
 3. **DeleteAccountModal.jsx** — Popup confirmación eliminación cuenta
 4. **SubscriptionPage.jsx** — Página "Mi Plan" + Pantalla "Confirmar Plan"
+5. **PillarBarsPopup.jsx** — Popup categorías de pilares: máximo 5 visibles + scroll
+6. **SaldoCard.jsx** — Tarjeta especial para pilar Saldo (sin categorías)
 
 ---
 
@@ -125,6 +127,64 @@ Redesign visual clay exacto de 4 componentes principales:
 
 ---
 
+### 5. PillarBarsPopup.jsx
+**Cambios:**
+- Popup de categorías de pilares: máximo 5 categorías visibles
+- `maxHeight` ajustado a exactamente `230px` (para mostrar 5 categorías completas)
+- Categorías 6+ requieren scroll hacia abajo
+- Aplicado en ambos modos: inline y modal
+
+**Especificación:**
+- Altura por categoría: 34.2px (contenido) + 12px (margin-bottom) = **46.2px**
+- Total para 5 categorías: **5 × 46.2px = 230px**
+- Si hay <5 categorías, solo muestra las existentes (sin forzar altura mínima)
+- `overflowY: auto`, `scrollbarWidth: none` (scroll nativo sin barra visible)
+
+---
+
+### 6. SaldoCard.jsx (NEW)
+**Creado para:**
+- Renderizar tarjeta especial cuando se selecciona el pilar "Saldo"
+- Evitar bug: Saldo no está en PILLARS array, por lo que PillarBarsPopup fallaba
+- Mostrar solo información del saldo (sin categorías)
+
+**Diseño:**
+- Ícono: Barras (▬▮▯) en 20×20px
+- Color: Gris (#D4D4D8) si es positivo, Rojo (#FF8A8A) si es negativo
+- Descripción: "Lo que te queda disponible tras tus gastos del período."
+- Botón: "Entendido" (cierra la tarjeta)
+- Modos: inline (Estado 1 expandida) y modal (Estado 2)
+
+**Integración:**
+- Importado en `DashboardExpandedState.jsx` y `DashboardOverlays.jsx`
+- Renderizado cuando `activeId === "saldo"` o `selectedPillarDetail.id === "saldo"`
+- Reemplaza PillarBarsPopup para el pilar Saldo
+
+---
+
+### 7. DashboardExpandedState.jsx (BUG FIX)
+**Fix: "Ver movimientos" no redirigía a MovimientosScreen**
+
+**Problema:**
+- Línea 110: usaba `setSelectedPillarDetail()` en lugar de `setSelectedPillarForMovements()`
+- ScreenRouter solo renderiza MovimientosScreen si AMBAS condiciones se cumplen:
+  - `screen === "movimientos"` ✅
+  - `selectedPillarForMovements` existe ❌ (faltaba este setter)
+
+**Solución:**
+- Importado `setSelectedPillarForMovements` del contexto
+- Cambio en callback `onViewMovements()` (línea 108-110):
+  ```jsx
+  onViewMovements={() => {
+    setSelectedPillarForMovements(PILLARS.find(p => p.id === activeId));
+    setScreen("movimientos");
+  }}
+  ```
+
+**Resultado:** Clickear "Ver movimientos" ahora redirige correctamente a MovimientosScreen con filtro por pilar.
+
+---
+
 ## ESPECIFICACIONES TÉCNICAS
 
 ### Tokens de Diseño
@@ -153,7 +213,11 @@ src/components/
 ├── SettingsPage.jsx           ✅ SVG icons + Manrope
 ├── ProfilePage.jsx            ✅ Diseño clay + FAB flotante
 ├── DeleteAccountModal.jsx     ✅ Popup confirmación
-└── SubscriptionPage.jsx       ✅ Mi Plan + Confirmar Plan
+├── SubscriptionPage.jsx       ✅ Mi Plan + Confirmar Plan
+├── PillarBarsPopup.jsx        ✅ Popup pilares: 5 categorías max + scroll
+├── SaldoCard.jsx              ✅ NUEVO - Tarjeta Saldo (sin categorías)
+├── DashboardExpandedState.jsx ✅ Integración SaldoCard en Estado 1
+└── DashboardOverlays.jsx      ✅ Integración SaldoCard en Estado 2
 ```
 
 ---
@@ -168,6 +232,8 @@ src/components/
 - ✅ Animaciones clayRise + press effects
 - ✅ Responsive y accesible
 - ✅ Sin imágenes externas (solo SVG/emoji)
+- ✅ Popup de pilares: exactamente 5 categorías visibles (230px)
+- ✅ Tarjeta Saldo: no bugea al seleccionar (SaldoCard integrada)
 
 ---
 

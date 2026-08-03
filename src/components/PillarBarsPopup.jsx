@@ -178,7 +178,7 @@ export default function PillarBarsPopup({
             {(() => { const isOver = totalSpent > pillar.budget; const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF"; return <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>{fmt(totalSpent)}</div>{isMonthPeriod && <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>de {fmt(pillar.budget)}</div>}</div>; })()}
           </div>
         )}
-        <div style={{ maxHeight: "300px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const category = ALL_CATS.find(cat => cat.id === catId); let catName = getCategoryName(catId); if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) { const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`; catName = getAttributeAtDate(category, "name", queryDate); } return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
+        <div style={{ maxHeight: "230px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const category = ALL_CATS.find(cat => cat.id === catId); let catName = getCategoryName(catId); if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) { const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`; catName = getAttributeAtDate(category, "name", queryDate); } return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
         <button onClick={onViewMovements} {...pressViewMovements.handlers} style={{ width: "100%", padding: 13, borderRadius: 14, border: "none", background: "rgba(155,109,255,0.16)", color: "#9B6DFF", fontSize: 13, fontWeight: 800, cursor: "pointer", marginTop: "auto", flexShrink: 0, ...pressViewMovements.getPressStyle() }}>Ver movimientos →</button>
       </div>
     );
@@ -273,7 +273,7 @@ export default function PillarBarsPopup({
         )}
 
         {/* Categorías - scroll interno, máximo 5 visibles (o todas si expandido) */}
-        <div ref={categoriesRef} style={{ maxHeight: isExpanded ? "calc(90vh - 280px)" : "228px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12, transition: "maxHeight 0.3s ease" }}>
+        <div ref={categoriesRef} style={{ maxHeight: isExpanded ? "calc(90vh - 280px)" : "230px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12, transition: "maxHeight 0.3s ease" }}>
           <style>{`::-webkit-scrollbar { display: none; }`}</style>
           {/* Filas desde categorySpent (incluye categorías borradas con gasto) para cuadrar con el total y con Movimientos */}
           {Object.keys(categorySpent)

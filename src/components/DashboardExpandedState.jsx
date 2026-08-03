@@ -5,6 +5,7 @@ import DonutTagsBar from "./DonutTagsBar";
 import DonutChartComponent from "./DonutChart";
 import PillarCardsGrid from "./PillarCardsGrid";
 import PillarBarsPopup from "./PillarBarsPopup";
+import SaldoCard from "./SaldoCard";
 import { PILLARS, SALDO_COLOR } from "../constants";
 import { useDashboard } from "../contexts/DashboardContext";
 
@@ -23,6 +24,7 @@ export default function DashboardExpandedState() {
     pressingSegmentId, setPressingSegmentId,
     chipPcts, customBudgets, getBudgetForMonth, hasSaldo, saldo, saldoPctFinal,
     setSelectedPillarDetail, setShowPillarBars, showPillarBars,
+    setSelectedPillarForMovements,
     donutRef, donutContainerRef, pillarsGridRef,
     transactions, setScreen,
   } = useDashboard();
@@ -92,19 +94,28 @@ export default function DashboardExpandedState() {
               />
             </LoadingWrapper>
           ) : (
-            // Tarjeta expandida (pilar seleccionado) - reutilizando PillarBarsPopup inline
-            <PillarBarsPopup
-              pillar={PILLARS.find(p => p.id === activeId)}
-              onClose={() => setActiveId(null)}
-              onViewMovements={() => {
-                setScreen("movimientos");
-                setSelectedPillarDetail(PILLARS.find(p => p.id === activeId));
-              }}
-              isDark={isDark}
-              transactions={transactions}
-              selectedPeriod={selectedPeriod}
-              isInline={true}
-            />
+            // Tarjeta expandida (pilar seleccionado)
+            activeId === "saldo" ? (
+              <SaldoCard
+                isDark={isDark}
+                saldo={saldo}
+                onClose={() => setActiveId(null)}
+                isInline={true}
+              />
+            ) : (
+              <PillarBarsPopup
+                pillar={PILLARS.find(p => p.id === activeId)}
+                onClose={() => setActiveId(null)}
+                onViewMovements={() => {
+                  setSelectedPillarForMovements(PILLARS.find(p => p.id === activeId));
+                  setScreen("movimientos");
+                }}
+                isDark={isDark}
+                transactions={transactions}
+                selectedPeriod={selectedPeriod}
+                isInline={true}
+              />
+            )
           )}
         </ErrorBoundary>
       </div>
