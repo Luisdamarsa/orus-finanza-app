@@ -1,28 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { Tag } from "lucide-react";
+import { useState } from "react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
-import PageLayout from "./PageLayout";
+import BackButton from "./BackButton";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
-import { DARK, LIGHT, RADIUS } from "../constants/tokens";
-import { rowStyles, buttonStyles } from "../utils/clayStyles";
+import { DARK, LIGHT } from "../constants/tokens";
 
-/**
- * CategoriesPage.jsx
- *
- * Página de administración de categorías
- * Muestra todas las categorías agrupadas por pilar
- * Permite agregar nuevas categorías
- *
- * Props:
- *   onBack - Callback para volver atrás
- *   onAddCategory - Callback para abrir AddCategoryPage (nueva)
- *   onEditCategory - Callback para editar categoría (categoryName, pillarId)
- *   categories - {pillarId: [cat1, cat2, ...]}
- */
 export default function CategoriesPage({
   onBack,
   onAddCategory,
@@ -31,274 +16,194 @@ export default function CategoriesPage({
   tab = "gastos",
   setTab,
 }) {
-  // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
   const tokens = isDark ? DARK : LIGHT;
 
-  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
   const t = {
     bg: tokens.bg,
-    card: tokens.surfaceFlat,
+    surface: tokens.surfaceFlat,
+    raised: isDark ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)" : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
     border: tokens.border,
     text: tokens.text,
     sub: tokens.sub,
+    accent: "#9B6DFF",
+    shadowSm: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
   };
 
-  // 🆕 Ref para medir altura de descripción dinámicamente
-  const descriptionRef = useRef(null);
-  const [contentTop, setContentTop] = useState(220);
-  // 🆕 Hooks para animación de press
-  const pressBack = usePress();
+  const pillarSoftBg = {
+    fijos: isDark ? "rgba(147, 197, 253, 0.16)" : "rgba(37, 99, 235, 0.14)",
+    deuda: isDark ? "rgba(252, 165, 165, 0.16)" : "rgba(225, 29, 72, 0.14)",
+    ahorro: isDark ? "rgba(134, 239, 172, 0.16)" : "rgba(22, 163, 74, 0.14)",
+    ocio: isDark ? "rgba(196, 181, 253, 0.16)" : "rgba(147, 51, 234, 0.14)",
+    varios: isDark ? "rgba(253, 230, 138, 0.16)" : "rgba(217, 119, 6, 0.14)",
+  };
+
   const pressAdd = usePress();
-  // 🆕 Estado para rastrear qué categoría está siendo presionada
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
-  // 🆕 Tab activa ("gastos"/"ingresos") viene de props (persiste al ir/volver de crear categoría)
   const incomeCategories = categories["ingreso"] || [];
-
-  // 🆕 Estado de loading para skeleton
   const [isLoading] = useState(false);
-
-  // 🆕 Medir altura dinámicamente de la descripción
-  useEffect(() => {
-    if (descriptionRef.current) {
-      const descriptionHeight = descriptionRef.current.offsetHeight;
-      // Descripción comienza en top: 164, más su altura, más padding bottom 6px
-      const newContentTop = 164 + descriptionHeight + 6;
-      setContentTop(newContentTop);
-    }
-  }, []);
 
   return (
     <>
-    <PageLayout
-      isDark={isDark}
-      onBack={onBack}
-      title="Categorías"
-      icon={<Tag size={20} strokeWidth={1.6} />}
-      pressBack={pressBack}
-      description={
-        <>
-          {/* Descripción 1 */}
-          <div style={{
-            fontSize: 13,
-            color: t.sub,
-            marginBottom: 4,
-            lineHeight: 1.4,
-            fontWeight: 400,
-            textAlign: "left",
-          }}>
-            Organiza tus movimientos en categorías. Los gastos van por pilar; los ingresos, por fuente.
-          </div>
+      <div style={{ position: "absolute", inset: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "26px 22px 90px", background: t.bg, boxSizing: "border-box", fontFamily: "Manrope, system-ui, sans-serif" }}>
+        <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-          {/* Descripción 2 (Ejemplos) */}
-          <div style={{
-            fontSize: 12,
-            color: t.sub,
-            opacity: 0.75,
-            fontStyle: "italic",
-            textAlign: "left",
-          }}>
-            Ej.: "Arriendo" en Fijos (gasto) · "Sueldo" en Ingresos.
-          </div>
-        </>
-      }
-      descriptionRef={descriptionRef}
-      contentTopOffset={contentTop}
-    >
-      {/* LoadingWrapper para mostrar skeleton mientras carga */}
-      <LoadingWrapper
-        isLoading={isLoading}
-        skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />}
-        isDark={isDark}
-      >
-          <>
-            {/* Tabs: Gastos / Ingresos */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              {[["gastos", "Gastos"], ["ingresos", "Ingresos"]].map(([id, label]) => (
-                <button
-                  key={id}
-                  onClick={() => setTab(id)}
-                  style={{ flex: 1, padding: "4px 0", borderRadius: 10, border: `1.5px solid ${tab === id ? "#9B6DFF" : t.border}`, background: tab === id ? "#9B6DFF22" : "transparent", color: tab === id ? "#9B6DFF" : t.sub, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                  {label}
-                </button>
-              ))}
+        <BackButton onClick={onBack} />
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, marginBottom: 10 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <path d="M3 12l9-9h6v6l-9 9-6-6z"/>
+            <circle cx="15" cy="9" r="1"/>
+          </svg>
+          <div style={{ fontSize: 19, fontWeight: 800, color: t.text, textAlign: "center" }}>Categorías</div>
+        </div>
+
+        <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${t.border}` }}>
+          Organiza tus movimientos en categorías. Los gastos van por pilar; los ingresos, por fuente.
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginTop: 20, background: t.raised, borderRadius: 16, padding: 5, boxShadow: t.shadowSm }}>
+          {[["gastos", "Gastos"], ["ingresos", "Ingresos"]].map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              style={{
+                flex: 1,
+                padding: 10,
+                borderRadius: 12,
+                border: "none",
+                background: tab === id ? t.accent : "transparent",
+                color: tab === id ? "#fff" : t.sub,
+                fontSize: "12.5px",
+                fontWeight: 800,
+                cursor: "pointer",
+                fontFamily: "Manrope",
+                transition: "all 0.2s",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <LoadingWrapper isLoading={isLoading} skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />} isDark={isDark}>
+          {tab === "gastos" && (
+            <div style={{ marginTop: 22 }}>
+              {PILLARS.map((pillar) => {
+                const pillarCategories = categories[pillar.id] || [];
+                return (
+                  <div key={pillar.id} style={{ marginBottom: 20 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 14, background: pillarSoftBg[pillar.id] || t.raised, marginBottom: 8 }}>
+                      <span style={{ fontSize: 18 }}>{pillar.icon}</span>
+                      <span style={{ fontSize: "12.5px", fontWeight: 800, color: t.text, textTransform: "uppercase", letterSpacing: ".4px" }}>
+                        {pillar.label}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {pillarCategories.length > 0 ? (
+                        pillarCategories.map((catId) => (
+                          <button
+                            key={catId}
+                            onClick={() => onEditCategory(catId, pillar.id)}
+                            onPointerDown={() => setPressingCategoryId(catId)}
+                            onPointerUp={() => setPressingCategoryId(null)}
+                            onPointerLeave={() => setPressingCategoryId(null)}
+                            style={{
+                              padding: "13px 16px",
+                              borderRadius: 14,
+                              border: "none",
+                              background: t.surface,
+                              color: t.text,
+                              fontSize: 13,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              boxShadow: t.shadowSm,
+                              fontFamily: "Manrope",
+                              transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
+                              transition: "all 0.1s",
+                            }}
+                          >
+                            {getCategoryName(catId)}
+                          </button>
+                        ))
+                      ) : (
+                        <div style={{ padding: "12px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
+                          Sin categorías
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
+          )}
 
-            {tab === "gastos" && (
-            <div>
-            {/* Pilares y sus categorías (carga desde abajo con .orus-rise) */}
-            {PILLARS.map((pillar, pillarIdx) => {
-          const pillarCategories = categories[pillar.id] || [];
-
-          return (
-            <div key={pillar.id} className="orus-rise" style={{ marginBottom: 16, animationDelay: `${pillarIdx * 0.1}s` }}>
-              {/* Título del Pilar - Con tag/badge (icono + nombre dentro) — ancho completo */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 12,
-                  padding: "0",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "8px 14px",
-                    borderRadius: 8,
-                    background: pillar.color + "22",
-                    border: `1px solid ${pillar.color}44`,
-                    width: "100%",
-                  }}
-                >
-                  <span style={{ fontSize: 20.7 }}>{pillar.icon}</span>
-                  <span style={{ fontSize: 16.1, fontWeight: 700, color: pillar.color, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                    {pillar.label}
-                  </span>
-                </div>
-              </div>
-
-              {/* Categorías del Pilar */}
-              <div
-                style={{
-                  background: "transparent",
-                  border: `1px solid ${t.border}`,
-                  borderRadius: 12,
-                  padding: 0,
-                  marginBottom: 8,
-                  overflow: "hidden",
-                }}
-              >
-                {pillarCategories.length > 0 ? (
-                  pillarCategories.map((catId, idx) => {
-                    const isPressingThisCategory = pressingCategoryId === catId;
-                    return (
-                      <button
-                        key={catId}
-                        onClick={() => onEditCategory(catId, pillar.id)}
-                        onPointerDown={() => setPressingCategoryId(catId)}
-                        onPointerUp={() => setPressingCategoryId(null)}
-                        onPointerLeave={() => setPressingCategoryId(null)}
-                        style={{
-                          width: "100%",
-                          padding: "10px 16px",
-                          borderBottom: idx < pillarCategories.length - 1 ? `1px solid ${t.border}` : "none",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          fontSize: 13,
-                          color: t.text,
-                          background: isPressingThisCategory ? (isDark ? "#252538" : "#F0EFF8") : "transparent",
-                          border: "none",
-                          borderRadius: 8,
-                          cursor: "pointer",
-                          textAlign: "left",
-                          transform: isPressingThisCategory ? "scale(0.98) translateY(1px)" : "scale(1) translateY(0)",
-                          boxShadow: isPressingThisCategory ? "inset 0 2px 4px rgba(0, 0, 0, 0.2)" : "none",
-                          transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isPressingThisCategory) {
-                            e.currentTarget.style.background = isDark ? "#252538" : "#F0EFF8";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isPressingThisCategory) {
-                            e.currentTarget.style.background = "transparent";
-                          }
-                        }}
-                      >
-                        <span>{getCategoryName(catId)}</span>
-                      </button>
-                    );
-                  })
-                ) : (
-                  <div
+          {tab === "ingresos" && (
+            <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 8 }}>
+              {incomeCategories.length > 0 ? (
+                incomeCategories.map((catId) => (
+                  <button
+                    key={catId}
+                    onClick={() => onEditCategory(catId, "ingreso")}
+                    onPointerDown={() => setPressingCategoryId(catId)}
+                    onPointerUp={() => setPressingCategoryId(null)}
+                    onPointerLeave={() => setPressingCategoryId(null)}
                     style={{
-                      padding: "12px 16px",
+                      padding: "13px 16px",
+                      borderRadius: 14,
+                      border: "none",
+                      background: t.surface,
+                      color: t.text,
                       fontSize: 13,
-                      color: t.sub,
-                      fontStyle: "italic",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      boxShadow: t.shadowSm,
+                      fontFamily: "Manrope",
+                      transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
+                      transition: "all 0.1s",
                     }}
                   >
-                    Sin categorías
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-            })}
-            </div>
-            )}
-
-            {tab === "ingresos" && (
-              <div>
-                <div style={{ border: `1px solid ${t.border}`, borderRadius: 12, overflow: "hidden" }}>
-                  {incomeCategories.length > 0 ? (
-                    incomeCategories.map((catId, idx) => (
-                      <button
-                        key={catId}
-                        onClick={() => onEditCategory(catId, "ingreso")}
-                        onPointerDown={() => setPressingCategoryId(catId)}
-                        onPointerUp={() => setPressingCategoryId(null)}
-                        onPointerLeave={() => setPressingCategoryId(null)}
-                        style={{ width: "100%", padding: "12px 16px", borderBottom: idx < incomeCategories.length - 1 ? `1px solid ${t.border}` : "none", display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: t.text, background: pressingCategoryId === catId ? (isDark ? "#252538" : "#F0EFF8") : "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
-                        <span style={{ fontSize: 15 }}>💵</span>
-                        <span>{getCategoryName(catId)}</span>
-                      </button>
-                    ))
-                  ) : (
-                    <div style={{ padding: "18px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
-                      Aún no tienes categorías de ingreso. Toca “+ Añadir categoría”.
-                    </div>
-                  )}
+                    {getCategoryName(catId)}
+                  </button>
+                ))
+              ) : (
+                <div style={{ padding: "18px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
+                  Aun no tienes categorias de ingreso. Toca "+ Anadir categoria".
                 </div>
-              </div>
-            )}
-          </>
-      </LoadingWrapper>
-    </PageLayout>
+              )}
+            </div>
+          )}
+        </LoadingWrapper>
+      </div>
 
-    {/* Botón Flotante Añadir Categoría */}
-    <div style={{ position: "fixed", bottom: 24, right: 22 }}>
-      <button
-        onClick={() => onAddCategory(tab === "ingresos")}
-        {...pressAdd.handlers}
-        style={{
-          padding: "12px 18px",
-          borderRadius: 20,
-          border: "none",
-          background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          opacity: pressAdd.pressing ? 0.9 : 1,
-          fontSize: 14,
-          color: "white",
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-          ...pressAdd.getPressStyle(),
-        }}
-        onMouseEnter={(e) => {
-          if (!pressAdd.pressing) {
-            e.currentTarget.style.transform = "scale(1.05)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!pressAdd.pressing) {
-            e.currentTarget.style.transform = "scale(1)";
-          }
-        }}
-      >
-        <span style={{ fontSize: 18 }}>+</span>
-        <span>Añadir categoría</span>
-      </button>
-    </div>
+      <div style={{ position: "fixed", bottom: 24, right: 24 }}>
+        <button
+          onClick={() => onAddCategory(tab === "ingresos")}
+          {...pressAdd.handlers}
+          style={{
+            padding: "14px 20px",
+            borderRadius: 18,
+            border: "none",
+            background: "linear-gradient(155deg,#B18CFF,#8B5CF6)",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 800,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            boxShadow: "0 16px 28px -10px rgba(139,92,246,0.6)",
+            fontFamily: "Manrope",
+            opacity: pressAdd.pressing ? 0.9 : 1,
+            transform: pressAdd.pressing ? "scale(0.95)" : "scale(1)",
+            transition: "all 0.1s",
+          }}
+        >
+          <span style={{ fontSize: 14 }}>+</span>
+          <span>Anadir categoria</span>
+        </button>
+      </div>
     </>
   );
 }
