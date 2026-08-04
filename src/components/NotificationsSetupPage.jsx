@@ -1,266 +1,246 @@
 import { useState } from "react";
 import { usePress } from "../hooks/usePress";
+import { useTheme } from "../hooks/useTheme";
+import HeaderBar from "./HeaderBar";
+import { DARK, LIGHT } from "../constants/tokens";
 
-/**
- * NotificationsSetupPage.jsx
- *
- * Página para explicar cómo activar "Notificaciones de Wallet"
- * Guía paso a paso y toggle al final para guardar preferencia
- */
-export default function NotificationsSetupPage({
-  isDark,
-  onBack,
-  notificationListenerEnabled,
-  setNotificationListenerEnabled,
-}) {
-  const pressBack = usePress();
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+export default function NotificationsSetupPage({ onBack, isDark, notificationListenerEnabled, setNotificationListenerEnabled }) {
+  const theme = useTheme();
+  const resolvedIsDark = isDark !== undefined ? isDark : theme.isDark;
+  const tokens = resolvedIsDark ? DARK : LIGHT;
+
+  const t = {
+    bg: tokens.bg,
+    surface: resolvedIsDark ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)" : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
+    text: tokens.text,
+    sub: tokens.sub,
+    accent: resolvedIsDark ? "#9B6DFF" : "#7C4DFF",
+    accentSoft: resolvedIsDark ? "rgba(155,109,255,0.2)" : "rgba(124,77,255,0.15)",
+    border: tokens.border,
+    shadowSm: resolvedIsDark ? "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 10px 22px -10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(0,0,0,0.04)",
+    inputBg: resolvedIsDark ? "rgba(255,255,255,0.04)" : "rgba(30,20,60,0.04)",
+  };
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSources, setSelectedSources] = useState([]);
+
+  const sources = [
+    { id: "google-pay", name: "Google Pay", icon: "P", color: "#4285F4" },
+    { id: "google-wallet", name: "Google Wallet", icon: "🎫", color: "#4285F4" },
+  ];
+
+  const filteredSources = sources.filter(s =>
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    !selectedSources.find(sel => sel.id === s.id)
+  );
+
+  const toggleSource = (source) => {
+    setSelectedSources([...selectedSources, source]);
+    setSearchQuery("");
+  };
+
+  const removeSource = (sourceId) => {
+    setSelectedSources(selectedSources.filter(s => s.id !== sourceId));
+  };
+
+  const pressToggle = usePress();
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, position: "relative" }}>
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
+      <style>{`::-webkit-scrollbar { display: none; } input::placeholder { color: #8B87A3 !important; }`}</style>
+
       {/* Header fijo */}
-      <div
-        style={{
-          position: "absolute",
-          top: 52,
-          left: 0,
-          right: 0,
-          height: 52,
-          background: t.bg,
-          padding: "8px 22px",
-          boxSizing: "border-box",
-          borderBottom: `1px solid ${t.border}`,
-          zIndex: 30,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 9,
-              border: "none",
-              background: isDark ? "#1E1E2E" : "#EEE9FF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              ...pressBack.getPressStyle(),
-            }}>
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? "#C4C2E0" : "#6B7280"}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F3FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
+        }
+        pageTitle="Activar Notificaciones"
+        isDark={resolvedIsDark}
+      />
+
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 50px", boxSizing: "border-box" }}>
+
+        {/* Explicación */}
+        <div style={{ fontSize: "12px", fontWeight: 600, color: "#8B87A3", lineHeight: 1.5, textAlign: "left" }}>
+          Recibe notificaciones automáticas de tus transacciones de Wallet. ORUS las leerá y te preguntará si registrarlas. Tú controlas qué se registra.
+        </div>
+
+        {/* Instrucciones */}
+        <div style={{ fontSize: "14px", fontWeight: 800, color: "#F5F3FF", marginTop: 20, textAlign: "left" }}>Instrucciones</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
+        {[
+          "1. Abre Configuración",
+          "2. Ve a Notificaciones",
+          "3. Busca \"leer notificaciones\"",
+          "4. Busca \"ORUS\" y actívala",
+          "5. ¡Listo! Ahora ORUS lee las notificaciones de wallet",
+        ].map((item, idx) => (
+          <div key={idx} style={{ fontSize: "12px", fontWeight: 600, color: "#8B87A3", textAlign: "left" }}>
+            {item}
+          </div>
+        ))}
+      </div>
+
+      {/* Automatizaciones Activas */}
+      <div style={{ marginTop: 22, display: "flex", alignItems: "center", padding: "15px 16px", borderRadius: 16, background: t.surface, boxShadow: t.shadowSm }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 11, background: "rgba(134,239,172,0.16)", display: "flex", alignItems: "center", justifyContent: "center", color: "#86EFAC", flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
             </svg>
-          </button>
-          <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>Atrás</span>
+          </div>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: "#F5F3FF" }}>Automatizaciones activas</div>
+            <div style={{ fontSize: "10.5px", fontWeight: 600, color: "#8B87A3", marginTop: 2 }}>ORUS lee notificaciones de tu wallet</div>
+          </div>
         </div>
-      </div>
-
-      {/* Título */}
-      <div
-        style={{
-          position: "absolute",
-          top: 104,
-          left: 0,
-          right: 0,
-          height: 60,
-          background: t.bg,
-          paddingLeft: "22px",
-          paddingBottom: "3px",
-          boxSizing: "border-box",
-          zIndex: 25,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-start",
-        }}>
-        <div
+        <button
+          onClick={() => setNotificationListenerEnabled && setNotificationListenerEnabled(!notificationListenerEnabled)}
+          {...pressToggle.handlers}
           style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: t.text,
-            display: "flex",
+            width: 44,
+            height: 26,
+            borderRadius: 13,
+            border: "none",
+            background: notificationListenerEnabled ? t.accent : t.border,
+            cursor: "pointer",
+            padding: 2,
+            boxSizing: "border-box",
+            display: "inline-flex",
             alignItems: "center",
-            gap: 8,
-          }}>
-          <span style={{ fontSize: 22 }}>💳</span>
-          Activar Notificaciones
-        </div>
+            position: "relative",
+            transition: "background 0.18s ease",
+            ...pressToggle.getPressStyle(),
+          }}
+        >
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: "50%",
+              background: "#FFFFFF",
+              position: "absolute",
+              left: notificationListenerEnabled ? 20 : 2,
+              transition: "left 0.18s ease",
+            }}
+          />
+        </button>
       </div>
 
-      {/* Contenido scrolleable */}
-      <div
-        style={{
-          position: "absolute",
-          top: 164,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          scrollbarWidth: "none",
-          padding: "20px 22px 40px 22px",
-          boxSizing: "border-box",
-        }}>
-        <style>{`::-webkit-scrollbar { display: none; }`}</style>
+      {/* Selecciona Fuente */}
+      <div style={{ fontSize: "14px", fontWeight: 800, color: "#F5F3FF", marginTop: 22, textAlign: "left" }}>Selecciona fuente</div>
 
-        {/* Section 1: ¿Qué necesitas? - Como descripción de página */}
-        <div className="orus-rise" style={{ marginBottom: 24, animationDelay: "0.04s" }}>
-          <div style={{ fontSize: 13, color: t.sub, lineHeight: 1.6, textAlign: "left" }}>
-            Necesitas permiso para que ORUS lea las notificaciones de tu Wallet, y tener una tarjeta configurada en Wallet.
-          </div>
-        </div>
+      {/* Search Bar */}
+      <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderRadius: 14, background: t.inputBg, boxShadow: t.shadowSm }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.sub} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar fuente..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            flex: 1,
+            background: "none",
+            border: "none",
+            fontSize: "12.5px",
+            fontWeight: 600,
+            color: "#F5F3FF",
+            outline: "none",
+            fontFamily: "Manrope",
+          }}
+        />
+      </div>
 
-        {/* Section 2: Instrucciones */}
-        <div className="orus-rise" style={{ marginBottom: 24, animationDelay: "0.12s" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 12px 0", textAlign: "left" }}>
-            Instrucciones
-          </h3>
-
-          <div style={{ fontSize: 12, lineHeight: 1.8, color: t.sub, textAlign: "left" }}>
-            <div style={{ marginBottom: 10, color: t.text }}>
-              1. Abre Configuración
-            </div>
-            <div style={{ marginBottom: 10, color: t.text }}>
-              2. Ve a Notificaciones
-            </div>
-            <div style={{ marginBottom: 10, color: t.text }}>
-              3. Busca "leer notificaciones"
-            </div>
-            <div style={{ marginBottom: 10, color: t.text }}>
-              4. Busca "ORUS" y actívala
-            </div>
-            <div style={{ color: t.text }}>
-              5. ¡Listo! Ahora ORUS lee las notificaciones de wallet
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Toggle de automatizaciones activas */}
-        <div className="orus-rise" style={{ marginBottom: 40, animationDelay: "0.20s" }}>
-          <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: 16 }}>
-            <div style={{ flex: 1, textAlign: "left" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: t.text, marginBottom: 3 }}>✅ Automatizaciones activas</div>
-              <div style={{ fontSize: 11, color: t.sub }}>ORUS lee notificaciones de tu wallet</div>
-            </div>
+      {/* Dropdown */}
+      {searchQuery && filteredSources.length > 0 && (
+        <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+          {filteredSources.map((source) => (
             <button
-              onClick={() => setNotificationListenerEnabled(!notificationListenerEnabled)}
+              key={source.id}
+              onClick={() => toggleSource(source)}
               style={{
-                flexShrink: 0,
-                width: 44,
-                height: 24,
-                borderRadius: 12,
+                padding: "13px 14px",
+                borderRadius: 14,
+                background: t.surface,
+                boxShadow: t.shadowSm,
                 border: "none",
-                background: notificationListenerEnabled ? "#9B6DFF" : isDark ? "#3D3D4D" : "#D5D3E8",
                 cursor: "pointer",
-                padding: 2,
-                boxSizing: "border-box",
-                display: "inline-flex",
+                display: "flex",
                 alignItems: "center",
-              }}>
-              <div
+                gap: 12,
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => e.target.style.opacity = "0.8"}
+              onMouseLeave={(e) => e.target.style.opacity = "1"}
+            >
+              <div style={{ width: 26, height: 26, borderRadius: 8, background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "12px", fontWeight: 800, color: source.color }}>
+                {source.icon}
+              </div>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: t.text, flex: 1, textAlign: "left" }}>{source.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Chips seleccionados */}
+      {selectedSources.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+          {selectedSources.map((source) => (
+            <div
+              key={source.id}
+              style={{
+                padding: "7px 8px 7px 6px",
+                borderRadius: 20,
+                background: t.accentSoft,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <div style={{ width: 18, height: 18, borderRadius: 6, background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 800, color: source.color, flexShrink: 0 }}>
+                {source.icon}
+              </div>
+              <span style={{ fontSize: "11.5px", fontWeight: 700, color: t.accent, flex: 1, textAlign: "left" }}>{source.name}</span>
+              <button
+                onClick={() => removeSource(source.id)}
                 style={{
-                  width: 20,
-                  height: 20,
+                  width: 16,
+                  height: 16,
                   borderRadius: "50%",
-                  background: "#FFFFFF",
-                  transform: notificationListenerEnabled ? "translateX(20px)" : "translateX(0)",
-                  transition: "transform 0.2s",
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
                 }}
-              />
-            </button>
-          </div>
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="3" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Section 4: Selecciona fuente */}
-        <div className="orus-rise" style={{ marginBottom: 24, animationDelay: "0.28s" }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: t.text, margin: "0 0 12px 0", textAlign: "left" }}>
-            Selecciona fuente
-          </h3>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Google Pay */}
-            <button
-              style={{
-                width: "100%",
-                background: isDark ? "#1E1E2E" : "#FFFFFF",
-                border: `1.5px solid #9B6DFF`,
-                borderRadius: 8,
-                padding: 12,
-                cursor: "pointer",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}>
-              <img
-                src="https://cdn.simpleicons.org/googlepay/4285F4"
-                alt="Google Pay"
-                style={{ width: 24, height: 24, flexShrink: 0 }}
-              />
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#9B6DFF" }}>Google Pay</div>
-            </button>
-
-            {/* Google Wallet */}
-            <button
-              style={{
-                width: "100%",
-                background: isDark ? "#252535" : "#F5F3FF",
-                border: `1.5px solid ${t.border}`,
-                borderRadius: 8,
-                padding: 12,
-                cursor: "pointer",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-              }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-                {/* Billetera con tiras de colores - Google Wallet style */}
-                <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="#34A853" strokeWidth="1.5" />
-                <rect x="2" y="4" width="20" height="3.5" fill="#34A853" />
-                <rect x="2" y="7.5" width="20" height="2.5" fill="#EA4335" />
-                <rect x="2" y="10" width="20" height="2.5" fill="#4285F4" />
-                <rect x="2" y="12.5" width="20" height="2.5" fill="#FBBC04" />
-              </svg>
-              <div style={{ fontSize: 14, fontWeight: 600, color: t.text }}>Google Wallet</div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer: Mensaje de soporte - Fijo al bottom */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "auto",
-          background: `linear-gradient(to top, ${t.bg}, transparent)`,
-          padding: "16px 22px",
-          boxSizing: "border-box",
-          zIndex: 20,
-          textAlign: "center",
-        }}>
-        <div style={{ fontSize: 11, color: t.sub, lineHeight: 1.6 }}>
-          ¿Tienes problemas para que ORUS lea las notificaciones? Contacta con{" "}
-          <a href="#" style={{ color: "#9B6DFF", textDecoration: "none", fontWeight: 600 }}>
+        {/* Footer */}
+        <div style={{ fontSize: "11px", fontWeight: 600, color: "#8B87A3", textAlign: "center", marginTop: 30, lineHeight: 1.6 }}>
+          ¿Tienes problemas...? Contacta con nuestra{" "}
+          <span style={{ color: "#9B6DFF", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}>
             ayuda
-          </a>
-          .
+          </span>
+          {" "}sobre cómo configurar notificaciones.
         </div>
       </div>
     </div>

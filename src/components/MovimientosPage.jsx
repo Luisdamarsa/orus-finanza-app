@@ -176,13 +176,12 @@ export default function MovimientosPage({
   }, [groups]);
 
   return (
-    <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", paddingTop: 26, boxSizing: "border-box" }}>
+    <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
       {/* Header fijo */}
       <div style={{
         flexShrink: 0,
-        height: 52,
         background: t.bg,
-        padding: "6px 22px",
+        padding: "20px 22px 0px 22px",
         boxSizing: "border-box",
         display: "flex",
         alignItems: "center",

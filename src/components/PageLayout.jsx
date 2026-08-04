@@ -28,25 +28,27 @@ export default function PageLayout({
 
   return (
     <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", fontFamily: "Manrope, system-ui, sans-serif" }}>
-      {/* Header fijo */}
-      <div style={{ padding: "26px 22px 0", background: t.bg, borderBottom: `1px solid ${t.border}`, zIndex: 10 }}>
-        <BackButton onClick={onBack} />
+      {/* Header fijo - Botón + Título centrados */}
+      <div style={{ padding: "20px 22px", background: t.bg, borderBottom: `1px solid ${t.border}`, zIndex: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexShrink: 0 }}>
+        <div style={{ width: 32 }}><BackButton onClick={onBack} /></div>
 
-        {/* Título */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, marginBottom: 10 }}>
+        {/* Título centrado */}
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
           {icon && <span style={{ fontSize: 20 }}>{icon}</span>}
           <div style={{ fontSize: 19, fontWeight: 800, color: t.text, textAlign: "center" }}>
             {title}
           </div>
         </div>
 
-        {/* Descripción */}
-        {description && (
-          <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 16, paddingBottom: 16 }}>
-            {description}
-          </div>
-        )}
+        <div style={{ width: 32 }} />
       </div>
+
+      {/* Descripción - si existe, también en header fijo */}
+      {description && (
+        <div style={{ padding: "0 22px 16px", background: t.bg, borderBottom: `1px solid ${t.border}`, fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5 }}>
+          {description}
+        </div>
+      )}
 
       {/* Contenido scrolleable */}
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "16px 22px 90px 22px", boxSizing: "border-box" }}>

@@ -3,6 +3,7 @@ import { userStorage } from "../utils/userStorage";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
+import HeaderBar from "./HeaderBar";
 import DeleteAccountModal from "./DeleteAccountModal";
 
 /**
@@ -88,72 +89,70 @@ export default function ProfilePage({
 
   return (
     <>
-      <div style={{ position: "absolute", inset: 0, overflowY: "auto", padding: "26px 22px 60px", background: "#000000", textAlign: "left", fontFamily: "Manrope" }}>
+      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: "#000000", fontFamily: "Manrope" }}>
 
-        {/* HEADER */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {/* Botón Atrás */}
-          <button
-            onClick={onBack}
-            {...pressBack.handlers}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              background: "none",
-              border: "none",
-              color: tokens.sub,
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: "pointer",
-              padding: "6px 0",
-              fontFamily: "Manrope",
-            }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-            Atrás
-          </button>
+        {/* Header fijo - HeaderBar + Botón Cerrar Sesión */}
+        <div style={{ padding: "20px 22px 0px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexShrink: 0, zIndex: 10 }}>
+          {/* HeaderBar a la izquierda */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1 }}>
+            <div style={{ flexShrink: 0 }}>
+              <button
+                onClick={onBack}
+                {...pressBack.handlers}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "none",
+                  border: "none",
+                  color: tokens.sub,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  padding: "6px 0",
+                  fontFamily: "Manrope",
+                  opacity: pressBack.pressing ? 0.7 : 1,
+                  transform: pressBack.pressing ? "scale(0.95)" : "scale(1)",
+                  transition: "all 0.1s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 5l-7 7 7 7" />
+                </svg>
+                Atrás
+              </button>
+            </div>
 
-          {/* Botón Cerrar Sesión */}
+            {/* Título + Ícono alineados a la izquierda */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={tokens.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+              <span style={{ fontSize: 13, fontWeight: 800, color: tokens.text, fontFamily: "Manrope" }}>Perfil</span>
+            </div>
+          </div>
+
+          {/* Botón Cerrar Sesión a la derecha */}
           <button
             onClick={() => setScreen("onboarding")}
             {...pressLogout.handlers}
             style={{
-              padding: "9px 16px",
-              borderRadius: 14,
+              padding: "6px 12px",
+              borderRadius: 12,
               border: "none",
               background: tokens.raised,
               color: tokens.text,
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: 11,
               cursor: "pointer",
               boxShadow: tokens.shadowSm,
               fontFamily: "Manrope",
+              flexShrink: 0,
               ...pressLogout.getPressStyle({ scale: 0.97 }),
             }}>
             Cerrar Sesión
           </button>
         </div>
 
-        {/* TÍTULO con ícono */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 20 }}>
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 11,
-              background: tokens.accentSoft,
-              color: tokens.accent,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
-          </div>
-          <span style={{ fontSize: 18, fontWeight: 800, color: tokens.text, fontFamily: "Manrope" }}>Perfil</span>
-        </div>
+        {/* Contenido scrollable */}
+        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 60px", textAlign: "left", boxSizing: "border-box" }}>
 
         {/* TARJETA: Nombre de Usuario */}
         <div
@@ -387,8 +386,9 @@ export default function ProfilePage({
           transition: "opacity 0.2s ease",
           ...(hasChanged ? pressSave.getPressStyle({ scale: 0.94 }) : {}),
         }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
-      </button>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        </button>
+      </div>
     </>
   );
 }

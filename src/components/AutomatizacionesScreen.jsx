@@ -27,6 +27,8 @@ export default function AutomatizacionesScreen({
         setIosShortcutsEnabled={setIosShortcutsEnabled}
         onOpenAccessibilitySettings={onOpenAccessibilitySettings}
         setScreen={setScreen}
+        onNotificationsSetup={() => setScreen("notifications-setup")}
+        onShortcutsSetup={() => setScreen("shortcuts-setup")}
       />
     </ScreenShell>
   );

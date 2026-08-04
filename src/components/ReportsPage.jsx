@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { BarChart3 } from "lucide-react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
-import PageLayout from "./PageLayout";
+import HeaderBar from "./HeaderBar";
 import { userStorage } from "../utils/userStorage";
 import { DARK, LIGHT } from "../constants/tokens";
 
@@ -16,7 +15,12 @@ import { DARK, LIGHT } from "../constants/tokens";
 const REPORTS = [
   {
     id: "monthly",
-    icon: "📅",
+    icon: (color) => (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M3 10h18M8 3v4M16 3v4"/>
+      </svg>
+    ),
     name: "Mensual",
     description: "Informe de tu mes en números",
     color: "#93C5FD",
@@ -32,7 +36,11 @@ const REPORTS = [
   },
   {
     id: "quarterly",
-    icon: "📊",
+    icon: (color) => (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 20V10M12 20V4M19 20v-7"/>
+      </svg>
+    ),
     name: "Trimestral",
     description: "Análisis profundo de tu trimestre",
     color: "#FCA5A5",
@@ -45,10 +53,17 @@ const REPORTS = [
     ],
     benefits: "Ve el cuadro más grande de tu salud financiera. Detecta patrones que los informes mensuales no muestran.",
     frequency: "Se genera cada fin de trimestre automáticamente",
+    recommended: true,
   },
   {
     id: "annual",
-    icon: "🎯",
+    icon: (color) => (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="5"/>
+        <circle cx="12" cy="12" r="1" fill={color}/>
+      </svg>
+    ),
     name: "Anual",
     description: "Tu año financiero resumido",
     color: "#86EFAC",
@@ -123,22 +138,31 @@ export default function ReportsPage({ onBack, onNavigate }) {
   const toggleReport = (id) => setEnabledReports((cur) => ({ ...cur, [id]: !cur[id] }));
 
   return (
-    <PageLayout
-      isDark={isDark}
-      onBack={onBack}
-      title="Informes"
-      icon={<BarChart3 size={20} strokeWidth={1.6} />}
-      pressBack={pressBack}
-      contentTopOffset={contentTopOffset}
-      description={
-        <div ref={descriptionRef} style={{ fontSize: 12, color: t.sub, lineHeight: 1.5, textAlign: "left" }}>
-          Elige el período que se ajuste a ti. Puedes cambiar cuando quieras.
-        </div>
-      }
-    >
-      <div ref={containerRef} style={{ display: "flex", flexDirection: "column", minHeight: "100%", gap: 0 }}>
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
+      <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 20V10M12 20V4M19 20v-7" />
+          </svg>
+        }
+        pageTitle="Informes"
+        isDark={isDark}
+      />
+
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 90px", boxSizing: "border-box" }}>
+
+      {/* Descripción */}
+      <div ref={descriptionRef} style={{ fontSize: 12, color: t.sub, lineHeight: 1.5, textAlign: "center", marginBottom: 22, marginTop: 0 }}>
+        Elige el período que se ajuste a ti. Puedes cambiar cuando quieras.
+      </div>
+
+      <div ref={containerRef} style={{ display: "flex", flexDirection: "column", gap: 0, minHeight: "100%" }}>
         {/* Contenedor de tarjetas */}
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
           {/* Tarjetas de reportes */}
           {REPORTS.map((report) => (
           <div
@@ -182,40 +206,40 @@ export default function ReportsPage({ onBack, onNavigate }) {
                 e.currentTarget.style.opacity = "1";
               }}
               style={{
-                background: t.card,
-                border: `2px solid ${report.color}`,
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 8,
+                background: tokens.surfaceFlat || t.card,
+                border: `1.5px solid ${report.color}`,
+                borderRadius: 20,
+                padding: "16px 16px 18px",
                 cursor: "pointer",
                 transition: "all 0.15s ease",
                 display: "flex",
                 flexDirection: expanded === report.id ? "column" : "row",
-                justifyContent: "space-between",
                 alignItems: expanded === report.id ? "flex-start" : "center",
                 gap: 12,
+                overflow: "hidden",
+                boxShadow: isDark ? "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 10px 22px -10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(0,0,0,0.04)",
               }}
             >
               {/* Header - siempre visible */}
               <div style={{ display: "flex", gap: 12, width: "100%" }}>
-                {/* Icono */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <span style={{ fontSize: 36 }}>{report.icon}</span>
+                {/* Icono badge */}
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: `${report.color}26`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: report.color }}>
+                  {typeof report.icon === "function" ? report.icon(report.color) : report.icon}
                 </div>
 
                 {/* Nombre + Descripción */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 16, fontWeight: 800, color: t.text }}>{report.name}</span>
-                    {report.id === "quarterly" && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 14.5, fontWeight: 800, color: t.text }}>{report.name}</span>
+                    {report.recommended && (
                       <span
                         style={{
-                          fontSize: 9,
+                          fontSize: 8.5,
                           fontWeight: 800,
-                          color: "#9B6DFF",
-                          background: "#9B6DFF22",
-                          padding: "5px 10px",
-                          borderRadius: 6,
+                          color: "#B18CFF",
+                          background: "rgba(139,92,246,0.22)",
+                          padding: "2px 8px",
+                          borderRadius: 8,
                           textTransform: "uppercase",
                           letterSpacing: 0.4,
                         }}
@@ -224,7 +248,7 @@ export default function ReportsPage({ onBack, onNavigate }) {
                       </span>
                     )}
                   </div>
-                  <div style={{ fontSize: 11.5, color: t.sub, lineHeight: 1.45, marginTop: 2, textAlign: "left" }}>{report.description}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: t.sub, lineHeight: 1.45, marginTop: 2, textAlign: "left" }}>{report.description}</div>
                 </div>
 
                 {/* Toggle */}
@@ -234,8 +258,8 @@ export default function ReportsPage({ onBack, onNavigate }) {
                     toggleReport(report.id);
                   }}
                   style={{
-                    width: 48,
-                    height: 28,
+                    width: 44,
+                    height: 26,
                     borderRadius: 14,
                     background: enabledReports[report.id] ? report.color : t.border,
                     position: "relative",
@@ -246,13 +270,13 @@ export default function ReportsPage({ onBack, onNavigate }) {
                 >
                   <div
                     style={{
-                      width: 24,
-                      height: 24,
+                      width: 22,
+                      height: 22,
                       borderRadius: "50%",
                       background: "#FFFFFF",
                       position: "absolute",
                       top: 2,
-                      left: enabledReports[report.id] ? 22 : 2,
+                      left: enabledReports[report.id] ? 20 : 2,
                       transition: "left 0.3s ease",
                     }}
                   />
@@ -261,17 +285,17 @@ export default function ReportsPage({ onBack, onNavigate }) {
 
               {/* Contenido expandido - DENTRO del mismo div */}
               {expanded === report.id && (
-                <div style={{ width: "100%", marginTop: 4, paddingTop: 4, borderTop: `1px solid ${report.color}33`, textAlign: "left" }}>
-                  <div style={{ fontSize: 12, color: t.sub, marginBottom: 10, lineHeight: 1.4 }}>
-                    <strong>Tareas que hace este informe:</strong><br/>
+                <div style={{ width: "100%", marginTop: 4, paddingTop: 4, borderTop: `1px solid ${t.border}`, textAlign: "left" }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 800, color: t.text, marginBottom: 10, lineHeight: 1.4 }}>
+                    Tareas que hace este informe:<br/>
                     {report.tasks.map((task, i) => (
-                      <div key={i} style={{ marginTop: 4 }}>{task}</div>
+                      <div key={i} style={{ marginTop: 4, fontSize: 11.5, fontWeight: 600, color: t.sub }}>{task}</div>
                     ))}
                   </div>
-                  <div style={{ fontSize: 12, color: report.color, fontWeight: 600, marginTop: 10, lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 11.5, color: report.color, fontWeight: 700, marginTop: 10, lineHeight: 1.4 }}>
                     {report.benefits}
                   </div>
-                  <div style={{ fontSize: 11, color: t.sub, marginTop: 10, fontStyle: "italic", lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 10, color: tokens.muted || t.sub, marginTop: 10, fontStyle: "italic", lineHeight: 1.4 }}>
                     {report.frequency}
                   </div>
                 </div>
@@ -290,22 +314,24 @@ export default function ReportsPage({ onBack, onNavigate }) {
           {...pressViewReports.handlers}
           style={{
             width: "100%",
-            padding: "12px 16px",
-            borderRadius: 12,
-            border: `1.5px solid #9B6DFF`,
-            background: "#9B6DFF",
+            padding: "16px",
+            borderRadius: 16,
+            border: "none",
+            background: "linear-gradient(155deg,#B18CFF,#8B5CF6)",
             color: "#FFFFFF",
-            fontSize: 13,
-            fontWeight: 700,
+            fontSize: 14,
+            fontWeight: 800,
             cursor: "pointer",
             marginTop: "auto",
             letterSpacing: 0.2,
+            boxShadow: "0 16px 28px -10px rgba(139,92,246,0.6), inset 0 1px 0 rgba(255,255,255,0.3)",
             ...pressViewReports.getPressStyle({ opacity: 0.85, scale: 0.98 }),
           }}
         >
           Mis informes
         </button>
       </div>
-    </PageLayout>
+      </div>
+    </div>
   );
 }

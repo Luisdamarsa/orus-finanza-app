@@ -56,23 +56,26 @@ export default function ShowIncomesPage({
   };
 
   return (
-    <div style={{ position: "absolute", inset: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "26px 22px 60px", background: t.bg, boxSizing: "border-box", fontFamily: "Manrope, system-ui, sans-serif" }}>
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
       <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <BackButton onClick={onBack} />
-      </div>
+      {/* Header fijo - BackButton + Título + Toggle */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "20px 22px 0px 22px", flexShrink: 0, zIndex: 10, fontFamily: "Manrope, system-ui, sans-serif" }}>
+        {/* BackButton solo */}
+        <div style={{ flexShrink: 0 }}>
+          <BackButton onClick={onBack} />
+        </div>
 
-      {/* Título + Toggle */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, marginBottom: 10, gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {/* Título + Toggle separados a la derecha */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
             <polyline points="17 6 23 6 23 12" />
           </svg>
-          <span style={{ fontSize: "16px", fontWeight: 800, color: t.text }}>Mostrar Ingresos</span>
+          <span style={{ fontSize: 13, fontWeight: 800, color: t.text }}>Mostrar Ingresos</span>
         </div>
+
+        {/* Toggle */}
         <button
           onClick={() => onToggleShowIncomes(!showIncomesEnabled)}
           style={{
@@ -85,6 +88,7 @@ export default function ShowIncomesPage({
             position: "relative",
             padding: 0,
             transition: "background 0.2s",
+            flexShrink: 0,
           }}
         >
           <span
@@ -103,8 +107,11 @@ export default function ShowIncomesPage({
         </button>
       </div>
 
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 60px", boxSizing: "border-box" }}>
+
       {/* Descripción */}
-      <div style={{ fontSize: "12px", fontWeight: 600, color: t.sub, lineHeight: 1.5, marginBottom: 24 }}>
+      <div style={{ fontSize: "12px", fontWeight: 600, color: t.sub, lineHeight: 1.5, marginBottom: 24, marginTop: 0 }}>
         Visualiza los ingresos que entran en el período seleccionado. Si el ingreso supera el gasto, también mostrará el saldo restante.
       </div>
 
@@ -247,6 +254,7 @@ export default function ShowIncomesPage({
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

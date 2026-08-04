@@ -1,44 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import { usePress } from "../hooks/usePress";
+import { useState } from "react";
 import { useTheme } from "../hooks/useTheme";
-import PageLayout from "./PageLayout";
-import { DARK, LIGHT, RADIUS } from "../constants/tokens";
-import { rowStyles, getClayShadow } from "../utils/clayStyles";
-import { getStaggerDelay } from "../constants/animations";
+import HeaderBar from "./HeaderBar";
+import { DARK, LIGHT } from "../constants/tokens";
 
 const PERMISSIONS = [
-  { id: "notif-push", icon: "🔔", color: "#FDE68A", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "Optimo" },
-  { id: "mic", icon: "🎤", color: "#9B6DFF", name: "Microfono", why: "Para registrar gastos por voz: gasté 20 mil en el súper.", kind: "mic", req: "Optimo" },
+  { id: "notif-push", name: "Notificaciones de ORUS", why: "Para avisarte cuando registramos un movimiento y enviarte recordatorios.", kind: "notif", req: "ÓPTIMO" },
+  { id: "mic", name: "Micrófono", why: "Para registrar gastos por voz: gasté 20 mil en el súper.", kind: "mic", req: "ÓPTIMO" },
 ];
 
 export default function PermissionsPage({ onBack, onOpenPrivacy }) {
-  // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
-  const pressBack = usePress();
-  const [status, setStatus] = useState({});
-  const [hint, setHint] = useState(false);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const root = containerRef.current;
-    if (!root) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
-      { rootMargin: "0px 0px -40px 0px", threshold: 0.05 }
-    );
-    root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  // 🆕 Tokens del design (Spatial UI + Claymorfismo)
   const tokens = isDark ? DARK : LIGHT;
+
   const t = {
     bg: tokens.bg,
-    card: tokens.surfaceFlat,
-    border: tokens.border,
+    surface: isDark ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)" : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
     text: tokens.text,
     sub: tokens.sub,
+    accent: isDark ? "#9B6DFF" : "#7C4DFF",
+    accentSoft: isDark ? "rgba(155,109,255,0.2)" : "rgba(124,77,255,0.15)",
+    raised: isDark ? "rgba(255,255,255,0.04)" : "rgba(30,20,60,0.04)",
+    shadowSm: isDark ? "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 10px 22px -10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(0,0,0,0.04)",
   };
+
+  const [status, setStatus] = useState({});
 
   const set = (id, v) => setStatus((s) => ({ ...s, [id]: v }));
 
@@ -48,112 +33,129 @@ export default function PermissionsPage({ onBack, onOpenPrivacy }) {
       .then((stream) => { stream.getTracks().forEach((tr) => tr.stop()); set("mic", "Permitido"); })
       .catch(() => set("mic", "Bloqueado"));
   };
+
   const requestNotif = () => {
     if (!("Notification" in window)) return set("notif-push", "No disponible");
     Notification.requestPermission().then((p) => set("notif-push", p === "granted" ? "Permitido" : "Bloqueado"));
   };
 
-  const statusColor = (v) => (v === "Permitido" ? "#22C55E" : v === "Bloqueado" ? "#FCA5A5" : t.sub);
+  const handlePermitClick = (p) => {
+    if (p.kind === "mic") requestMic();
+    else requestNotif();
+  };
 
-  const action = (p) => {
+  const renderPermissionCard = (p) => {
     const v = status[p.id];
-    if (p.kind === "native") {
-      return <span style={{ fontSize: 10, fontWeight: 700, color: t.sub, background: t.border, padding: "4px 9px", borderRadius: 20, whiteSpace: "nowrap" }}>En el telefono</span>;
-    }
-    if (v && v !== "Bloqueado") {
-      return <span style={{ fontSize: 10, fontWeight: 700, color: statusColor(v), whiteSpace: "nowrap" }}>{v}</span>;
-    }
+    const isGranted = v === "Permitido";
+
     return (
-      <button
-        onClick={p.kind === "mic" ? requestMic : requestNotif}
-        style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "#9B6DFF", border: "none", padding: "5px 11px", borderRadius: 20, cursor: "pointer", whiteSpace: "nowrap" }}>
-        {v === "Bloqueado" ? "Reintentar" : "Permitir"}
-      </button>
+      <div key={p.id} style={{ padding: 16, borderRadius: 18, background: t.surface, boxShadow: t.shadowSm, display: "flex", alignItems: "flex-start", gap: 12 }}>
+        {/* Icon Badge */}
+        <div style={{
+          width: 42,
+          height: 42,
+          borderRadius: 13,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: p.kind === "notif" ? "rgba(245,180,77,0.18)" : t.accentSoft,
+          color: p.kind === "notif" ? "#F5B44D" : t.accent,
+        }}>
+          {p.kind === "notif" ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10a7 7 0 0 0 14 0" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+            </svg>
+          )}
+        </div>
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
+            <span style={{ fontSize: "13.5px", fontWeight: 800, color: t.text }}>{p.name}</span>
+            <span style={{ padding: "2px 8px", borderRadius: 8, background: t.accentSoft, color: t.accent, fontSize: "8.5px", fontWeight: 800, letterSpacing: ".3px" }}>
+              {p.req}
+            </span>
+          </div>
+          <div style={{ fontSize: "11px", fontWeight: 600, color: t.sub, lineHeight: 1.5, marginTop: 4 }}>
+            {p.why}
+          </div>
+        </div>
+
+        {/* Button */}
+        <button
+          onClick={() => handlePermitClick(p)}
+          disabled={isGranted}
+          style={{
+            flexShrink: 0,
+            padding: "8px 16px",
+            borderRadius: 12,
+            border: "none",
+            background: isGranted ? "transparent" : "linear-gradient(155deg,#B18CFF,#8B5CF6)",
+            color: isGranted ? "#22C55E" : "#fff",
+            fontSize: "11.5px",
+            fontWeight: 800,
+            cursor: isGranted ? "default" : "pointer",
+            whiteSpace: "nowrap",
+          }}>
+          {isGranted ? "Permitido" : v === "Bloqueado" ? "Reintentar" : "Permitir"}
+        </button>
+      </div>
     );
   };
 
-  const iconEl = (p) => {
-    if (p.id === "mic") {
-      return (
-        <div style={{ width: 38, height: 38, borderRadius: 11, background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="2" width="6" height="12" rx="3" fill="white" stroke="none" />
-            <path d="M5 10a7 7 0 0 0 14 0" stroke="white" strokeWidth="2" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-          </svg>
-        </div>
-      );
-    }
-    return <div style={{ width: 38, height: 38, borderRadius: 11, background: p.color + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, flexShrink: 0 }}>{p.icon}</div>;
-  };
-
   return (
-    <PageLayout
-      isDark={isDark}
-      onBack={onBack}
-      pressBack={pressBack}
-      title={
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-          <span style={{ fontSize: 18 }}>🔐</span>PERMISOS
-        </span>
-      }
-    >
-      <style>{`.reveal{opacity:0;transform:translateY(26px);transition:opacity .5s ease, transform .5s ease;} .reveal.in{opacity:1;transform:none;}`}</style>
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
+      <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-      <div ref={containerRef} style={{ textAlign: "left" }}>
-        <div style={{ fontSize: 12.5, color: t.sub, lineHeight: 1.6, marginBottom: 6 }}>
-          ORUS pide estos permisos para funcionar mejor. Tu decides cuales conceder puedes cambiarlos
-          cuando quieras desde los ajustes de tu telefono.
-        </div>
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        }
+        pageTitle="Permisos"
+        isDark={isDark}
+      />
 
-        {PERMISSIONS.map((p, i) => (
-          <div key={p.id} className="reveal" style={{
-            ...rowStyles(t, isDark),
-            padding: 12,
-            marginTop: 12,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            borderRadius: RADIUS.lg,
-            animationDelay: getStaggerDelay(i),
-          }}>
-            {iconEl(p)}
-            <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <b style={{ fontSize: 13, color: t.text }}>{p.name}</b>
-                <span style={{ fontSize: 8.5, fontWeight: 700, color: p.req === "Optimo" ? "#9B6DFF" : t.sub, background: (p.req === "Optimo" ? "#9B6DFF" : t.sub) + "22", padding: "1px 6px", borderRadius: 8 }}>{p.req.toUpperCase()}</span>
-                {p.only && <span style={{ fontSize: 8.5, fontWeight: 700, color: "#4F8EF7", background: "#4F8EF722", padding: "1px 6px", borderRadius: 8 }}>SOLO {p.only.toUpperCase()}</span>}
-              </div>
-              <div style={{ fontSize: 10.5, color: t.sub, lineHeight: 1.45, marginTop: 3, textAlign: "left" }}>{p.why}</div>
-            </div>
-            <div style={{ flexShrink: 0 }}>{action(p)}</div>
-          </div>
-        ))}
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 50px", boxSizing: "border-box" }}>
 
-        <div className="reveal" style={{ background: t.card, border: "1px dashed " + t.border, borderRadius: 14, padding: 12, marginTop: 12, fontSize: 11, color: t.sub, lineHeight: 1.5 }}>
-          Recibes tus movimientos por correo? La conexion de correo bancario
-          se configura en Automatizacion ahí no se pide ningún permiso del telefono.
-        </div>
+      {/* Subtitle */}
+      <div style={{ fontSize: "12px", fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 22, marginTop: 0 }}>
+        ORUS pide estos permisos para funcionar mejor. Tu decides cuáles conceder puedes cambiarlos cuando quieras desde los ajustes de tu teléfono.
+      </div>
 
-        <button
-          className="reveal"
-          onClick={() => setHint(true)}
-          style={{ width: "100%", marginTop: 18, padding: "13px 0", borderRadius: 14, border: "1.5px solid " + t.border, background: t.card, color: t.text, fontSize: 13.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          Abrir ajustes del telefono
-        </button>
-        {hint && (
-          <div style={{ fontSize: 11, color: t.sub, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>
-            En la app instalada, esto abre los Ajustes ORUS de tu telefono, donde puedes conceder o
-            revocar cada permiso.
-          </div>
-        )}
+      {/* Permission Cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {PERMISSIONS.map(renderPermissionCard)}
+      </div>
 
-        <div style={{ fontSize: 10.5, color: t.sub, textAlign: "center", marginTop: 20, paddingBottom: 10, lineHeight: 1.5 }}>
-          ORUS solo usa estos datos para registrar y organizar tus finanzas. Ver la{" "}
-          <span onClick={onOpenPrivacy} style={{ color: "#9B6DFF", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>Politica de Privacidad</span>.
+      {/* Info Note */}
+      <div style={{ padding: 16, borderRadius: 16, background: t.raised, boxShadow: t.shadowSm, marginTop: 22 }}>
+        <div style={{ fontSize: "11.5px", fontWeight: 600, color: t.sub, lineHeight: 1.5 }}>
+          ¿Recibes tus movimientos por correo? La conexión de correo bancario se configura en Automatización; ahí no se pide ningún permiso del teléfono.
         </div>
       </div>
-    </PageLayout>
+
+      {/* Privacy Footer */}
+      <div style={{ fontSize: "11px", fontWeight: 600, color: t.sub, textAlign: "center", marginTop: 22, lineHeight: 1.6 }}>
+        ORUS solo usa estos datos para registrar y organizar tus finanzas. Ver la{" "}
+        <span onClick={onOpenPrivacy} style={{ color: t.accent, fontWeight: 700, cursor: "pointer" }}>
+          Política de Privacidad
+        </span>
+        .
+      </div>
+      </div>
+    </div>
   );
 }

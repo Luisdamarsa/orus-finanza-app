@@ -2,7 +2,7 @@ import { useState } from "react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
-import BackButton from "./BackButton";
+import HeaderBar from "./HeaderBar";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
@@ -45,18 +45,24 @@ export default function CategoriesPage({
 
   return (
     <>
-      <div style={{ position: "absolute", inset: 0, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "26px 22px 90px", background: t.bg, boxSizing: "border-box", fontFamily: "Manrope, system-ui, sans-serif" }}>
+      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-        <BackButton onClick={onBack} />
+        {/* Header fijo */}
+        <HeaderBar
+          onBack={onBack}
+          pageIcon={
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12l9-9h6v6l-9 9-6-6z"/>
+              <circle cx="15" cy="9" r="1"/>
+            </svg>
+          }
+          pageTitle="Categorías"
+          isDark={isDark}
+        />
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, marginBottom: 10 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-            <path d="M3 12l9-9h6v6l-9 9-6-6z"/>
-            <circle cx="15" cy="9" r="1"/>
-          </svg>
-          <div style={{ fontSize: 19, fontWeight: 800, color: t.text, textAlign: "center" }}>Categorías</div>
-        </div>
+        {/* Contenido scrollable */}
+        <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 90px", boxSizing: "border-box" }}>
 
         <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 0, paddingBottom: 16, borderBottom: `1px solid ${t.border}` }}>
           Organiza tus movimientos en categorías. Los gastos van por pilar; los ingresos, por fuente.
@@ -211,6 +217,7 @@ export default function CategoriesPage({
           <span style={{ fontSize: 14 }}>+</span>
           <span>Anadir categoria</span>
         </button>
+        </div>
       </div>
     </>
   );

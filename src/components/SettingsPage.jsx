@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
+import HeaderBar from "./HeaderBar";
 
 export default function SettingsPage({
   onBack,
@@ -53,34 +54,20 @@ export default function SettingsPage({
   ];
 
   return (
-    <div style={{ position: "absolute", inset: 0, overflowY: "auto", padding: "26px 22px 50px", background: "#000000" }}>
-      {/* Botón Atrás */}
-      <button
-        onClick={onBack}
-        {...pressBack.handlers}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          background: "none",
-          border: "none",
-          color: "#8B87A3",
-          fontWeight: 700,
-          fontSize: 13,
-          cursor: "pointer",
-          padding: "6px 0",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M15 5l-7 7 7 7" />
-        </svg>
-        Atrás
-      </button>
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: "#000000" }}>
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F3FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z" />
+          </svg>
+        }
+        pageTitle="Configuración"
+        isDark={true}
+      />
 
-      {/* Título */}
-      <div style={{ fontSize: 19, fontWeight: 800, color: "#F5F3FF", textAlign: "center", marginTop: 8 }}>
-        Configuración
-      </div>
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 50px" }}>
 
       {/* Lista de filas */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 22 }}>
@@ -207,18 +194,19 @@ export default function SettingsPage({
         })}
       </div>
 
-      {/* Footer */}
-      <div style={{ textAlign: "center", color: "#8B87A3", fontSize: 11, paddingTop: 28, marginTop: 28 }}>
-        <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 12, flexWrap: "wrap" }}>
-          <span onClick={onTerms} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
-            Términos y Condiciones
-          </span>
-          <span onClick={onPrivacy} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
-            Términos de Privacidad
-          </span>
+        {/* Footer */}
+        <div style={{ textAlign: "center", color: "#8B87A3", fontSize: 11, paddingTop: 28, marginTop: 28 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 12, flexWrap: "wrap" }}>
+            <span onClick={onTerms} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
+              Términos y Condiciones
+            </span>
+            <span onClick={onPrivacy} style={{ color: "#9B6DFF", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
+              Términos de Privacidad
+            </span>
+          </div>
+          <div>ORUS Finanzas v1.0.0</div>
+          <div style={{ marginTop: 4 }}>© 2026 ORUS. Todos los derechos reservados.</div>
         </div>
-        <div>ORUS Finanzas v1.0.0</div>
-        <div style={{ marginTop: 4 }}>© 2026 ORUS. Todos los derechos reservados.</div>
       </div>
     </div>
   );

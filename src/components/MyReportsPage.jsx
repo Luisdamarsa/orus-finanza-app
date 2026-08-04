@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { TrendingUp } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
-import PageLayout from "./PageLayout";
+import HeaderBar from "./HeaderBar";
 import { userStorage } from "../utils/userStorage";
 import { openReportInBrowser } from "../services/reportViewService";
 import { DARK, LIGHT } from "../constants/tokens";
@@ -10,28 +9,43 @@ import { DARK, LIGHT } from "../constants/tokens";
 // Crear hooks usePress para cada filtro
 const TabPressButton = ({ tab, isActive, onToggle, isDark, t }) => {
   const tabPress = usePress();
+  const tabColor = tab.color;
+
   return (
     <button
       key={tab.id}
       onClick={() => onToggle(tab.id)}
       {...tabPress.handlers}
       style={{
-        padding: "8px 14px",
-        borderRadius: 20,
-        border: isActive ? `2px solid ${t.accent}` : `1px solid ${t.border}`,
-        background: isActive ? `${t.accent}22` : t.card,
-        color: isActive ? t.accent : t.text,
-        fontSize: 12,
-        fontWeight: isActive ? 700 : 600,
+        padding: "9px 6px",
+        borderRadius: 14,
+        border: isActive ? `1.5px solid ${tabColor}` : `1.5px solid transparent`,
+        background: t.raised || "rgba(30,20,60,0.04)",
+        color: tabColor,
+        fontSize: 11.5,
+        fontWeight: 800,
         cursor: "pointer",
         whiteSpace: "nowrap",
         display: "flex",
         alignItems: "center",
         gap: 6,
+        flex: 1,
+        justifyContent: "center",
         ...tabPress.getPressStyle({ opacity: 0.8, scale: 0.95 }),
       }}
     >
-      <span>{tab.icon}</span>
+      <span style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 20,
+        height: 20,
+        borderRadius: 7,
+        background: `${tabColor}26`,
+        color: tabColor,
+      }}>
+        {tab.icon}
+      </span>
       {tab.label}
     </button>
   );
@@ -45,9 +59,24 @@ const TabPressButton = ({ tab, isActive, onToggle, isDark, t }) => {
  */
 
 const TABS = [
-  { id: "monthly", label: "Mensual", icon: "📅" },
-  { id: "quarterly", label: "Trimestral", icon: "📊" },
-  { id: "annual", label: "Anual", icon: "🎯" },
+  {
+    id: "monthly",
+    label: "Mensual",
+    color: "#93C5FD",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+  },
+  {
+    id: "quarterly",
+    label: "Trimestral",
+    color: "#FCA5A5",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+  },
+  {
+    id: "annual",
+    label: "Anual",
+    color: "#86EFAC",
+    icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+  },
 ];
 
 // Datos reales de informes generados (enero 2025 - mayo 2026)
@@ -97,14 +126,6 @@ export default function MyReportsPage({ onBack }) {
   // Usar FALLBACK_REPORTS por ahora (tiene todos los 24 informes)
   const allReports = FALLBACK_REPORTS;
 
-  // Calcular contentTopOffset dinámicamente basado en altura de descripción
-  useEffect(() => {
-    if (descriptionRef.current) {
-      const descriptionHeight = descriptionRef.current.offsetHeight;
-      const newContentTop = 164 + descriptionHeight + 6;
-      setContentTopOffset(newContentTop);
-    }
-  }, []);
 
   // 🆕 Tokens del design (Spatial UI + Claymorfismo)
   const tokens = isDark ? DARK : LIGHT;
@@ -185,13 +206,30 @@ export default function MyReportsPage({ onBack }) {
     });
 
   return (
-    <PageLayout
-      isDark={isDark}
-      onBack={onBack}
-      title="Mis Informes"
-      icon={<TrendingUp size={20} strokeWidth={1.6} />}
-      description="Historial de tus informes generados automáticamente. Cada uno se crea al final del período."
-    >
+    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", background: t.bg, fontFamily: "Manrope, system-ui, sans-serif" }}>
+      <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+      {/* Header fijo */}
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 6 13.5 15.5 8 10 1 17"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+        }
+        pageTitle="Mis Informes"
+        isDark={isDark}
+      />
+
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 50px", boxSizing: "border-box" }}>
+
+      {/* Descripción */}
+      <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 22, marginTop: 0 }}>
+        Historial de tus informes generados automáticamente. Cada uno se crea al final del período.
+      </div>
+
       <div ref={containerRef} style={{ display: "flex", flexDirection: "column", minHeight: "100%", gap: 0 }}>
         {/* Tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 24, overflowX: "auto", scrollbarWidth: "none", paddingBottom: 4 }}>
@@ -229,25 +267,41 @@ export default function MyReportsPage({ onBack }) {
               const isExpanded = expandedReportId === report.id;
 
               // Tamaños y estilos según tipo
-              let fontSize = 14;
-              let fontWeight = 400;
-              let paddingLeft = 16;
-              let paddingVertical = 7;
+              let fontSize = 13;
+              let fontWeight = 600;
+              let paddingLeft = 4;
+              let paddingVertical = 12;
+              let paddingRight = 4;
+              let chevronSize = 13;
+              let showBorderBottom = false;
 
               // Aplicar formato de tap solo si NO hay filtro activo
               const showHierarchy = activeFilter === null;
 
               if (isAnnual) {
-                fontSize = 14 * 1.2; // 16.8px
-                fontWeight = 700;
-                paddingLeft = 16;
-                paddingVertical = 7 + 2;
+                fontSize = 15;
+                fontWeight = 800;
+                paddingLeft = 4;
+                paddingVertical = 8;
+                paddingRight = 4;
+                chevronSize = 14;
+                showBorderBottom = false;
               } else if (isQuarterly) {
-                fontSize = (14 * 1.2) * 0.8; // 13.44px
-                fontWeight = 700;
-                paddingLeft = showHierarchy ? 16 + 10 : 16; // Indentado solo sin filtro
+                fontSize = 13;
+                fontWeight = 800;
+                paddingLeft = showHierarchy ? 4 : 4;
+                paddingVertical = 8;
+                paddingRight = 4;
+                chevronSize = 14;
+                showBorderBottom = false;
               } else if (isMonthly) {
-                paddingLeft = showHierarchy ? 16 + 20 : 16; // Más indentado solo sin filtro
+                fontSize = 13;
+                fontWeight = 600;
+                paddingLeft = 16;
+                paddingVertical = 12;
+                paddingRight = 4;
+                chevronSize = 13;
+                showBorderBottom = true;
               }
 
               // Función para abrir informe en navegador
@@ -310,22 +364,22 @@ export default function MyReportsPage({ onBack }) {
                 <div
                   key={report.id}
                   style={{
-                    borderBottom: idx < reports.length - 1 ? `1px solid ${t.border}` : "none",
-                    background: "#000000",
+                    borderBottom: showBorderBottom && idx < reports.length - 1 ? `1px solid ${t.border}` : "none",
+                    background: "transparent",
+                    marginTop: isAnnual || (isQuarterly && showHierarchy) ? 6 : 0,
                   }}
                 >
                   {/* Header expandible */}
                   <div
                     onClick={() => setExpandedReportId(isExpanded ? null : report.id)}
                     style={{
-                      padding: `${paddingVertical}px 16px ${paddingVertical}px ${paddingLeft}px`,
+                      padding: `${paddingVertical}px ${paddingRight}px ${paddingVertical}px ${paddingLeft}px`,
                       cursor: "pointer",
                       transition: "all 0.15s ease",
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
                       gap: 12,
-                      background: "#000000",
+                      background: "transparent",
                     }}
                     onMouseDown={(e) => {
                       e.currentTarget.style.opacity = "0.8";
@@ -364,18 +418,23 @@ export default function MyReportsPage({ onBack }) {
                     </div>
 
                     {/* Chevron > */}
-                    <div
+                    <svg
+                      width={chevronSize}
+                      height={chevronSize}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={t.sub}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       style={{
-                        fontSize: 16,
-                        color: t.sub,
-                        opacity: 0.6,
                         flexShrink: 0,
                         transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
                         transition: "transform 0.2s ease",
                       }}
                     >
-                      &gt;
-                    </div>
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
                   </div>
 
                   {/* Contenido expandido */}
@@ -394,7 +453,6 @@ export default function MyReportsPage({ onBack }) {
                       <div
                         style={{
                           display: "flex",
-                          justifyContent: "space-between",
                           alignItems: "center",
                           gap: 12,
                         }}
@@ -470,6 +528,7 @@ export default function MyReportsPage({ onBack }) {
           </div>
         </div>
       </div>
-    </PageLayout>
+      </div>
+    </div>
   );
 }

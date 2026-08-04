@@ -1,19 +1,28 @@
-import { usePress } from "../hooks/usePress";
-import PageLayout from "./PageLayout";
+import { useTheme } from "../hooks/useTheme";
+import HeaderBar from "./HeaderBar";
 import terminosRaw from "../legal/terminos.md?raw";
 import privacidadRaw from "../legal/privacidad.md?raw";
+import { DARK, LIGHT } from "../constants/tokens";
 
 /**
- * LegalPage.jsx — pantalla de documentos legales (Términos y Condiciones / Privacidad).
- * Mismo formato que las demás páginas (PageLayout: header + título centrado + contenido).
- * El contenido vive en src/legal/*.md (editable) y se renderiza con un mini-markdown.
+ * LegalPage.jsx — Términos y Condiciones / Privacidad
+ * Header con HeaderBar + Título + Fecha
+ * Contenido renderizado desde markdown
  */
 const DOCS = {
-  terms: { title: "TÉRMINOS Y CONDICIONES", md: terminosRaw },
-  privacy: { title: "TÉRMINOS DE PRIVACIDAD", md: privacidadRaw },
+  terms: {
+    title: "TÉRMINOS Y CONDICIONES",
+    md: terminosRaw,
+    updatedDate: "4 de agosto, 2026"
+  },
+  privacy: {
+    title: "TÉRMINOS DE PRIVACIDAD",
+    md: privacidadRaw,
+    updatedDate: "4 de agosto, 2026"
+  },
 };
 
-// Negritas **texto** dentro de una línea
+// Inline markdown: **texto** → bold
 function inline(text, k) {
   return text.split(/(\*\*[^*]+\*\*)/g).map((p, i) =>
     p.startsWith("**") && p.endsWith("**")
@@ -22,53 +31,108 @@ function inline(text, k) {
   );
 }
 
-// Mini-renderer de markdown (subset: ##/###, >, -, **bold**, ---, párrafos). El # (H1) se omite
-// porque el título lo pone PageLayout.
-function renderMarkdown(md, t, isDark) {
-  const out = [];
-  let list = [];
-  let key = 0;
-  const flush = () => {
-    if (list.length) {
-      out.push(
-        <ul key={`ul-${key++}`} style={{ margin: "4px 0 10px", paddingLeft: 18 }}>
-          {list.map((li, i) => (
-            <li key={i} style={{ fontSize: 13, lineHeight: 1.55, color: t.text, marginBottom: 4 }}>{inline(li, `li-${i}`)}</li>
-          ))}
-        </ul>
-      );
-      list = [];
-    }
+export default function LegalPage({ onBack, variant }) {
+  const { isDark } = useTheme();
+  const tokens = isDark ? DARK : LIGHT;
+  const t = {
+    bg: tokens.bg,
+    text: tokens.text,
+    sub: tokens.sub,
+    muted: isDark ? "#6B6680" : "#A99FB8",
+    accent: isDark ? "#9B6DFF" : "#7C4DFF",
+    accentSoft: isDark ? "rgba(155,109,255,0.2)" : "rgba(124,77,255,0.15)",
   };
-  for (const raw of md.split("\n")) {
-    const line = raw.replace(/\r$/, "");
-    if (line.trim() === "") { flush(); continue; }
-    if (line.startsWith("- ")) { list.push(line.slice(2)); continue; }
-    flush();
-    if (line.startsWith("# ")) continue; // título lo pone PageLayout
-    else if (line.startsWith("### ")) out.push(<h3 key={key++} style={{ fontSize: 13.5, fontWeight: 700, color: t.text, margin: "12px 0 4px" }}>{inline(line.slice(4), key)}</h3>);
-    else if (line.startsWith("## ")) out.push(<h2 key={key++} style={{ fontSize: 15, fontWeight: 800, color: t.text, margin: "30px 0 6px" }}>{inline(line.slice(3), key)}</h2>);
-    else if (line.startsWith("> ")) out.push(
-      <div key={key++} style={{ borderLeft: `3px solid #9B6DFF88`, padding: "7px 10px", margin: "8px 0", background: isDark ? "#1A1730" : "#F3F0FF", color: t.sub, fontSize: 12, lineHeight: 1.5, borderRadius: 6 }}>{inline(line.slice(2), key)}</div>
-    );
-    else if (line.startsWith("---")) out.push(<div key={key++} style={{ height: 1, background: t.border, margin: "14px 0" }} />);
-    else out.push(<p key={key++} style={{ fontSize: 13, lineHeight: 1.6, color: t.text, margin: "0 0 8px" }}>{inline(line, key)}</p>);
-  }
-  flush();
-  return out;
-}
 
-export default function LegalPage({ isDark, onBack, variant }) {
-  const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
   const doc = DOCS[variant] || DOCS.terms;
 
   return (
-    <PageLayout isDark={isDark} onBack={onBack} title={doc.title}>
-      <div style={{ textAlign: "left" }}>
-        {renderMarkdown(doc.md, t, isDark)}
+    <div style={{
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      flexDirection: "column",
+      background: t.bg,
+      fontFamily: "Manrope, system-ui, sans-serif",
+    }}>
+      <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+      {/* Header con HeaderBar */}
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2h9l5 5v13a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/>
+            <path d="M15 2v5h5M8 13h8M8 17h8M8 9h4"/>
+          </svg>
+        }
+        pageTitle={doc.title}
+        isDark={isDark}
+      />
+
+      {/* Contenido scrollable */}
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        overflowX: "hidden",
+        scrollbarWidth: "none",
+        padding: "26px 22px 50px",
+        boxSizing: "border-box",
+      }}>
+
+        {/* Aviso placeholder */}
+        <div style={{
+          padding: "14px 16px",
+          borderRadius: 16,
+          background: t.accentSoft,
+          display: "flex",
+          gap: 10,
+          alignItems: "flex-start",
+          marginBottom: 24,
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={t.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 2 }}>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          <div style={{ fontSize: "11px", fontWeight: 600, color: t.text, lineHeight: 1.5 }}>
+            Este es contenido de ejemplo. La versión definitiva debe ser revisada por asesoría legal en Colombia.
+          </div>
+        </div>
+
+        {/* Cuerpo de términos - renderizado simple de markdown */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          {doc.md.split("\n## ").slice(1).map((section, idx) => {
+            const [titleLine, ...bodyLines] = section.split("\n");
+            const sectionNum = idx + 1;
+            const sectionTitle = titleLine.trim();
+            const sectionBody = bodyLines.join("\n").trim();
+
+            return (
+              <div key={idx} style={{ textAlign: "left" }}>
+                <div style={{ fontSize: "13.5px", fontWeight: 800, color: t.text, marginBottom: 6 }}>
+                  {sectionNum}. {sectionTitle}
+                </div>
+                <div style={{ fontSize: "12px", fontWeight: 600, color: t.sub, lineHeight: 1.7 }}>
+                  {inline(sectionBody.replace(/\n/g, " "), `body-${idx}`)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer con contacto */}
+        <div style={{
+          fontSize: "10.5px",
+          fontWeight: 600,
+          color: t.muted,
+          textAlign: "center",
+          marginTop: 22,
+          lineHeight: 1.6,
+          paddingTop: 22,
+          borderTop: `1px solid ${t.muted}22`,
+        }}>
+          Contacto: <span style={{ color: t.accent, fontWeight: 700 }}>soporte@orus.app</span>
+        </div>
       </div>
-    </PageLayout>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ import { getCategoryName } from "../utils/categoryUtils";
 import { userStorage } from "../utils/userStorage";
 import LoadingWrapper from "./LoadingWrapper";
 import { MenuListSkeleton } from "./LoadingSkeleton";
-import BackButton from "./BackButton";
+import HeaderBar from "./HeaderBar";
 
 export default function BudgetsPage({
   onBack,
@@ -162,32 +162,33 @@ export default function BudgetsPage({
       style={{
         position: "absolute",
         inset: 0,
-        overflowY: "auto",
-        overflowX: "hidden",
-        scrollbarWidth: "none",
-        padding: "26px 22px 90px",
+        display: "flex",
+        flexDirection: "column",
         background: t.bg,
-        boxSizing: "border-box",
         fontFamily: "Manrope, system-ui, sans-serif",
       }}
     >
       <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
-      {/* Header */}
-      <BackButton onClick={onBack} />
+      {/* Header fijo */}
+      <HeaderBar
+        onBack={onBack}
+        pageIcon={
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+        }
+        pageTitle="Presupuestos"
+        isDark={isDark}
+      />
 
-      {/* Title */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8, marginBottom: 10 }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={t.text} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="16" />
-          <line x1="8" y1="12" x2="16" y2="12" />
-        </svg>
-        <div style={{ fontSize: 19, fontWeight: 800, color: t.text, textAlign: "center" }}>Presupuestos</div>
-      </div>
+      {/* Contenido scrollable */}
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 90px", boxSizing: "border-box" }}>
 
       {/* Subtitle */}
-      <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginTop: 10, marginBottom: 24 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginTop: 0, marginBottom: 24 }}>
         Define cuánto quieres gastar en cada categoría y pilar. Los cambios se guardan automáticamente.
       </div>
 
@@ -484,6 +485,7 @@ export default function BudgetsPage({
           <polyline points="20 6 9 17 4 12" />
         </svg>
       </button>
+      </div>
     </div>
   );
 }
