@@ -82,8 +82,12 @@ export default function MovimientosPage({
     }
   });
 
-  // Porcentaje del presupuesto
-  const budget = isMonthPeriod ? (pilar.budget || null) : null;
+  // Porcentaje del presupuesto - usar getAttributeAtDate para períodos históricos
+  let budget = null;
+  if (isMonthPeriod) {
+    const budgetQueryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+    budget = getAttributeAtDate(pilar, "budget", budgetQueryDate) || null;
+  }
   const percentage = budget ? (totalSpent / budget) * 100 : null;
   const isOverBudget = percentage && percentage > 100;
 

@@ -44,7 +44,6 @@ export default function AboutPage({ onBack }) {
   // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
 
-  const pressBack = usePress();
   const containerRef = useRef(null);
 
   // Reveal por scroll: cada .reveal aparece desde abajo cuando entra en pantalla
@@ -120,7 +119,6 @@ export default function AboutPage({ onBack }) {
     <PageLayout
       isDark={isDark}
       onBack={onBack}
-      pressBack={pressBack}
       title={
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
           <svg width="20" height="20" viewBox="0 0 36 36" style={{ flexShrink: 0 }} aria-hidden="true">

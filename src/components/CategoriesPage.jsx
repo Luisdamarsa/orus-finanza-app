@@ -58,11 +58,11 @@ export default function CategoriesPage({
           <div style={{ fontSize: 19, fontWeight: 800, color: t.text, textAlign: "center" }}>Categorías</div>
         </div>
 
-        <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${t.border}` }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 0, paddingBottom: 16, borderBottom: `1px solid ${t.border}` }}>
           Organiza tus movimientos en categorías. Los gastos van por pilar; los ingresos, por fuente.
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginTop: 20, background: t.raised, borderRadius: 16, padding: 5, boxShadow: t.shadowSm }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 0, background: t.raised, borderRadius: 16, padding: 5, boxShadow: t.shadowSm }}>
           {[["gastos", "Gastos"], ["ingresos", "Ingresos"]].map(([id, label]) => (
             <button
               key={id}
@@ -110,15 +110,19 @@ export default function CategoriesPage({
                             onPointerUp={() => setPressingCategoryId(null)}
                             onPointerLeave={() => setPressingCategoryId(null)}
                             style={{
+                              width: "100%",
+                              textAlign: "left",
                               padding: "13px 16px",
                               borderRadius: 14,
                               border: "none",
-                              background: t.surface,
+                              background: isDark
+                                ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
+                                : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
                               color: t.text,
                               fontSize: 13,
                               fontWeight: 700,
                               cursor: "pointer",
-                              boxShadow: t.shadowSm,
+                              boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
                               fontFamily: "Manrope",
                               transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
                               transition: "all 0.1s",
@@ -150,15 +154,19 @@ export default function CategoriesPage({
                     onPointerUp={() => setPressingCategoryId(null)}
                     onPointerLeave={() => setPressingCategoryId(null)}
                     style={{
+                      width: "100%",
+                      textAlign: "left",
                       padding: "13px 16px",
                       borderRadius: 14,
                       border: "none",
-                      background: t.surface,
+                      background: isDark
+                        ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
+                        : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
                       color: t.text,
                       fontSize: 13,
                       fontWeight: 700,
                       cursor: "pointer",
-                      boxShadow: t.shadowSm,
+                      boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
                       fontFamily: "Manrope",
                       transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
                       transition: "all 0.1s",

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Zap } from "lucide-react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
@@ -25,21 +25,10 @@ export default function AutomatizacionesPage({
   // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
 
-  const pressBack = usePress();
   const pressNotif = usePress();
   const pressShortcut = usePress();
   const [pressingButton, setPressingButton] = useState(null);
-  const descriptionRef = useRef(null);
-  const [contentTop, setContentTop] = useState(220);
 
-  // Medir altura dinámicamente de la descripción
-  useEffect(() => {
-    if (descriptionRef.current) {
-      const descriptionHeight = descriptionRef.current.offsetHeight;
-      const newContentTop = 164 + descriptionHeight + 6;
-      setContentTop(newContentTop);
-    }
-  }, []);
 
   // 🆕 Tokens del design (Spatial UI + Claymorfismo)
   const tokens = isDark ? DARK : LIGHT;
@@ -86,26 +75,7 @@ export default function AutomatizacionesPage({
       onBack={onBack}
       title="Automatizaciones"
       icon={<Zap size={20} strokeWidth={1.6} />}
-      descriptionRef={descriptionRef}
-      contentTopOffset={contentTop}
-      pressBack={pressBack}
-      description={
-        <>
-          <div
-            ref={descriptionRef}
-            style={{
-              fontSize: 13,
-              color: t.sub,
-              marginBottom: 4,
-              lineHeight: 1.4,
-              fontWeight: 400,
-              textAlign: "left",
-            }}
-          >
-            ORUS capta tus movimientos de 3 formas. Activa las que quieras y olvídate de registrar.
-          </div>
-        </>
-      }
+      description="ORUS capta tus movimientos de 3 formas. Activa las que quieras y olvídate de registrar."
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
         {/* ===== SECCIÓN 1: NOTIFICACIONES DE WALLET ===== */}

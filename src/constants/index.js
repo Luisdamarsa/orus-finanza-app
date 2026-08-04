@@ -33,7 +33,7 @@ export const PILLARS = [
     darkBg: "#1a2744",
     icon: "🏠",
     budget: 1200000,  // 🆕 Presupuesto mutable del pilar
-    history: [],      // 🆕 Historial de cambios
+    history: [{ field: "budget", old: null, new: 1200000, changedAt: "2025-01-01T00:00:00Z" }],      // 🆕 Historial de cambios
     get spent() { return getPillarTotals("fijos").spent; },
     get categories() { return getPillarCategories("fijos"); }
   },
@@ -46,7 +46,7 @@ export const PILLARS = [
     darkBg: "#2a1111",
     icon: "💰",
     budget: 500000,  // 🆕
-    history: [],     // 🆕
+    history: [{ field: "budget", old: null, new: 500000, changedAt: "2025-01-01T00:00:00Z" }],     // 🆕
     get spent() { return getPillarTotals("deuda").spent; },
     get categories() { return getPillarCategories("deuda"); }
   },
@@ -59,7 +59,7 @@ export const PILLARS = [
     darkBg: "#0d2118",
     icon: "🐖",
     budget: 300000,  // 🆕
-    history: [],     // 🆕
+    history: [{ field: "budget", old: null, new: 300000, changedAt: "2025-01-01T00:00:00Z" }],     // 🆕
     get spent() { return getPillarTotals("ahorro").spent; },
     get categories() { return getPillarCategories("ahorro"); }
   },
@@ -72,7 +72,7 @@ export const PILLARS = [
     darkBg: "#1e1635",
     icon: "✨",
     budget: 400000,  // 🆕
-    history: [],     // 🆕
+    history: [{ field: "budget", old: null, new: 400000, changedAt: "2025-01-01T00:00:00Z" }],     // 🆕
     get spent() { return getPillarTotals("ocio").spent; },
     get categories() { return getPillarCategories("ocio"); }
   },
@@ -85,7 +85,7 @@ export const PILLARS = [
     darkBg: "#231c0d",
     icon: "🎲",
     budget: null,  // 🆕 Sin presupuesto fijo
-    history: [],   // 🆕
+    history: [],   // 🆕 Sin historial inicial porque no tiene presupuesto
     get spent() { return getPillarTotals("varios").spent; },
     get categories() { return getPillarCategories("varios"); }
   },
@@ -124,21 +124,21 @@ export const PILLAR_MAP = {
 
 export const ALL_CATS = [
   // 🏠 FIJOS
-  { id: "cat_arriendo",       name: "Arriendo",         pillar: "fijos", spent: 700000,   budget: 700000, history: [] },
-  { id: "cat_internet",       name: "Internet",         pillar: "fijos", spent: 120000,   budget: 130000, history: [] },
-  { id: "cat_servicios",      name: "Servicios",        pillar: "fijos", spent: 160000,   budget: 200000, history: [] },
-  { id: "cat_suscripciones",  name: "Suscripciones",    pillar: "fijos", spent: 0,        budget: 170000, history: [] },
+  { id: "cat_arriendo",       name: "Arriendo",         pillar: "fijos", spent: 700000,   budget: 700000, history: [{ field: "budget", old: null, new: 700000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_internet",       name: "Internet",         pillar: "fijos", spent: 120000,   budget: 130000, history: [{ field: "budget", old: null, new: 130000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_servicios",      name: "Servicios",        pillar: "fijos", spent: 160000,   budget: 200000, history: [{ field: "budget", old: null, new: 200000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_suscripciones",  name: "Suscripciones",    pillar: "fijos", spent: 0,        budget: 170000, history: [{ field: "budget", old: null, new: 170000, changedAt: "2025-01-01T00:00:00Z" }] },
   // 💰 DEUDA
-  { id: "cat_tarjeta_visa",   name: "Tarjeta Visa",     pillar: "deuda", spent: 300000,   budget: 300000, history: [] },
-  { id: "cat_credito_banco",  name: "Crédito banco",    pillar: "deuda", spent: 200000,   budget: 200000, history: [] },
+  { id: "cat_tarjeta_visa",   name: "Tarjeta Visa",     pillar: "deuda", spent: 300000,   budget: 300000, history: [{ field: "budget", old: null, new: 300000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_credito_banco",  name: "Crédito banco",    pillar: "deuda", spent: 200000,   budget: 200000, history: [{ field: "budget", old: null, new: 200000, changedAt: "2025-01-01T00:00:00Z" }] },
   // 🐖 AHORRO
-  { id: "cat_fondo_emergencia", name: "Fondo emergencia", pillar: "ahorro", spent: 250000,  budget: 200000, history: [] },
-  { id: "cat_meta_viaje",     name: "Meta viaje",       pillar: "ahorro", spent: 130000,  budget: 100000, history: [] },
+  { id: "cat_fondo_emergencia", name: "Fondo emergencia", pillar: "ahorro", spent: 250000,  budget: 200000, history: [{ field: "budget", old: null, new: 200000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_meta_viaje",     name: "Meta viaje",       pillar: "ahorro", spent: 130000,  budget: 100000, history: [{ field: "budget", old: null, new: 100000, changedAt: "2025-01-01T00:00:00Z" }] },
   // 🎉 OCIO
-  { id: "cat_restaurantes",   name: "Restaurantes",     pillar: "ocio", spent: 180000,   budget: 150000, history: [] },
-  { id: "cat_domicilios",     name: "Domicilios",       pillar: "ocio", spent: 95000,    budget: 100000, history: [] },
-  { id: "cat_cine_planes",    name: "Cine / Planes",    pillar: "ocio", spent: 65000,    budget: 80000, history: [] },
-  { id: "cat_bares",          name: "Bares",            pillar: "ocio", spent: 50000,    budget: 70000, history: [] },
+  { id: "cat_restaurantes",   name: "Restaurantes",     pillar: "ocio", spent: 180000,   budget: 150000, history: [{ field: "budget", old: null, new: 150000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_domicilios",     name: "Domicilios",       pillar: "ocio", spent: 95000,    budget: 100000, history: [{ field: "budget", old: null, new: 100000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_cine_planes",    name: "Cine / Planes",    pillar: "ocio", spent: 65000,    budget: 80000, history: [{ field: "budget", old: null, new: 80000, changedAt: "2025-01-01T00:00:00Z" }] },
+  { id: "cat_bares",          name: "Bares",            pillar: "ocio", spent: 50000,    budget: 70000, history: [{ field: "budget", old: null, new: 70000, changedAt: "2025-01-01T00:00:00Z" }] },
   // 🛒 VARIOS
   { id: "cat_supermercado",   name: "Supermercado",     pillar: "varios", spent: 90000,   budget: null, history: [] },
   { id: "cat_transporte",     name: "Transporte",       pillar: "varios", spent: 35000,   budget: null, history: [] },

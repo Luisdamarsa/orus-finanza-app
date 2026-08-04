@@ -59,14 +59,13 @@ function renderMarkdown(md, t, isDark) {
 }
 
 export default function LegalPage({ isDark, onBack, variant }) {
-  const pressBack = usePress();
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
     : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
   const doc = DOCS[variant] || DOCS.terms;
 
   return (
-    <PageLayout isDark={isDark} onBack={onBack} title={doc.title} pressBack={pressBack}>
+    <PageLayout isDark={isDark} onBack={onBack} title={doc.title}>
       <div style={{ textAlign: "left" }}>
         {renderMarkdown(doc.md, t, isDark)}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
@@ -84,11 +84,8 @@ export default function MyReportsPage({ onBack }) {
   // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
 
-  const pressBack = usePress();
   const containerRef = useRef(null);
-  const descriptionRef = useRef(null);
   const [activeFilter, setActiveFilter] = useState(null); // null = sin filtro
-  const [contentTopOffset, setContentTopOffset] = useState(164);
   const [expandedReportId, setExpandedReportId] = useState(null); // Reporte expandido
   const [downloadingReportId, setDownloadingReportId] = useState(null); // Reporte descargado
 
@@ -193,13 +190,7 @@ export default function MyReportsPage({ onBack }) {
       onBack={onBack}
       title="Mis Informes"
       icon={<TrendingUp size={20} strokeWidth={1.6} />}
-      pressBack={pressBack}
-      contentTopOffset={contentTopOffset}
-      description={
-        <div ref={descriptionRef} style={{ fontSize: 13, color: t.sub, lineHeight: 1.4 }}>
-          Historial de tus informes generados automáticamente. Cada uno se crea al final del período.
-        </div>
-      }
+      description="Historial de tus informes generados automáticamente. Cada uno se crea al final del período."
     >
       <div ref={containerRef} style={{ display: "flex", flexDirection: "column", minHeight: "100%", gap: 0 }}>
         {/* Tabs */}

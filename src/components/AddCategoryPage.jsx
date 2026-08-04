@@ -1,26 +1,18 @@
 import { useState, useEffect } from "react";
-import { usePress } from "../hooks/usePress";
 import { PILLARS } from "../constants";
 import { usePopup } from "../services/PopupService";
-import { CheckmarkIcon, TrashIcon } from "../icons/Icons";
+import SaveDeleteButtons from "./SaveDeleteButtons";
 
 /**
- * AddCategoryPage.jsx - REFORMULADA (Crear + Editar)
+ * AddCategoryPage.jsx - Clay Design (Crear + Editar)
  *
- * Página para agregar o editar una categoría (mismo formato que Nueva Transacción)
- *
- * Características:
- * - Modo NUEVO: Input vacío, pilar sin seleccionar
- * - Modo EDITAR: Pre-llena nombre y pilar, botón guardar deshabilitado hasta cambio
- * - Botón guardar (✓) en esquina inferior derecha
- * - Botón eliminar (🗑️) en esquina inferior izquierda (solo en modo edición)
- * - Deduplicación automática con números crecientes
+ * Página para agregar o editar una categoría con clay design system
  *
  * Props:
  *   isDark - Tema oscuro
  *   onBack - Callback para volver atrás
  *   onSave - Callback(pillarId, categoryName) para guardar
- *   onDelete - Callback(categoryName, pillarId) para eliminar (solo edición)
+ *   onDelete - Callback() para eliminar (solo edición)
  *   categories - {pillarId: [cat1, cat2, ...]} para validar duplicados
  *   isEditing - Boolean si está editando
  *   editingCategoryName - Nombre de la categoría a editar
@@ -36,18 +28,10 @@ export default function AddCategoryPage({
   editingCategoryName = null,
   editingPillarId = null,
 }) {
-  // 🆕 Usar el servicio de popups
   const popup = usePopup();
-  // 🆕 Hooks para animación de press en botones
-  const pressBack = usePress();
-  const pressSave = usePress();
-  const pressDelete = usePress();
   const [description, setDescription] = useState("");
   const [selectedPillar, setSelectedPillar] = useState(null);
   const [hasChanged, setHasChanged] = useState(false);
-  // 🆕 Estado para trackear qué botón de pilar está siendo presionado
-  const [pressingPillar, setPressingPillar] = useState(null);
-  // 🆕 Categoría de INGRESO (marcada con editingPillarId "ingreso"): no lleva pilar.
   const isIncome = editingPillarId === "ingreso";
 
   // Pre-llenar datos en modo edición
@@ -60,8 +44,24 @@ export default function AddCategoryPage({
   }, [isEditing, editingCategoryName, editingPillarId]);
 
   const t = isDark
-    ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99" }
-    : { bg: "#F8F7FF", card: "#FFFFFF", border: "#E5E3F5", text: "#1A1830", sub: "#9896B0" };
+    ? {
+        bg: "#000000",
+        card: "linear-gradient(155deg,#211d2c 0%,#141220 100%)",
+        border: "rgba(255,255,255,0.07)",
+        text: "#F5F3FF",
+        sub: "#8B87A3",
+        accent: "#9B6DFF",
+        raised: "rgba(255,255,255,0.04)",
+      }
+    : {
+        bg: "#F3F1FA",
+        card: "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
+        border: "rgba(30,20,60,0.08)",
+        text: "#1A1830",
+        sub: "#726E8C",
+        accent: "#7C4DFF",
+        raised: "rgba(30,20,60,0.04)",
+      };
 
   // Validar si descripción tiene >= 2 caracteres
   const isValidLength = description.trim().length >= 2;
@@ -158,101 +158,84 @@ export default function AddCategoryPage({
       style={{
         position: "absolute",
         inset: 0,
-        zIndex: 40,
-        // Día: fondo claro (antes fijo negro); Noche: negro igual que antes.
-        background: isDark ? "#000000" : t.bg,
+        padding: "26px 22px",
         display: "flex",
         flexDirection: "column",
-        padding: "60px 22px 24px",
-        boxSizing: "border-box"
+        background: t.bg,
+        fontFamily: "Manrope, system-ui, sans-serif",
+        boxSizing: "border-box",
       }}
     >
-      <style>{`@keyframes popIn { from { transform:scale(0.92);opacity:0 } to { transform:scale(1);opacity:1 } }`}</style>
-
-      {/* Botón Atrás */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 0 }}>
-        <button
-          onClick={onBack}
-          {...pressBack.handlers}
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 9,
-            border: "none",
-            background: isDark ? "#1E1E2E" : "#EEE9FF",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            ...pressBack.getPressStyle(),
-          }}
-        >
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={isDark ? "#C4C2E0" : "#6B7280"}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <span style={{ fontSize: 12, color: t.sub, fontWeight: 500 }}>
-          Atrás
-        </span>
-      </div>
-
-      {/* Contenido del formulario - centrado en toda la pantalla */}
-      <div
+      {/* Header */}
+      <button
+        onClick={onBack}
         style={{
-          position: "absolute",
-          top: "50%",
-          left: "22px",
-          right: "22px",
-          transform: "translateY(-50%)",
-          zIndex: 41
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          background: "none",
+          border: "none",
+          color: t.sub,
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: "pointer",
+          padding: 0,
+          fontFamily: "Manrope",
         }}
       >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+        <span>Atrás</span>
+      </button>
+
+      {/* Centered card zone */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px 0",
+        }}
+      >
+        {/* Card */}
         <div
           style={{
-            background: t.card,
-            border: `1px solid ${t.border}`,
+            width: "100%",
+            padding: "18px 16px",
             borderRadius: 20,
-            padding: "18px 18px 16px",
-            boxShadow: isDark
-              ? "0 8px 32px rgba(0,0,0,0.4)"
-              : "0 4px 20px rgba(100,80,200,0.08)"
+            background: t.card,
+            boxShadow:
+              "0 20px 40px -16px rgba(0,0,0,0.7), 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
           }}
         >
-          {/* ===== SECCIÓN 1: Título + Descripción ===== */}
-
-          {/* Título */}
+          {/* Label */}
           <div
             style={{
               fontSize: 10,
               fontWeight: 800,
-              color: "#9B6DFF",
-              letterSpacing: 1,
-              marginBottom: 12
+              color: t.accent,
+              letterSpacing: ".7px",
+              textTransform: "uppercase",
             }}
           >
-            {isEditing ? "CATEGORÍA" : "NUEVA CATEGORÍA"}
+            {isEditing ? "Categoría" : "Nueva Categoría"}
           </div>
 
-          <style>{`
-            .add-category-input::placeholder {
-              color: #9896B0;
-              opacity: 0.35;
-            }
-          `}</style>
-
-          {/* Input de Descripción */}
+          {/* Input nombre */}
           <input
             type="text"
-            className="add-category-input"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe la categoría (Arriendo, Salidas, etc...)"
@@ -262,168 +245,88 @@ export default function AddCategoryPage({
               border: "none",
               outline: "none",
               fontSize: 14,
-              fontWeight: description ? 700 : 400,
-              color: description ? t.text : "#7B7A99",
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-              marginBottom: 14,
+              fontWeight: 700,
+              color: t.text,
+              marginTop: 12,
               padding: 0,
-              boxSizing: "border-box"
+              fontFamily: "Manrope",
             }}
           />
 
           {/* Separador */}
-          {!isIncome && (<>
-          <div style={{ height: 1, background: t.border, marginBottom: 12 }} />
-
-          {/* ===== SECCIÓN 2: Selector de Pilar (solo GASTOS) ===== */}
-
-          {/* Label Pilar */}
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 800,
-              color: t.sub,
-              letterSpacing: 0.6,
-              marginBottom: 8,
-              textTransform: "uppercase",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between"
-            }}
-          >
-            <span>Pilar</span>
-            {!selectedPillar && (
-              <span
+          {!isIncome && (
+            <>
+              <div
                 style={{
-                  fontSize: 8,
-                  fontWeight: 500,
-                  fontStyle: "italic",
+                  height: 1,
+                  background: t.border,
+                  margin: "14px 0 12px",
+                }}
+              />
+
+              {/* Label pilar */}
+              <div
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
                   color: t.sub,
-                  opacity: 0.7
+                  letterSpacing: ".6px",
+                  textTransform: "uppercase",
+                  marginBottom: 8,
                 }}
               >
-                Sin selección = Varios (defecto)
-              </span>
-            )}
-          </div>
+                Pilar
+              </div>
 
-          {/* Botones de Pilar - 5 columnas */}
-          <div
-            style={{
-              display: "flex",
-              gap: 6,
-              flexWrap: "wrap",
-              marginBottom: 0
-            }}
-          >
-            {PILLARS.map((pillar) => {
-              const isSelected = selectedPillar === pillar.id;
-              return (
-                <button
-                  key={pillar.id}
-                  onClick={() => setSelectedPillar(isSelected ? null : pillar.id)}
-                  onPointerDown={() => setPressingPillar(pillar.id)}
-                  onPointerUp={() => setPressingPillar(null)}
-                  onPointerLeave={() => setPressingPillar(null)}
-                  style={{
-                    flex: "1 1 auto",
-                    minWidth: 60,
-                    padding: "6px 8px",
-                    borderRadius: 12,
-                    border: isSelected ? `2px solid ${pillar.color}` : "2px solid transparent",
-                    cursor: "pointer",
-                    background: pressingPillar === pillar.id
-                      ? `${pillar.color}44`
-                      : isSelected
-                        ? pillar.color + "22"
-                        : isDark
-                          ? "#252538"
-                          : "#F0EFF8",
-                    color: isSelected ? pillar.color : t.sub,
-                    fontSize: 11,
-                    fontWeight: isSelected ? 700 : 600,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 3,
-                    outline: "none",
-                    transition: "all 0.18s",
-                    transform: pressingPillar === pillar.id ? "scale(0.94)" : "scale(1)",
-                    opacity: pressingPillar === pillar.id ? 0.7 : 1,
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>{pillar.icon}</span>
-                  <span>{pillar.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          </>)}
+              {/* Selector pilares */}
+              <div style={{ display: "flex", gap: 6 }}>
+                {PILLARS.map((pillar) => {
+                  const isActive = selectedPillar === pillar.id;
+                  return (
+                    <button
+                      key={pillar.id}
+                      onClick={() => setSelectedPillar(isActive ? null : pillar.id)}
+                      style={{
+                        flex: 1,
+                        minWidth: 60,
+                        padding: "8px 6px",
+                        borderRadius: 12,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 4,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        border: isActive
+                          ? `2px solid ${pillar.color}`
+                          : "2px solid transparent",
+                        background: isActive ? `${pillar.color}22` : t.raised,
+                        color: isActive ? pillar.color : t.sub,
+                        cursor: "pointer",
+                        fontFamily: "Manrope",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <span style={{ fontSize: 14 }}>{pillar.icon}</span>
+                      <span style={{ textAlign: "center", lineHeight: 1.2 }}>
+                        {pillar.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Botón Eliminar (🗑️) - Esquina Inferior Izquierda (solo en edición) */}
-      {isEditing && (
-        <div style={{ position: "absolute", bottom: 24, left: 22 }}>
-          <button
-            onClick={handleDelete}
-            onPointerDown={pressDelete.handlers.onPointerDown}
-            onPointerUp={pressDelete.handlers.onPointerUp}
-            onPointerLeave={pressDelete.handlers.onPointerLeave}
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: "50%",
-              border: "none",
-              background: "linear-gradient(135deg, #EF4444, #DC2626)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: 1,
-              ...pressDelete.getPressStyle(),
-            }}
-            onMouseEnter={(e) => {
-              if (!pressDelete.pressing) {
-                e.currentTarget.style.transform = "scale(1.08)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!pressDelete.pressing) {
-                e.currentTarget.style.transform = "scale(1)";
-              }
-            }}
-          >
-            <TrashIcon width={22} height={22} color="white" strokeWidth={2.5} />
-          </button>
-        </div>
-      )}
-
-      {/* Botón Guardar (✓) - Esquina Inferior Derecha */}
-      <div style={{ position: "absolute", bottom: 24, right: 22 }}>
-        <button
-          onClick={handleSave}
-          disabled={!canSave}
-          onPointerDown={() => canSave && pressSave.handlers.onPointerDown()}
-          onPointerUp={() => pressSave.handlers.onPointerUp()}
-          onPointerLeave={() => pressSave.handlers.onPointerLeave()}
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            border: "none",
-            background: "linear-gradient(135deg, #9B6DFF, #4F8EF7)",
-            cursor: canSave ? "pointer" : "not-allowed",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: canSave ? (pressSave.pressing ? 0.9 : 1) : 0.45,
-            ...(canSave ? pressSave.getPressStyle() : {}),
-          }}
-        >
-          <CheckmarkIcon width={22} height={22} color="white" strokeWidth={3} />
-        </button>
-      </div>
+      {/* Save and Delete buttons */}
+      <SaveDeleteButtons
+        onSave={handleSave}
+        onDelete={isEditing ? handleDelete : undefined}
+        disabledSave={!canSave}
+        showDelete={isEditing}
+      />
     </div>
   );
 }

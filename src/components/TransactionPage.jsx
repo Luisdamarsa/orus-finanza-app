@@ -9,6 +9,7 @@ import { FormSkeleton } from "./LoadingSkeleton";
 import { DARK, LIGHT, RADIUS } from "../constants/tokens";
 import { inputStyles, buttonStyles, getClayShadow } from "../utils/clayStyles";
 import { getPaymentMethodColor } from "../utils/colorUtils";
+import SaveDeleteButtons from "./SaveDeleteButtons";
 
 /**
  * TransactionPage.jsx - REFORMULADA (Crear + Editar)
@@ -356,18 +357,18 @@ export default function TransactionPage({
                 overflow: "hidden",
                 boxShadow: "0 6px 12px -8px rgba(0,0,0,0.5), inset 0 1px 1px rgba(0,0,0,0.3)",
                 flexShrink: 0,
-                marginLeft: 12
+                marginLeft: 2
               }}>
               <button
                 onClick={() => setIsIncome(false)}
                 style={{
-                  width: 26,
-                  height: 26,
+                  width: 24,
+                  height: 24,
                   border: "none",
                   background: !isIncome ? "rgba(239,68,68,0.22)" : "linear-gradient(155deg,#262231,#17151f)",
                   color: !isIncome ? "#FF8A8A" : "#8B87A3",
                   fontWeight: 800,
-                  fontSize: 14,
+                  fontSize: 13,
                   cursor: "pointer",
                   transition: "all 0.15s"
                 }}>
@@ -376,13 +377,13 @@ export default function TransactionPage({
               <button
                 onClick={() => setIsIncome(true)}
                 style={{
-                  width: 26,
-                  height: 26,
+                  width: 24,
+                  height: 24,
                   border: "none",
                   background: isIncome ? "rgba(134,239,172,0.22)" : "linear-gradient(155deg,#262231,#17151f)",
                   color: isIncome ? "#86EFAC" : "#8B87A3",
                   fontWeight: 800,
-                  fontSize: 14,
+                  fontSize: 13,
                   cursor: "pointer",
                   transition: "all 0.15s"
                 }}>
@@ -784,88 +785,22 @@ export default function TransactionPage({
       {/* Botones flotantes - Guardar + Eliminar (editar) o solo Guardar (crear) */}
       {isEditing ? (
         <>
-          {/* Botón Eliminar - Esquina inferior izquierda */}
-          <button
-            onClick={handleDelete}
-            {...pressDelete.handlers}
-            style={{
-              position: "absolute",
-              bottom: 20,
-              left: 16,
-              width: 52,
-              height: 52,
-              borderRadius: "50%",
-              border: "none",
-              background: "#EF4444",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              ...pressDelete.getPressStyle(),
-            }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <line x1="10" y1="11" x2="10" y2="17" />
-              <line x1="14" y1="11" x2="14" y2="17" />
-            </svg>
-          </button>
-
-          {/* Botón Guardar - Esquina inferior derecha */}
-          <button
-            onClick={handleEdit}
-            disabled={!canSave}
-            {...pressSave.handlers}
-            style={{
-              position: "absolute",
-              bottom: 22,
-              right: 22,
-              width: 58,
-              height: 58,
-              borderRadius: "50%",
-              border: "none",
-              background: "linear-gradient(155deg, #B18CFF, #8B5CF6)",
-              cursor: canSave ? "pointer" : "not-allowed",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: canSave ? 1 : 0.5,
-              boxShadow: "0 18px 30px -10px rgba(139,92,246,0.65), inset 0 1px 0 rgba(255,255,255,0.3)",
-              ...pressSave.getPressStyle(),
-            }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </button>
+          {/* Save and Delete buttons */}
+          <SaveDeleteButtons
+            onSave={handleEdit}
+            onDelete={handleDelete}
+            disabledSave={!canSave}
+            showDelete={true}
+          />
         </>
       ) : (
         <>
           {/* Modo Crear: Solo Guardar */}
-          <button
-            onClick={handleCreate}
-            disabled={!canSave}
-            {...pressSave.handlers}
-            style={{
-              position: "absolute",
-              bottom: 22,
-              right: 22,
-              width: 58,
-              height: 58,
-              borderRadius: "50%",
-              border: "none",
-              background: "linear-gradient(155deg, #B18CFF, #8B5CF6)",
-              cursor: canSave ? "pointer" : "not-allowed",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: canSave ? 1 : 0.5,
-              boxShadow: "0 18px 30px -10px rgba(139,92,246,0.65), inset 0 1px 0 rgba(255,255,255,0.3)",
-              ...pressSave.getPressStyle(),
-            }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </button>
+          <SaveDeleteButtons
+            onSave={handleCreate}
+            disabledSave={!canSave}
+            showDelete={false}
+          />
         </>
       )}
     </div>
