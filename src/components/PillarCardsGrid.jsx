@@ -106,13 +106,15 @@ export default function PillarCardsGrid({
 
           // 🆕 Obtener presupuesto histórico del pilar en la fecha del período
           let historicalBudget = budgetForMonth;
-          if (selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
-            // Crear una fecha en el medio del mes seleccionado para consultar histórico
-            const pillar = PILLARS.find(pillar => pillar.id === p.id);
-            if (pillar) {
-              const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
-              historicalBudget = getAttributeAtDate(pillar, "budget", queryDate);
-            }
+          // 🆕 FASE 2 - Solo usar getAttributeAtDate si NO hay presupuesto personalizado
+          // Si budgetForMonth ya devolvió un presupuesto personalizado, usarlo directamente
+          const pillar = PILLARS.find(p2 => p2.id === p.id);
+          const hasCustomBudget = budgetForMonth !== pillar?.budget;
+
+          if (selectedPeriod && selectedPeriod.month && selectedPeriod.year && !hasCustomBudget && pillar) {
+            // Solo consultar histórico si NO hay presupuesto personalizado
+            const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
+            historicalBudget = getAttributeAtDate(pillar, "budget", queryDate);
           }
 
           // 🆕 Si el periodo es "Todo el tiempo" (null) o "Todo el año" (month === null), no mostrar presupuestos
