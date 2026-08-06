@@ -119,6 +119,8 @@ export default function DashboardExpandedState() {
                 selectedPeriod={selectedPeriod}
                 isInline={true}
                 currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
+                customBudgets={customBudgets} // 🆕 FASE 2 - Pasar presupuestos personalizados
+                getBudgetForMonth={getBudgetForMonth} // 🆕 FASE 2 - Calcular presupuesto del mes
               />
             )
           )}

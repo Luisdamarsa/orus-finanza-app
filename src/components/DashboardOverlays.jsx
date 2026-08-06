@@ -27,7 +27,7 @@ export default function DashboardOverlays() {
     setFilterType, setMovementOpenedFrom, txnActions,
     setSearchOpen, setSearchQuery, searchOpen, searchQuery,
     setVoicePrefill,
-    currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
+    currentUserId, customBudgets, getBudgetForMonth, // 🆕 FASE 2 - Pasar userId y presupuestos
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
@@ -113,6 +113,8 @@ export default function DashboardOverlays() {
               transactions={transactions}
               selectedPeriod={selectedPeriod}
               currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
+              customBudgets={customBudgets} // 🆕 FASE 2 - Pasar presupuestos personalizados
+              getBudgetForMonth={getBudgetForMonth} // 🆕 FASE 2 - Calcular presupuesto del mes
             />
           )}
         </>

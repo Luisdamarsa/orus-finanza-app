@@ -38,6 +38,8 @@ export default function PillarBarsPopup({
   selectedPeriod,
   isInline = false,
   currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
+  customBudgets, // 🆕 FASE 2 - Pasar presupuestos personalizados
+  getBudgetForMonth, // 🆕 FASE 2 - Calcular presupuesto del mes
 }) {
   // 🆕 Hook para animación de press en botón de ver movimientos
   const pressViewMovements = usePress();
@@ -124,6 +126,13 @@ export default function PillarBarsPopup({
     : null;
   // ¿Es un mes específico? (si no: año o "todo el tiempo" → sin presupuesto)
   const isMonthPeriod = !!selectedPeriod && selectedPeriod.month != null;
+
+  // 🆕 FASE 2 - Calcular presupuesto personalizado del pilar (no el base)
+  const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
+  const currentYear = selectedPeriod?.year || new Date().getFullYear();
+  const budgetForMonth = getBudgetForMonth
+    ? getBudgetForMonth(pillar.id, currentMonth, currentYear, customBudgets, currentUserId)
+    : pillar.budget;
   const pillarCategoryIds = ALL_CATS
     .filter((cat) => cat.pillar === pillar.id)
     .filter((cat) => cat.userId === currentUserId) // 🆕 FASE 2 - Filtrar por userId para evitar duplicados
@@ -177,7 +186,7 @@ export default function PillarBarsPopup({
               <div style={{ width: 34, height: 34, borderRadius: 12, background: pillar.color + "28", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>{pillar.icon}</div>
               <div><div style={{ fontSize: 15, fontWeight: 800, color: "#F5F3FF" }}>{pillar.label}</div></div>
             </div>
-            {(() => { const isOver = totalSpent > pillar.budget; const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF"; return <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>{fmt(totalSpent)}</div>{isMonthPeriod && <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>de {fmt(pillar.budget)}</div>}</div>; })()}
+            {(() => { const isOver = totalSpent > budgetForMonth; const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF"; return <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>{fmt(totalSpent)}</div>{isMonthPeriod && <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>de {fmt(budgetForMonth)}</div>}</div>; })()}
           </div>
         )}
         <div style={{ maxHeight: "230px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const category = ALL_CATS.find(cat => cat.id === catId); let catName = getCategoryName(catId); if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) { const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`; catName = getAttributeAtDate(category, "name", queryDate); } return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
