@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import * as categoryService from "../services/categoryService";
 import * as catalog from "../services/categoryCatalogService";
 
@@ -14,14 +14,31 @@ import * as catalog from "../services/categoryCatalogService";
  * - Acciones verbo-based; async-tolerant (no exponen setCategories crudo).
  * - Cuando el servicio se vuelva async (API/Supabase), solo cambian catalog/service; los
  *   componentes ya manejan isLoading/error → gratis.
+ *
+ * 🆕 FASE 2: Recibe userId para filtrar categorías por usuario.
  */
-export function useCategories() {
+export function useCategories(userId) {
   const [categories, setCategories] = useState(() =>
-    categoryService.getInitialCategories()
+    categoryService.getInitialCategories(userId)  // 🆕 Pasar userId
   );
   // Placeholders del contrato: hoy no hay I/O async, mañana sí.
   const [isLoading] = useState(false);
   const [error] = useState(null);
+
+  // 🆕 FASE 2 - Actualizar categorías cuando userId cambia
+  useEffect(() => {
+    console.log(`\n🔄 useCategories - userId cambió a: ${userId}`);
+    setCategories(categoryService.getInitialCategories(userId));
+  }, [userId]);
+
+  // 🆕 DEBUG: Loguear categorías cargadas
+  useEffect(() => {
+    const totalCats = Object.values(categories).flat().length;
+    console.log(`\n📦 useCategories(${userId})`);
+    console.log(`  Total categorías: ${totalCats}`);
+    console.log(`  Pilares: `, Object.keys(categories));
+    console.log(`  Detalles por pilar:`, categories);
+  }, [userId, categories]);
 
   // ── Sincronizadores del estado React (bajo nivel, internos) ────────────────
   const syncAdd = useCallback((pillarId, categoryId) => {

@@ -51,10 +51,7 @@ export default function LoginPage({ setScreen }) {
   };
 
   const handleSignup = () => {
-    console.log("✅ Signup button clicked");
-    console.log("🔄 Navigating to signup...");
     setScreen("signup");
-    console.log("✅ setScreen called with 'signup'");
   };
 
   const handleOAuth = (provider) => {

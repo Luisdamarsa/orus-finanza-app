@@ -29,6 +29,7 @@ export default function DashboardScreen() {
     setScrollY, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, filteredPillar,
     transactions, startTransactionEditing, newTxnToast,
     searchOpen, searchQuery, setSearchOpen, showPillarBars,
+    currentUser, // 🆕 FASE 2 - Usuario actual
   } = useDashboard();
 
   // 🆕 key que reinicia scroll + paginación al cambiar de periodo/filtro/búsqueda
@@ -91,6 +92,7 @@ export default function DashboardScreen() {
           t={t}
           fmt={fmt}
           userStorage={userStorage}
+          currentUser={currentUser}
         />
 
         {/* Scroll Container */}

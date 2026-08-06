@@ -27,6 +27,7 @@ export default function DashboardOverlays() {
     setFilterType, setMovementOpenedFrom, txnActions,
     setSearchOpen, setSearchQuery, searchOpen, searchQuery,
     setVoicePrefill,
+    currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
   } = useDashboard();
 
   const [showVoice, setShowVoice] = useState(false);
@@ -111,6 +112,7 @@ export default function DashboardOverlays() {
               isDark={isDark}
               transactions={transactions}
               selectedPeriod={selectedPeriod}
+              currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
             />
           )}
         </>

@@ -14,6 +14,7 @@ export default function ProfilePage({
   onBack,
   onSaveSuccess,
   setScreen,
+  currentUser, // 🆕 FASE 2 - Usuario actual
 }) {
   const { isDark } = useTheme();
   const popup = usePopup();
@@ -45,12 +46,26 @@ export default function ProfilePage({
   const [copiedUserId, setCopiedUserId] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
 
-  // Cargar datos del usuario
+  // 🆕 FASE 2 - Cargar datos del usuario desde currentUser o userStorage
   useEffect(() => {
-    const userData = userStorage.getUser();
-    setUser(userData);
-    setDisplayName(userData.displayName);
-  }, []);
+    if (currentUser) {
+      // Si tenemos currentUser (FASE 2), usarlo
+      setUser({
+        displayName: currentUser.username,
+        userId: currentUser.id,
+        nombre: currentUser.nombre,
+        apellido: currentUser.apellido,
+        email: currentUser.email,
+        phone: currentUser.phone,
+      });
+      setDisplayName(currentUser.username);
+    } else {
+      // Fallback a userStorage (original)
+      const userData = userStorage.getUser();
+      setUser(userData);
+      setDisplayName(userData?.displayName || "");
+    }
+  }, [currentUser]);
 
   // Detectar cambios
   useEffect(() => {

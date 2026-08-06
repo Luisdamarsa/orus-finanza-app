@@ -42,6 +42,7 @@ const HeaderService = forwardRef(({
   t,
   fmt,
   userStorage,
+  currentUser, // 🆕 FASE 2 - Usuario actual
 }, ref) => {
   // 🆕 Hooks para efecto de press en cada botón
   const pressSettings = usePress();
@@ -50,10 +51,12 @@ const HeaderService = forwardRef(({
 
   return (
     <div ref={ref} style={{ position: "absolute", top: 52, left: 0, right: 0, zIndex: 30, background: t.bg, padding: "0 22px", boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: showIncomes ? "space-between" : "flex-start" }}>
-      {/* Row 1: Luis Daniel + Config (SIEMPRE visible) */}
+      {/* Row 1: Nombre del usuario + Config (SIEMPRE visible) */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: 34, marginBottom: 0, marginTop: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-          <div style={{ fontSize: showIncomes ? 15 : 17, fontWeight: 800, color: t.text }}>{userStorage.getDisplayName()}</div>
+          <div style={{ fontSize: showIncomes ? 15 : 17, fontWeight: 800, color: t.text }}>
+            {currentUser?.username || userStorage.getDisplayName()}
+          </div>
           <div style={{ fontSize: showIncomes ? 10.5 : 11.5, fontWeight: 600, color: tokens.accent }}>Buenos días</div>
         </div>
         {/* Botón Settings (Engranaje) - FAB style: 48x48px circular */}

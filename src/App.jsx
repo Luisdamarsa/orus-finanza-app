@@ -9,6 +9,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { useTheme } from "./hooks/useTheme";
 
 // 🆕 Importar hooks
+import { useAuth } from "./hooks/useAuth";
 import { useCategories } from "./hooks/useCategories";
 import { useCategoryEditing } from "./hooks/useCategoryEditing";
 import { useTransactionEditing } from "./hooks/useTransactionEditing";
@@ -24,7 +25,7 @@ import { usePillarBudgets } from "./hooks/usePillarBudgets";
 // Imports desde los nuevos módulos organizados
 import {
   PILLARS, SALDO_COLOR, MONTHS_SHORT, MONTHS_FULL, METHOD_META, PILLAR_MAP,
-  ALL_CATS, MANUAL_METHODS, TRANSACTIONS, DUMMY_TRANSACTIONS
+  ALL_CATS, MANUAL_METHODS, DUMMY_TRANSACTIONS
 } from "./constants";
 
 import { calculateDashboard } from "./utils/dashboardCalculations";
@@ -51,19 +52,23 @@ import { userStorage } from "./utils/userStorage";
 
 
 // 🆕 Función para obtener el presupuesto correcto para un mes específico
-function getBudgetForMonth(pillarId, month, year, customBudgets) {
+// 🆕 FASE 2: Recibe userId para filtrar presupuestos por usuario
+function getBudgetForMonth(pillarId, month, year, customBudgets, userId) {
   const key = `${year}-${String(month).padStart(2, '0')}`;
 
+  // 🆕 Acceder a customBudgets[userId][key][pillarId] (estructura anidada)
+  const userBudgets = customBudgets[userId] || {};
+
   // Si hay presupuesto personalizado para ese mes, usarlo
-  if (customBudgets[key] && customBudgets[key][pillarId] !== undefined) {
-    return customBudgets[key][pillarId];
+  if (userBudgets[key] && userBudgets[key][pillarId] !== undefined) {
+    return userBudgets[key][pillarId];
   }
 
   // Si no, buscar el presupuesto personalizado más reciente ANTERIOR a ese mes
   for (let m = month - 1; m >= 1; m--) {
     const checkKey = `${year}-${String(m).padStart(2, '0')}`;
-    if (customBudgets[checkKey] && customBudgets[checkKey][pillarId] !== undefined) {
-      return customBudgets[checkKey][pillarId];
+    if (userBudgets[checkKey] && userBudgets[checkKey][pillarId] !== undefined) {
+      return userBudgets[checkKey][pillarId];
     }
   }
 
@@ -149,6 +154,33 @@ function Dashboard() {
   useEffect(() => {
     if (screen !== "new-transaction") setVoicePrefill(null);
   }, [screen]);
+
+  // 🆕 FASE 2 - Integración con useAuth
+  // Obtener el usuario actual logueado y extraer su ID para filtrar transacciones
+  const { user: authUser } = useAuth();
+
+  // 🆕 PASO 6 - Selector de usuario para testing (DEV ONLY)
+  // Permite cambiar entre los 3 usuarios para verificar el filtrado
+  const [devSelectedUserId, setDevSelectedUserId] = useState(null); // null = usar useAuth, no-null = forzar user
+  const MOCK_USER_OPTIONS = [
+    { id: "UA0001", name: "Luis Daniel (237 transacciones)" },
+    { id: "UB0002", name: "María García (55 transacciones)" },
+    { id: "UC0003", name: "Carlos López (50 transacciones)" },
+  ];
+
+  // Mapeo de usuarios mock
+  const MOCK_USERS_MAP = {
+    "UA0001": { id: "UA0001", username: "Luis Daniel", nombre: "Luis", apellido: "Daniel", email: "test@test.com", phone: "+57 3001111111" },
+    "UB0002": { id: "UB0002", username: "María García", nombre: "María", apellido: "García", email: "test1@example.com", phone: "+57 3002222222" },
+    "UC0003": { id: "UC0003", username: "Carlos López", nombre: "Carlos", apellido: "López", email: "test2@example.com", phone: "+57 3003333333" },
+  };
+
+  // Si devSelectedUserId está set, usarlo; si no, usar authUser
+  const currentUserId = devSelectedUserId || authUser?.id || "UA0001";
+
+  // Crear currentUser basado en currentUserId (si devSelectedUserId está set, buscar en MOCK_USERS_MAP)
+  const currentUser = devSelectedUserId ? MOCK_USERS_MAP[devSelectedUserId] : authUser;
+
   // 🆕 Pilar seleccionado para la página de movimientos
   const [customConcepts, setCustomConcepts] = useState([]);
   const {
@@ -157,15 +189,36 @@ function Dashboard() {
     editTransaction: applyEditTx,
     deleteTransaction: removeTx,
     loadTransactions,
-  } = useTransactions();
+  } = useTransactions(currentUserId); // 🆕 FASE 2: Pasar userId para filtrar transacciones
+
+  // 🆕 Console logs para debugging FASE 2 (DESPUÉS de useTransactions)
+  useEffect(() => {
+    console.log(`\n🆕 FASE 2 - USUARIO ACTUAL: ${currentUserId} (${currentUser?.nombre})`);
+    console.log(`  Transacciones del usuario: ${transactions.length}`);
+
+    // Desglose de transacciones por pilar
+    const txByPillar = {};
+    transactions.forEach(tx => {
+      if (!txByPillar[tx.pillar]) txByPillar[tx.pillar] = 0;
+      txByPillar[tx.pillar]++;
+    });
+    console.log(`  Distribución: `, txByPillar);
+  }, [currentUserId, currentUser, transactions]);
 
   // 🆕 Categorías: toda la lógica (crear/reutilizar/editar/borrar/varios) vive en el hook.
-  const { categories, createCategory, getOrCreateCategory, ensureVariosCategory, editCategory, deleteCategory } = useCategories();
+  // 🆕 FASE 2: Pasar userId para filtrar categorías por usuario
+  const { categories, createCategory, getOrCreateCategory, ensureVariosCategory, editCategory, deleteCategory } = useCategories(currentUserId);
   // 🆕 Inicia con el último mes que tiene datos (sin hardcodear)
   // 🆕 Filtro de Gastado/Ingresos
   // 🆕 Rastrear cómo se abrió Estado 2 (por cuál "puerta")
   // 🆕 Hooks independientes
-  const { customBudgets, setCustomBudgets } = usePillarBudgets();
+  // 🆕 FASE 2: Pasar userId para filtrar presupuestos por usuario
+  const { customBudgets, setCustomBudgets } = usePillarBudgets(currentUserId);
+
+  // 🆕 DEBUG: Loguear presupuestos del usuario
+  useEffect(() => {
+    console.log(`\n💰 Presupuestos para ${currentUserId}:`, customBudgets[currentUserId] || {});
+  }, [currentUserId, customBudgets]);
 
   // 🆕 Estados de loading para diferentes secciones
   const { isLoading, startLoading, stopLoading } = useMultipleLoading({
@@ -220,13 +273,44 @@ function Dashboard() {
     };
   }, []);
 
-  // Presupuestos (catálogo directo; la lógica de categorías está en useCategories)
-  const editCategoryBudget = (categoryId, newBudget) => {
-    catalog.setCategoryBudget(categoryId, newBudget);
+  // 🆕 FASE 2 - Presupuestos aislados por usuario
+  // Actualiza customBudgets[userId][mes/año][pillarId] para cada usuario
+  const editPillarBudget = (pillarId, newBudget) => {
+    console.log(`\n🔧 editPillarBudget INICIO:`, { pillarId, newBudget, currentUserId, selectedPeriod });
+
+    if (!currentUserId) {
+      console.log(`  ❌ NO currentUserId`);
+      return;
+    }
+    if (!selectedPeriod) {
+      console.log(`  ❌ NO selectedPeriod`);
+      return;
+    }
+
+    const month = selectedPeriod.month || new Date().getMonth() + 1;
+    const year = selectedPeriod.year || new Date().getFullYear();
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+
+    console.log(`  ✅ Guardando: ${currentUserId}[${key}][${pillarId}] = ${newBudget}`);
+
+    setCustomBudgets(prev => {
+      const updated = {
+        ...prev,
+        [currentUserId]: {
+          ...prev[currentUserId],
+          [key]: {
+            ...prev[currentUserId]?.[key],
+            [pillarId]: newBudget
+          }
+        }
+      };
+      console.log(`  Nuevo estado:`, updated);
+      return updated;
+    });
   };
 
-  const editPillarBudget = (pillarId, newBudget) => {
-    catalog.setPillarBudget(pillarId, newBudget);
+  const editCategoryBudget = (categoryId, newBudget) => {
+    catalog.setCategoryBudget(categoryId, newBudget);
   };
 
   // 🆕 FUNCIONES CRUD PARA TRANSACCIONES
@@ -271,6 +355,10 @@ function Dashboard() {
     // 🔄 DEV VERSION: Siempre cargar datos dummy de desarrollo
     console.log("📊 DEV: Cargando DUMMY_TRANSACTIONS al localStorage...");
     localStorage.setItem("orus_transactions", JSON.stringify(DUMMY_TRANSACTIONS));
+
+    // 🆕 FASE 2 - Verificar filtrado por userId
+    console.log(`🆕 FASE 2 - Usuario actual: ${currentUserId}`);
+    console.log(`🆕 FASE 2 - Transacciones cargadas para usuario: ${transactions.length}`);
 
     // Cargar transacciones desde localStorage si ya existen
     const isFirstLoad = !localStorage.getItem("orus_transactions");
@@ -448,6 +536,8 @@ function Dashboard() {
     startCategoryEditing, resetCategoryEditing,
     editingTransactionId, selectedTransactionForEdit,
     startTransactionEditing, resetTransactionEditing,
+    // 🆕 FASE 2 - Usuario actual
+    currentUser, currentUserId,
     ...dashboardMetrics,
   };
 
@@ -467,13 +557,59 @@ function Dashboard() {
     iosShortcutsEnabled, setIosShortcutsEnabled: handleSetIosShortcutsEnabled,
     onOpenAccessibilitySettings,
     previousScreen,
+    currentUser, // 🆕 FASE 2
     setScreen,
   };
 
   return (
-    <DashboardContext.Provider value={dashboard}>
-      <ScreenRouter {...routerProps} />
-    </DashboardContext.Provider>
+    <>
+      {/* 🆕 PASO 6 - Selector de usuario (DEV ONLY) - Esquina inferior izquierda */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 1000,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        color: '#fff',
+        padding: '8px 12px',
+        borderRadius: '6px',
+        fontSize: '11px',
+        fontFamily: 'monospace',
+        maxWidth: '220px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+        pointerEvents: 'auto'
+      }}>
+        <div style={{ marginBottom: '6px', fontWeight: 'bold', fontSize: '10px' }}>CAMBIAR USUARIO:</div>
+        <select
+          value={devSelectedUserId || ''}
+          onChange={(e) => setDevSelectedUserId(e.target.value || null)}
+          style={{
+            width: '100%',
+            padding: '4px',
+            marginBottom: '6px',
+            borderRadius: '4px',
+            border: '1px solid #555',
+            backgroundColor: '#1a1a1a',
+            color: '#fff',
+            cursor: 'pointer',
+            fontSize: '11px'
+          }}
+        >
+          <option value="">Auto (useAuth)</option>
+          {MOCK_USER_OPTIONS.map(u => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
+        <div style={{ fontSize: '10px', color: '#888', lineHeight: '1.4' }}>
+          <div>ID: {currentUserId}</div>
+          <div>TXS: {transactions.length}</div>
+        </div>
+      </div>
+
+      <DashboardContext.Provider value={dashboard}>
+        <ScreenRouter {...routerProps} />
+      </DashboardContext.Provider>
+    </>
   );
 }
 

@@ -51,10 +51,7 @@ export default function LoginPage({ setScreen }) {
   };
 
   const handleSignup = () => {
-    console.log("✅ Signup button clicked");
-    console.log("🔄 Navigating to signup...");
     setScreen("signup");
-    console.log("✅ setScreen called with 'signup'");
   };
 
   const handleOAuth = (provider) => {
@@ -74,7 +71,6 @@ export default function LoginPage({ setScreen }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
         padding: "20px",
         boxSizing: "border-box",
         overflow: "auto",
@@ -100,13 +96,14 @@ export default function LoginPage({ setScreen }) {
         }}
       />
 
-      {/* Top Section - Logo, Tagline, Form */}
+      {/* Main Content */}
       <div
         style={{
+          flex: 1,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          flex: "0 0 auto",
+          justifyContent: "center",
           width: "100%",
           zIndex: 1,
         }}
@@ -395,106 +392,93 @@ export default function LoginPage({ setScreen }) {
             </button>
           </div>
 
+          {/* Divider */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "12px 0" }}>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#8B87A3" }}>
+              O CONTINÚA CON
+            </div>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
+          </div>
+
+          {/* Social Buttons - exact spec */}
+          <div style={{ display: "flex", gap: 12 }}>
+            {/* Google */}
+            <button
+              type="button"
+              onClick={() => handleOAuth("google")}
+              {...pressGoogle.handlers}
+              disabled={isLoading}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 16,
+                border: "1px solid rgba(255,255,255,0.07)",
+                background: "linear-gradient(155deg, #262231, #17151f)",
+                boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                color: "#F5F3FF",
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: isLoading ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+                opacity: isLoading ? 0.6 : 1,
+                ...pressGoogle.getPressStyle({ opacity: 0.9, scale: 0.98 }),
+              }}
+            >
+              <GoogleLogoSvg />
+              <span>Google</span>
+            </button>
+
+            {/* Apple */}
+            <button
+              type="button"
+              onClick={() => handleOAuth("apple")}
+              {...pressApple.handlers}
+              disabled={isLoading}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px",
+                borderRadius: 16,
+                border: "1px solid rgba(255,255,255,0.07)",
+                background: "linear-gradient(155deg, #262231, #17151f)",
+                boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                color: "#F5F3FF",
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: isLoading ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+                opacity: isLoading ? 0.6 : 1,
+                ...pressApple.getPressStyle({ opacity: 0.9, scale: 0.98 }),
+              }}
+            >
+              <AppleLogoSvg />
+              <span>Apple</span>
+            </button>
+          </div>
         </form>
       </div>
 
-      {/* Bottom Section - OAuth + Footer */}
+      {/* Footer - links in accent purple */}
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          alignItems: "center",
-          flex: "0 0 auto",
-          width: "100%",
+          gap: 18,
+          justifyContent: "center",
+          fontSize: 11,
+          fontWeight: 600,
+          color: "#9B6DFF",
+          marginBottom: 16,
           zIndex: 1,
         }}
       >
-        {/* Divider */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "0px 0", width: "100%", maxWidth: 360 }}>
-          <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#8B87A3" }}>
-            O CONTINÚA CON
-          </div>
-          <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.1)" }} />
-        </div>
-
-        {/* Social Buttons - exact spec */}
-        <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 360 }}>
-          {/* Google */}
-          <button
-            type="button"
-            onClick={() => handleOAuth("google")}
-            {...pressGoogle.handlers}
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              padding: "14px",
-              borderRadius: 16,
-              border: "1px solid rgba(255,255,255,0.07)",
-              background: "linear-gradient(155deg, #262231, #17151f)",
-              boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
-              color: "#F5F3FF",
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: isLoading ? "not-allowed" : "pointer",
-              transition: "all 0.2s",
-              opacity: isLoading ? 0.6 : 1,
-              ...pressGoogle.getPressStyle({ opacity: 0.9, scale: 0.98 }),
-            }}
-          >
-            <GoogleLogoSvg />
-            <span>Google</span>
-          </button>
-
-          {/* Apple */}
-          <button
-            type="button"
-            onClick={() => handleOAuth("apple")}
-            {...pressApple.handlers}
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              padding: "14px",
-              borderRadius: 16,
-              border: "1px solid rgba(255,255,255,0.07)",
-              background: "linear-gradient(155deg, #262231, #17151f)",
-              boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
-              color: "#F5F3FF",
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: isLoading ? "not-allowed" : "pointer",
-              transition: "all 0.2s",
-              opacity: isLoading ? 0.6 : 1,
-              ...pressApple.getPressStyle({ opacity: 0.9, scale: 0.98 }),
-            }}
-          >
-            <AppleLogoSvg />
-            <span>Apple</span>
-          </button>
-        </div>
-
-        {/* Footer Links */}
-        <div
-          style={{
-            display: "flex",
-            gap: 18,
-            justifyContent: "center",
-            fontSize: 11,
-            fontWeight: 600,
-            color: "#9B6DFF",
-            marginTop: 8,
-            marginBottom: 0,
-          }}
-        >
         <button
           onClick={() => setScreen("legal")}
           style={{
@@ -529,7 +513,6 @@ export default function LoginPage({ setScreen }) {
         >
           Acerca de ORUS
         </button>
-        </div>
       </div>
     </div>
   );

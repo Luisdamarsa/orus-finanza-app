@@ -22,11 +22,12 @@ export default function DashboardExpandedState() {
     segments, activeId, setActiveId, handleSelectPillar,
     totalSpent, saldoForDonut, pillarSpends, selectedPeriod,
     pressingSegmentId, setPressingSegmentId,
-    chipPcts, customBudgets, getBudgetForMonth, hasSaldo, saldo, saldoPctFinal,
+    chipPcts, directPcts, customBudgets, getBudgetForMonth, hasSaldo, saldo, saldoPctFinal, directSaldoPct,
     setSelectedPillarDetail, setShowPillarBars, showPillarBars,
     setSelectedPillarForMovements,
     donutRef, donutContainerRef, pillarsGridRef,
     transactions, setScreen,
+    currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
   } = useDashboard();
 
   return (
@@ -76,6 +77,7 @@ export default function DashboardExpandedState() {
               <PillarCardsGrid
                 PILLARS={PILLARS}
                 chipPcts={chipPcts}
+                directPcts={directPcts}
                 pillarSpends={pillarSpends}
                 activeId={activeId}
                 setActiveId={setActiveId}
@@ -85,12 +87,14 @@ export default function DashboardExpandedState() {
                 hasSaldo={hasSaldo}
                 saldo={saldo}
                 saldoPctFinal={saldoPctFinal}
+                directSaldoPct={directSaldoPct}
                 SALDO_COLOR={SALDO_COLOR}
                 setSelectedPillarDetail={setSelectedPillarDetail}
                 setShowPillarBars={setShowPillarBars}
                 showPillarBars={showPillarBars}
                 isDark={isDark}
                 t={t}
+                currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId para presupuestos
               />
             </LoadingWrapper>
           ) : (
@@ -114,6 +118,7 @@ export default function DashboardExpandedState() {
                 transactions={transactions}
                 selectedPeriod={selectedPeriod}
                 isInline={true}
+                currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
               />
             )
           )}

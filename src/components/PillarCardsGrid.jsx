@@ -20,15 +20,16 @@ import { getPillarColor, getPillarSoftBg } from "../utils/colorUtils";
  * - Tarjeta de saldo (si existe)
  *
  * Props:
- *   PILLARS, chipPcts, pillarSpends, activeId, setActiveId
+ *   PILLARS, chipPcts, directPcts, pillarSpends, activeId, setActiveId
  *   selectedPeriod, customBudgets, getBudgetForMonth
- *   hasSaldo, saldo, saldoPctFinal, SALDO_COLOR
+ *   hasSaldo, saldo, saldoPctFinal, directSaldoPct, SALDO_COLOR
  *   setSelectedPillarDetail, setShowPillarBars
  *   isDark, t (tema)
  */
 export default function PillarCardsGrid({
   PILLARS,
   chipPcts,
+  directPcts,  // 🆕 FASE 2 - Porcentajes directos (sin Largest Remainder)
   pillarSpends,
   activeId,
   setActiveId,
@@ -38,15 +39,20 @@ export default function PillarCardsGrid({
   hasSaldo,
   saldo,
   saldoPctFinal,
+  directSaldoPct,  // 🆕 FASE 2 - Saldo % directo
   SALDO_COLOR,
   setSelectedPillarDetail,
   setShowPillarBars,
   showPillarBars,
   isDark,
   t,
+  currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar presupuestos
 }) {
   // 🆕 Tema desde ThemeContext para colores dinámicos
   const { isDark: isDarkTheme } = useTheme();
+
+  // 🆕 DEBUG: Verificar que directPcts se está recibiendo correctamente
+  console.log("🎯 PillarCardsGrid - chipPcts:", chipPcts, "directPcts:", directPcts, "saldoPctFinal:", saldoPctFinal, "directSaldoPct:", directSaldoPct);
 
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);
@@ -95,7 +101,7 @@ export default function PillarCardsGrid({
           // 🆕 Obtener presupuesto del mes (personalizado o base)
           const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
           const currentYear = selectedPeriod?.year || new Date().getFullYear();
-          const budgetForMonth = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets);
+          const budgetForMonth = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets, currentUserId); // 🆕 FASE 2 - Pasar userId
 
           // 🆕 Obtener presupuesto histórico del pilar en la fecha del período
           let historicalBudget = budgetForMonth;
@@ -119,7 +125,11 @@ export default function PillarCardsGrid({
           const isAct = activeId === p.id;
           const dc = isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color); // 🆕 color día/noche
           // 🆕 Rediseño: % del total arriba (color pilar), barra auto-escalable, gastado, % presupuesto abajo.
-          const pctTotal = chipPcts[i];
+          // 🆕 FASE 2 - Usar directPcts (sin Largest Remainder) para coincidir EXACTAMENTE con Estado 2
+          // 🔴 FIX: Usar el índice REAL del pilar en PILLARS, no el índice de iteración
+          const pillarIndex = PILLARS.findIndex(pillar => pillar.id === p.id);
+          const pctTotal = directPcts[pillarIndex] || chipPcts[pillarIndex];  // Usar índice correcto
+          console.log(`🎯 Pilar ${p.id} (iteración ${i}, PILLARS índice ${pillarIndex}): pctTotal=${pctTotal}, directPcts[${pillarIndex}]=${directPcts[pillarIndex]}, chipPcts[${pillarIndex}]=${chipPcts[pillarIndex]}, hasBudget=${hasBudget}, pc=${pc}`);
           const grayTrack = isDark ? "#2D2D3A" : "#E5E3F5"; // "no gastado"
           const overColor = p.id === "ahorro" ? "#22C55E" : "#EF4444"; // exceso: verde FUERTE en Ahorro (distinto del pastel), rojo en el resto
           // Barra que se escala sola: dentro del presupuesto → color + gris; pasado → color(presupuesto) + rojo(exceso).
@@ -282,7 +292,7 @@ export default function PillarCardsGrid({
                 <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 700, color: t.text }}>Saldo</span>
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0, color: saldo < 0 ? COLORS.gasto : (isDark ? SALDO_COLOR : "#64748B") }}>
-                {saldo < 0 ? "en rojo" : `${saldoPctFinal}% del total`}
+                {saldo < 0 ? "en rojo" : `${directSaldoPct || saldoPctFinal}% del total`}
               </span>
             </div>
             <div style={{ minHeight: 12, marginTop: 4, marginBottom: 2 }} />

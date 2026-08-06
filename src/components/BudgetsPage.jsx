@@ -63,6 +63,13 @@ export default function BudgetsPage({
   const [expandedPillars, setExpandedPillars] = useState({});
   const [isLoading] = useState(false);
   const [editingInputs, setEditingInputs] = useState({});
+
+  // 🆕 FASE 2 - Actualizar editedBudgets cuando initialBudgets cambia (ej: cambio de usuario)
+  useEffect(() => {
+    console.log(`\n📊 BudgetsPage.useEffect - initialBudgets cambió:`, initialBudgets);
+    setEditedBudgets(initialBudgets || {});
+    setHasChanged(false);
+  }, [JSON.stringify(initialBudgets)]);
   const [budgetAlertEnabled, setBudgetAlertEnabled] = useState(initialBudgetAlertEnabled);
 
   useEffect(() => {
@@ -123,14 +130,26 @@ export default function BudgetsPage({
   };
 
   const handleSave = () => {
+    console.log(`\n🔴 BudgetsPage.handleSave() INICIO`);
+    console.log(`  editPillarBudget: ${typeof editPillarBudget}`);
+    console.log(`  editedBudgets:`, editedBudgets);
+    console.log(`  initialBudgets:`, initialBudgets);
+
     try {
       // Guardar cambios de pilares
       if (editPillarBudget) {
+        console.log(`  ✅ Iterando editedBudgets...`);
         Object.entries(editedBudgets).forEach(([pillarId, budget]) => {
-          if ((initialBudgets[pillarId] || 0) !== budget) {
+          const initialBudget = initialBudgets[pillarId] || 0;
+          const changed = initialBudget !== budget;
+          console.log(`    ${pillarId}: ${initialBudget} → ${budget} (changed: ${changed})`);
+          if (changed) {
+            console.log(`    🔧 Llamando editPillarBudget(${pillarId}, ${budget})`);
             editPillarBudget(pillarId, budget);
           }
         });
+      } else {
+        console.log(`  ❌ NO editPillarBudget`);
       }
 
       // Guardar cambios de categorías

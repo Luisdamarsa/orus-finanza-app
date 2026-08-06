@@ -17,14 +17,31 @@ import { ALL_CATS } from "../constants";
 
 /**
  * Estructura inicial de categorías: { pillarId: [categoryId, ...] }.
- * Mañana: `async getAll(userId)` → fetch a la BD del usuario.
+ * 🆕 FASE 2: Filtra por userId. Mañana: `async getAll(userId)` → fetch a la BD del usuario.
+ * @param {string} userId - ID del usuario (ej: "UA0001")
  */
-export function getInitialCategories() {
+export function getInitialCategories(userId) {
+  console.log(`\n🎯 categoryService.getInitialCategories INICIO - userId: ${userId}`);
+
   const categories = {};
-  ALL_CATS.forEach((cat) => {
+  // 🆕 Filtrar solo categorías del usuario actual
+  console.log(`  ALL_CATS: `, ALL_CATS.length, ` categorías`);
+  console.log(`  Filtrando por userId === "${userId}"`);
+
+  const userCats = ALL_CATS.filter(cat => {
+    const match = cat.userId === userId;
+    if (match) console.log(`    ✓ ${cat.name} (${cat.userId})`);
+    return match;
+  });
+
+  console.log(`  RESULTADO: ${userCats.length} categorías filtradas`);
+
+  userCats.forEach((cat) => {
     if (!categories[cat.pillar]) categories[cat.pillar] = [];
     categories[cat.pillar].push(cat.id);
   });
+
+  console.log(`  RETORNANDO:`, categories);
   return categories;
 }
 

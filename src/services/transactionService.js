@@ -12,9 +12,20 @@ import { DUMMY_TRANSACTIONS } from "../constants";
  */
 const STORAGE_KEY = "orus_transactions";
 
-/** Semilla inicial. Mañana: `async getAll(userId)`. */
+/** Semilla inicial (TODAS las transacciones). Mañana: `async getAll(userId)`. */
 export function getInitialTransactions() {
   return DUMMY_TRANSACTIONS;
+}
+
+/**
+ * 🆕 FASE 2 - Filtra transacciones por userId.
+ * Solo devuelve transacciones que pertenecen al usuario logueado.
+ * Entrada: transacciones + userId
+ * Salida: array de transacciones del usuario
+ */
+export function getTransactionsByUser(transactions, userId) {
+  if (!userId) return []; // Si no hay userId, no devolver nada
+  return transactions.filter((tx) => tx.userId === userId);
 }
 
 /** Agrega una transacción generando un id nuevo. Devuelve el arreglo nuevo. */

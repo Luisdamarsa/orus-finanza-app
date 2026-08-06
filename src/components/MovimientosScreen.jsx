@@ -4,7 +4,7 @@ import MovimientosPage from "./MovimientosPage";
 /**
  * MovimientosScreen.jsx — pantalla de Movimientos por pilar (RS-6). Extraída de App.jsx.
  */
-export default function MovimientosScreen({ isDark, t, selectedPillarForMovements, transactions, selectedPeriod, setScreen, startTransactionEditing }) {
+export default function MovimientosScreen({ isDark, t, selectedPillarForMovements, transactions, selectedPeriod, setScreen, startTransactionEditing, showIncomes }) {
   return (
     <ScreenShell bg={t.bg}>
       <MovimientosPage
@@ -14,6 +14,7 @@ export default function MovimientosScreen({ isDark, t, selectedPillarForMovement
         transactions={transactions}
         selectedPeriod={selectedPeriod}
         onEditTransaction={(tx) => startTransactionEditing(tx)}
+        showIncomes={showIncomes}
       />
     </ScreenShell>
   );

@@ -9,6 +9,7 @@ import { PILLARS } from "../constants";
 export default function BudgetsScreen({
   isDark, t, selectedPeriod, customBudgets, setCustomBudgets,
   categories, editPillarBudget, editCategoryBudget, getBudgetForMonth, setScreen,
+  currentUser, // 🆕 FASE 2 - Recibir usuario actual para presupuestos por usuario
 }) {
   const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
   const currentYear = selectedPeriod?.year || new Date().getFullYear();
@@ -16,7 +17,8 @@ export default function BudgetsScreen({
 
   const currentMonthBudgets = {};
   PILLARS.forEach((p) => {
-    currentMonthBudgets[p.id] = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets);
+    // 🆕 FASE 2 - Pasar userId a getBudgetForMonth
+    currentMonthBudgets[p.id] = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets, currentUser?.id);
   });
 
   return (
@@ -28,7 +30,14 @@ export default function BudgetsScreen({
         categories={categories}
         editPillarBudget={editPillarBudget}
         editCategoryBudget={editCategoryBudget}
-        onSave={(newBudgets) => setCustomBudgets((prev) => ({ ...prev, [key]: newBudgets }))}
+        // 🆕 FASE 2 - Anidar por userId correctamente
+        onSave={(newBudgets) => setCustomBudgets((prev) => ({
+          ...prev,
+          [currentUser?.id]: {
+            ...prev[currentUser?.id],
+            [key]: newBudgets
+          }
+        }))}
         onSaveSuccess={() => setScreen("settings")}
       />
     </ScreenShell>

@@ -37,6 +37,7 @@ export default function PillarBarsPopup({
   transactions,
   selectedPeriod,
   isInline = false,
+  currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
 }) {
   // 🆕 Hook para animación de press en botón de ver movimientos
   const pressViewMovements = usePress();
@@ -125,6 +126,7 @@ export default function PillarBarsPopup({
   const isMonthPeriod = !!selectedPeriod && selectedPeriod.month != null;
   const pillarCategoryIds = ALL_CATS
     .filter((cat) => cat.pillar === pillar.id)
+    .filter((cat) => cat.userId === currentUserId) // 🆕 FASE 2 - Filtrar por userId para evitar duplicados
     .filter((cat) => {
       if (!periodKey) return !cat.deletedAt;
       const createdOk = !cat.createdAt || cat.createdAt.slice(0, 7) <= periodKey;

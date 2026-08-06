@@ -20,7 +20,9 @@ import ShortcutsSetupPage from "./ShortcutsSetupPage";
 import ReportsPage from "./ReportsPage";
 import MyReportsPage from "./MyReportsPage";
 import LoginPage from "./LoginPage";
+import SignupPage from "./SignupPage";
 import OnboardingPage from "./OnboardingPage";
+import ForgotPasswordPage from "./ForgotPasswordPage";
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -43,8 +45,10 @@ export default function ScreenRouter({
   iosShortcutsEnabled, setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
   previousScreen,
+  currentUser, // 🆕 FASE 2
   setScreen,
 }) {
+  console.log("📺 ScreenRouter rendering with screen:", screen);
   if (screen === "pillar-detail" && selectedPillarDetail) {
     return (
       <ScreenShell bg={t.bg}>
@@ -76,15 +80,15 @@ export default function ScreenRouter({
   }
 
   if (screen === "profile") {
-    return <ProfileScreen isDark={isDark} t={t} setScreen={setScreen} />;
+    return <ProfileScreen isDark={isDark} t={t} setScreen={setScreen} currentUser={currentUser} />;
   }
 
   if (screen === "budgets") {
-    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} />;
+    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} currentUser={currentUser} />;
   }
 
   if (screen === "movimientos" && selectedPillarForMovements) {
-    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} />;
+    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} showIncomes={showIncomes} />;
   }
 
   if (screen === "categories") {
@@ -235,6 +239,22 @@ export default function ScreenRouter({
     );
   }
 
+  if (screen === "signup") {
+    return (
+      <ScreenShell bg="#000000">
+        <SignupPage setScreen={setScreen} />
+      </ScreenShell>
+    );
+  }
+
+  if (screen === "forgot-password") {
+    return (
+      <ScreenShell bg="#000000">
+        <ForgotPasswordPage setScreen={setScreen} />
+      </ScreenShell>
+    );
+  }
+
   if (screen === "about-login") {
     return (
       <ScreenShell bg={t.bg}>
@@ -251,17 +271,6 @@ export default function ScreenRouter({
     );
   }
 
-  if (screen === "forgot-password") {
-    // TODO: Crear pantalla de recuperación de contraseña
-    return (
-      <ScreenShell bg={t.bg}>
-        <div style={{ padding: 20, color: t.text }}>
-          <button onClick={() => setScreen("login")} style={{ cursor: "pointer" }}>← Volver al inicio</button>
-          <p style={{ marginTop: 20 }}>Pantalla de recuperación de contraseña (próximamente)</p>
-        </div>
-      </ScreenShell>
-    );
-  }
 
   return <DashboardScreen />;
 }

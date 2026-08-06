@@ -62,8 +62,7 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   // PASO 3: CALCULAR PORCENTAJES (La lógica CRÍTICA)
   // ============================================================
 
-  // Base común: siempre usar baseTotal (mismo denominador para Estado 1 y Estado 2,
-  // así los % del donut y los % de los tags de pilares coinciden).
+  // Base común: siempre usar baseTotal (mismo denominador para Estado 1 y Estado 2)
   const rawPcts = PILLARS.map(p =>
     baseTotal > 0 ? (pillarSpends[p.id] / baseTotal) * 100 : 0
   );
@@ -71,9 +70,24 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   const saldoPct = baseTotal > 0 ? (saldoForDonut / baseTotal) * 100 : 0;
   const allRawPcts = [...rawPcts, saldoPct];
 
-  // Aplicar Largest Remainder Method para que sumen exactamente 100%
+  // 🆕 PASO 3A: CALCULAR PORCENTAJES DIRECTOS (SIN Largest Remainder)
+  // Estos se usan para las tarjetas (Estado 1) y deben coincidir EXACTAMENTE con Estado 2
+  const directPcts = rawPcts.map(pct => Math.round(pct));
+  const directSaldoPct = Math.round(saldoPct);
+
+  // 🔴 DEBUG: Ver qué está pasando
+  console.log("🔴 dashboardCalculations DEBUG:");
+  console.log("  - totalSpent:", totalSpent);
+  console.log("  - saldoForDonut:", saldoForDonut);
+  console.log("  - baseTotal:", baseTotal);
+  console.log("  - showIncomes:", showIncomes);
+  console.log("  - rawPcts:", rawPcts);
+  console.log("  - saldoPct:", saldoPct);
+  console.log("  - directPcts:", directPcts);
+  console.log("  - directSaldoPct:", directSaldoPct);
+
+  // PASO 3B: Aplicar Largest Remainder Method SOLO para el donut (si es necesario que sume 100%)
   const allFloorPcts = allRawPcts.map(Math.floor);
-  // 🆕 Sin datos (baseTotal 0) NO repartir: si no, el método suma 1% a cada bucket → mostraba 1%.
   const toAdd = baseTotal > 0 ? 100 - allFloorPcts.reduce((a, b) => a + b, 0) : 0;
   const allByRem = allRawPcts.map((v, i) => ({ i, rem: v - Math.floor(v) })).sort((a, b) => b.rem - a.rem);
 
@@ -125,8 +139,12 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
     hasSaldo,
 
     // Porcentajes (para tarjetas sin presupuesto)
-    chipPcts,        // [25%, 25%, 25%, 25%] para pilares
-    saldoPctFinal,   // [25%] para saldo
+    chipPcts,        // [25%, 25%, 25%, 25%] para pilares (Largest Remainder - solo para donut)
+    saldoPctFinal,   // [25%] para saldo (Largest Remainder - solo para donut)
+
+    // 🆕 FASE 2 - Porcentajes DIRECTOS para tarjetas (igual que Estado 2)
+    directPcts,      // Porcentajes SIN Largest Remainder (para mostrar en tarjetas)
+    directSaldoPct,  // Saldo % SIN Largest Remainder
 
     // Donut
     segments,        // Segmentos del gráfico donut

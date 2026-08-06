@@ -27,6 +27,7 @@ export default function MovimientosPage({
   transactions,
   selectedPeriod,
   onEditTransaction, // 🆕 Callback para editar transacción
+  showIncomes, // 🆕 FASE 2 - Si debe incluir saldo en el denominador
 }) {
   // 🆕 Hooks para animación de press en botones
   const pressClearFilter = usePress();
@@ -108,12 +109,20 @@ export default function MovimientosPage({
   };
   const allSpends = {};
   PILLARS.forEach((p) => { allSpends[p.id] = 0; });
+  let incomingTotal = 0; // 🆕 Para calcular saldo
   transactions.forEach((tx) => {
     if (tx.amount < 0 && tx.pillar !== "ingreso" && allSpends[tx.pillar] !== undefined && inPeriod(tx)) {
       allSpends[tx.pillar] += Math.abs(tx.amount);
     }
+    // 🆕 Sumar ingresos para calcular saldo
+    if ((tx.amount > 0 || tx.pillar === "ingreso") && inPeriod(tx)) {
+      incomingTotal += tx.amount > 0 ? tx.amount : 0;
+    }
   });
-  const grandTotal = Object.values(allSpends).reduce((a, b) => a + b, 0);
+  const totalSpentForSaldo = Object.values(allSpends).reduce((a, b) => a + b, 0);
+  const saldo = showIncomes ? (incomingTotal - totalSpentForSaldo) : 0;
+  const saldoForGrandTotal = saldo > 0 ? saldo : 0;
+  const grandTotal = totalSpentForSaldo + saldoForGrandTotal; // 🆕 Incluir saldo cuando showIncomes es ON
   const contextSegments = PILLARS.filter((p) => allSpends[p.id] > 0).map((p) => ({
     id: p.id,
     color: isDark ? p.color : (DAY_PILLAR_COLOR[p.id] || p.color),
