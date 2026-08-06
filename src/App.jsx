@@ -557,7 +557,7 @@ function Dashboard() {
     iosShortcutsEnabled, setIosShortcutsEnabled: handleSetIosShortcutsEnabled,
     onOpenAccessibilitySettings,
     previousScreen,
-    currentUser, // 🆕 FASE 2
+    currentUser, currentUserId, // 🆕 FASE 2
     setScreen,
   };
 

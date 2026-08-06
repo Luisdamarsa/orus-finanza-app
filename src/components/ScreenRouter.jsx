@@ -45,7 +45,7 @@ export default function ScreenRouter({
   iosShortcutsEnabled, setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
   previousScreen,
-  currentUser, // 🆕 FASE 2
+  currentUser, currentUserId, // 🆕 FASE 2
   setScreen,
 }) {
   console.log("📺 ScreenRouter rendering with screen:", screen);
