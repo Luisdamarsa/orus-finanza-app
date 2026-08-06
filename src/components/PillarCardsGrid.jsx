@@ -53,6 +53,7 @@ export default function PillarCardsGrid({
 
   // 🆕 DEBUG: Verificar que directPcts se está recibiendo correctamente
   console.log("🎯 PillarCardsGrid - chipPcts:", chipPcts, "directPcts:", directPcts, "saldoPctFinal:", saldoPctFinal, "directSaldoPct:", directSaldoPct);
+  console.log("🎯 PillarCardsGrid - currentUserId:", currentUserId, "customBudgets:", customBudgets);
 
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);

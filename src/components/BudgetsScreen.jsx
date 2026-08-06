@@ -9,7 +9,7 @@ import { PILLARS } from "../constants";
 export default function BudgetsScreen({
   isDark, t, selectedPeriod, customBudgets, setCustomBudgets,
   categories, editPillarBudget, editCategoryBudget, getBudgetForMonth, setScreen,
-  currentUser, // 🆕 FASE 2 - Recibir usuario actual para presupuestos por usuario
+  currentUser, currentUserId, // 🆕 FASE 2 - Recibir usuario actual para presupuestos por usuario
 }) {
   const currentMonth = selectedPeriod?.month || new Date().getMonth() + 1;
   const currentYear = selectedPeriod?.year || new Date().getFullYear();
@@ -17,8 +17,8 @@ export default function BudgetsScreen({
 
   const currentMonthBudgets = {};
   PILLARS.forEach((p) => {
-    // 🆕 FASE 2 - Pasar userId a getBudgetForMonth
-    currentMonthBudgets[p.id] = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets, currentUser?.id);
+    // 🆕 FASE 2 - Pasar userId a getBudgetForMonth (usar currentUserId, no currentUser?.id)
+    currentMonthBudgets[p.id] = getBudgetForMonth(p.id, currentMonth, currentYear, customBudgets, currentUserId);
   });
 
   return (

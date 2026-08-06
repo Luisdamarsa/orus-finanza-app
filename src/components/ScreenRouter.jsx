@@ -84,7 +84,7 @@ export default function ScreenRouter({
   }
 
   if (screen === "budgets") {
-    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} currentUser={currentUser} />;
+    return <BudgetsScreen isDark={isDark} t={t} selectedPeriod={selectedPeriod} customBudgets={customBudgets} setCustomBudgets={setCustomBudgets} categories={categories} editPillarBudget={editPillarBudget} editCategoryBudget={editCategoryBudget} getBudgetForMonth={getBudgetForMonth} setScreen={setScreen} currentUser={currentUser} currentUserId={currentUserId} />;
   }
 
   if (screen === "movimientos" && selectedPillarForMovements) {
