@@ -179,41 +179,56 @@ export default function TransactionPage({
 
   /**
    * Guardar en modo crear
+   * 🆕 FASE 3A: Ahora es async (onDone es async)
    */
-  function handleCreate() {
+  async function handleCreate() {
     if (!canSave) return;
-    onDone({
-      desc,
-      rawAmount,
-      isIncome,
-      method,
-      concept,      // si isNewCategory, aquí va el NOMBRE; si no, el id de la categoría
-      pillarId,
-      isNewCategory // la categoría se crea/reutiliza al guardar (en createTransaction)
-    });
+    try {
+      await onDone({
+        desc,
+        rawAmount,
+        isIncome,
+        method,
+        concept,      // si isNewCategory, aquí va el NOMBRE; si no, el id de la categoría
+        pillarId,
+        isNewCategory // la categoría se crea/reutiliza al guardar (en createTransaction)
+      });
+    } catch (err) {
+      console.error("❌ Error creating transaction:", err);
+    }
   }
 
   /**
    * Guardar en modo editar
+   * 🆕 FASE 3A: Ahora es async (onSave es async)
    */
-  function handleEdit() {
+  async function handleEdit() {
     if (!canSave) return;
-    const updatedTransaction = {
-      ...editingTransaction,
-      description: desc,
-      amount: isIncome ? numericAmount : -numericAmount,
-      method,
-      category: concept,
-      pillar: pillarId,
-    };
-    onSave(editingTransaction.id, updatedTransaction);
+    try {
+      const updatedTransaction = {
+        ...editingTransaction,
+        description: desc,
+        amount: isIncome ? numericAmount : -numericAmount,
+        method,
+        category: concept,
+        pillar: pillarId,
+      };
+      await onSave(editingTransaction.id, updatedTransaction);
+    } catch (err) {
+      console.error("❌ Error editing transaction:", err);
+    }
   }
 
   /**
    * Eliminar transacción
+   * 🆕 FASE 3A: Ahora es async (onDelete es async)
    */
-  function handleDelete() {
-    onDelete(editingTransaction.id);
+  async function handleDelete() {
+    try {
+      await onDelete(editingTransaction.id);
+    } catch (err) {
+      console.error("❌ Error deleting transaction:", err);
+    }
   }
 
   return (
