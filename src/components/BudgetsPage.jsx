@@ -158,11 +158,19 @@ export default function BudgetsPage({
       // Guardar cambios de categorías (FASE 3B: ahora async)
       if (editCategoryBudget) {
         for (const [catId, newBudget] of Object.entries(categoryBudgets)) {
+          // 🆕 Validar que newBudget sea un número válido (no null, no undefined)
+          if (newBudget === null || newBudget === undefined || newBudget === '') {
+            continue;  // Saltar categorías sin cambios
+          }
+
           const currentCategory = ALL_CATS.find(c => c.id === catId);
           const oldBudget = currentCategory?.budget || 0;
-          if (oldBudget !== newBudget) {
+          const numNewBudget = parseInt(newBudget) || 0;
+
+          if (oldBudget !== numNewBudget) {
             // 🆕 Ahora editCategoryBudget es async y recibe currentUserId
-            await editCategoryBudget(catId, newBudget);
+            console.log(`  🔧 Guardando presupuesto: ${catId} ${oldBudget} → ${numNewBudget}`);
+            await editCategoryBudget(catId, numNewBudget);
           }
         }
       }
