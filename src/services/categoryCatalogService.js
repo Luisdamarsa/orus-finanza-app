@@ -1,5 +1,7 @@
 import { ALL_CATS, PILLARS } from "../constants";
 import { addHistoryEntry } from "./attributeHistoryService";
+// 🆕 FASE 3B: Importar budgetService para presupuestos en Supabase
+import * as budgetService from "./budgetService";
 
 /**
  * categoryCatalogService.js
@@ -103,8 +105,9 @@ export async function setCategoryBudget(categoryId, newBudget, userId) {
   // Actualizar en Supabase si userId está disponible
   if (userId) {
     try {
-      const { budgetService } = await import('./budgetService');
-      return await budgetService.setCategoryBudget(userId, categoryId, newBudget);
+      const success = await budgetService.setCategoryBudget(userId, categoryId, newBudget);
+      console.log(`✅ Presupuesto categoría guardado en Supabase: ${categoryId}=${newBudget}`);
+      return success;
     } catch (err) {
       console.error("Error updating budget in Supabase:", err);
       // Fallback: actualizar en memoria si falla Supabase
