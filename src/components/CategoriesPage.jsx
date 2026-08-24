@@ -94,6 +94,23 @@ export default function CategoriesPage({
           ))}
         </div>
 
+        {/* 🆕 FASE 3A - Mostrar error si hay */}
+        {error && (
+          <div style={{
+            marginTop: 16,
+            padding: "12px 14px",
+            borderRadius: 12,
+            background: isDark ? "rgba(239, 68, 68, 0.15)" : "rgba(225, 29, 72, 0.1)",
+            border: `1px solid ${isDark ? "rgba(239, 68, 68, 0.3)" : "rgba(225, 29, 72, 0.2)"}`,
+            color: isDark ? "#FF8A8A" : "#E11D48",
+            fontSize: 12,
+            fontWeight: 600,
+            textAlign: "center"
+          }}>
+            ⚠️ Error cargando categorías: {error}
+          </div>
+        )}
+
         <LoadingWrapper isLoading={isLoading} skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />} isDark={isDark}>
           {tab === "gastos" && (
             <div style={{ marginTop: 22 }}>
