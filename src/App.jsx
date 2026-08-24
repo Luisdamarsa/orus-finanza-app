@@ -545,6 +545,8 @@ function Dashboard() {
     pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts,
     transactions, categories, customBudgets, setCustomBudgets,
     isLoading, startLoading, stopLoading,
+    // 🆕 FASE 3A - Loading states de Supabase
+    txLoading, txError, catLoading, catError,
     editingCategoryId, editingCategoryName, editingPillarId,
     startCategoryEditing, resetCategoryEditing,
     editingTransactionId, selectedTransactionForEdit,
@@ -558,6 +560,8 @@ function Dashboard() {
     screen, isDark, t, setTheme,
     selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
     categories, customConcepts, txnActions, voicePrefill,
+    // 🆕 FASE 3A - Loading states de Supabase
+    txLoading, txError, catLoading, catError,
     editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
     showIncomes, setShowIncomes,
     selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,

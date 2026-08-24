@@ -34,6 +34,8 @@ export default function ScreenRouter({
   screen, isDark, t, setTheme,
   selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
   categories, customConcepts, txnActions, voicePrefill,
+  // 🆕 FASE 3A - Loading states de Supabase
+  txLoading, txError, catLoading, catError,
   editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
   showIncomes, setShowIncomes,
   selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
@@ -88,11 +90,13 @@ export default function ScreenRouter({
   }
 
   if (screen === "movimientos" && selectedPillarForMovements) {
-    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} showIncomes={showIncomes} />;
+    // 🆕 FASE 3A - Pasar txLoading, txError
+    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} txLoading={txLoading} txError={txError} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} showIncomes={showIncomes} />;
   }
 
   if (screen === "categories") {
-    return <CategoriesScreen isDark={isDark} t={t} categories={categories} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} categoriesTab={categoriesTab} setCategoriesTab={setCategoriesTab} />;
+    // 🆕 FASE 3A - Pasar catLoading, catError
+    return <CategoriesScreen isDark={isDark} t={t} categories={categories} catLoading={catLoading} catError={catError} setScreen={setScreen} resetCategoryEditing={resetCategoryEditing} startCategoryEditing={startCategoryEditing} categoriesTab={categoriesTab} setCategoriesTab={setCategoriesTab} />;
   }
 
   if (screen === "add-category") {

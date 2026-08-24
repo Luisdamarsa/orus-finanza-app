@@ -15,6 +15,9 @@ export default function CategoriesPage({
   categories = {},
   tab = "gastos",
   setTab,
+  // 🆕 FASE 3A - Loading state desde Supabase
+  isLoading = false,
+  error = null,
 }) {
   const { isDark } = useTheme();
   const tokens = isDark ? DARK : LIGHT;
@@ -41,7 +44,6 @@ export default function CategoriesPage({
   const pressAdd = usePress();
   const [pressingCategoryId, setPressingCategoryId] = useState(null);
   const incomeCategories = categories["ingreso"] || [];
-  const [isLoading] = useState(false);
 
   return (
     <>

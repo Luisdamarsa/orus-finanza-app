@@ -4,8 +4,9 @@ import { getCategoryName } from "../utils/categoryUtils";
 
 /**
  * CategoriesScreen.jsx — pantalla de Categorías (RS-5). Extraída de App.jsx.
+ * 🆕 FASE 3A - Recibe catLoading, catError de Supabase
  */
-export default function CategoriesScreen({ isDark, t, categories, setScreen, resetCategoryEditing, startCategoryEditing, categoriesTab, setCategoriesTab }) {
+export default function CategoriesScreen({ isDark, t, categories, catLoading, catError, setScreen, resetCategoryEditing, startCategoryEditing, categoriesTab, setCategoriesTab }) {
   return (
     <ScreenShell bg={t.bg}>
       <CategoriesPage
@@ -13,6 +14,8 @@ export default function CategoriesScreen({ isDark, t, categories, setScreen, res
         onBack={() => setScreen("settings")}
         tab={categoriesTab}
         setTab={setCategoriesTab}
+        isLoading={catLoading}
+        error={catError}
         onAddCategory={(isIncome) => {
           // income → marca el contexto con editingPillarId "ingreso" (sigue siendo "crear", sin nombre)
           if (isIncome) startCategoryEditing(null, null, "ingreso");
