@@ -1,66 +1,91 @@
-import { DUMMY_TRANSACTIONS } from "../constants";
+import { supabase } from './supabaseService';
 
 /**
- * transactionService.js - Capa de datos de transacciones.
- *
- * HOY: transformaciones puras sobre el arreglo + persistencia en localStorage.
- * MAÑANA: este es el único archivo que cambia — cada función se vuelve una
- * llamada async a la API/Supabase (getAll/create/update/delete), scopeada por
- * usuario/workspace. El hook (useTransactions) no se entera.
- *
- * FASE 1.3 — capa de datos de transacciones.
+ * transactionService.js - REFACTORIZADO para Supabase
+ * 
+ * Ahora TODAS las funciones usan Supabase en lugar de localStorage
  */
-const STORAGE_KEY = "orus_transactions";
 
-/** Semilla inicial (TODAS las transacciones). Mañana: `async getAll(userId)`. */
-export function getInitialTransactions() {
-  return DUMMY_TRANSACTIONS;
+// ✅ Obtener TODAS las transacciones del usuario
+export async function getTransactionsByUser(userId) {
+  if (!userId) return [];
+  
+  const { data, error } = await supabase
+    .from('transacciones')
+    .select('*')
+    .eq('user_id', userId)
+    .order('date', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching transactions:', error);
+    return [];
+  }
+  return data || [];
 }
 
-/**
- * 🆕 FASE 2 - Filtra transacciones por userId.
- * Solo devuelve transacciones que pertenecen al usuario logueado.
- * Entrada: transacciones + userId
- * Salida: array de transacciones del usuario
- */
-export function getTransactionsByUser(transactions, userId) {
-  if (!userId) return []; // Si no hay userId, no devolver nada
-  return transactions.filter((tx) => tx.userId === userId);
+// ✅ Crear nueva transacción
+export async function addTransaction(userId, txData) {
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from('transacciones')
+    .insert([
+      {
+        user_id: userId,
+        date: txData.date,
+        time: txData.time,
+        description: txData.description,
+        amount: txData.amount,
+        pillar: txData.pillar,
+        category: txData.category,
+        method: txData.method,
+      }
+    ])
+    .select();
+
+  if (error) {
+    console.error('Error adding transaction:', error);
+    return null;
+  }
+  return data?.[0] || null;
 }
 
-/** Agrega una transacción generando un id nuevo. Devuelve el arreglo nuevo. */
-export function addTransaction(transactions, txData) {
-  const id = Math.max(...transactions.map((t) => t.id || 0), 0) + 1;
-  return [...transactions, { ...txData, id }];
+// ✅ Editar transacción
+export async function editTransaction(transactionId, updates) {
+  const { data, error } = await supabase
+    .from('transacciones')
+    .update(updates)
+    .eq('id', transactionId)
+    .select();
+
+  if (error) {
+    console.error('Error editing transaction:', error);
+    return null;
+  }
+  return data?.[0] || null;
 }
 
-/** Edita una transacción manteniendo id, fecha y hora. Devuelve el arreglo nuevo. */
-export function editTransaction(transactions, id, updatedData) {
-  const i = transactions.findIndex((tx) => tx.id === id);
-  if (i === -1) return transactions;
-  const copy = [...transactions];
-  copy[i] = {
-    ...transactions[i],
-    ...updatedData,
-    id: transactions[i].id,     // mantener ID
-    date: transactions[i].date, // mantener fecha
-    time: transactions[i].time, // mantener hora
-  };
-  return copy;
+// ✅ Eliminar transacción
+export async function deleteTransaction(transactionId) {
+  const { error } = await supabase
+    .from('transacciones')
+    .delete()
+    .eq('id', transactionId);
+
+  if (error) {
+    console.error('Error deleting transaction:', error);
+    return false;
+  }
+  return true;
 }
 
-/** Elimina una transacción por id. Devuelve el arreglo nuevo. */
-export function removeTransaction(transactions, id) {
-  return transactions.filter((tx) => tx.id !== id);
-}
-
-/** Persiste el arreglo. Mañana: escritura a la API. */
+// ✅ Guardar en localStorage (ya no se usa, pero lo dejamos por ahora)
 export function saveToStorage(transactions) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  // Ya no guardamos en localStorage, Supabase es la fuente de verdad
+  console.log('💾 Datos guardados en Supabase automáticamente');
 }
 
-/** Lee el arreglo persistido (o null). Mañana: lectura desde la API. */
+// ✅ Cargar desde localStorage (compatibilidad legacy)
 export function loadFromStorage() {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : null;
+  return null; // Ya no usamos localStorage
 }
