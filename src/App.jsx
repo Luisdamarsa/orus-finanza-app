@@ -188,8 +188,11 @@ function Dashboard() {
     addTransaction: addTx,
     editTransaction: applyEditTx,
     deleteTransaction: removeTx,
+    isLoading: txLoading,
+    error: txError,
     loadTransactions,
   } = useTransactions(currentUserId); // 🆕 FASE 2: Pasar userId para filtrar transacciones
+  // 🆕 FASE 3A: Ahora addTx, applyEditTx, removeTx son async
 
   // 🆕 Console logs para debugging FASE 2 (DESPUÉS de useTransactions)
   useEffect(() => {
@@ -207,7 +210,8 @@ function Dashboard() {
 
   // 🆕 Categorías: toda la lógica (crear/reutilizar/editar/borrar/varios) vive en el hook.
   // 🆕 FASE 2: Pasar userId para filtrar categorías por usuario
-  const { categories, createCategory, getOrCreateCategory, ensureVariosCategory, editCategory, deleteCategory } = useCategories(currentUserId);
+  // 🆕 FASE 3A: Ahora createCategory, editCategory, deleteCategory son async
+  const { categories, createCategory, getOrCreateCategory, ensureVariosCategory, editCategory, deleteCategory, isLoading: catLoading, error: catError } = useCategories(currentUserId);
   // 🆕 Inicia con el último mes que tiene datos (sin hardcodear)
   // 🆕 Filtro de Gastado/Ingresos
   // 🆕 Rastrear cómo se abrió Estado 2 (por cuál "puerta")
@@ -314,16 +318,25 @@ function Dashboard() {
   };
 
   // 🆕 FUNCIONES CRUD PARA TRANSACCIONES
-  const editTransaction = (transactionId, updatedData) => {
-    applyEditTx(transactionId, updatedData);
-    resetTransactionEditing();
-    console.log("✅ Transacción editada:", transactionId);
+  // 🆕 FASE 3A: Ahora son async para esperar a Supabase
+  const editTransaction = async (transactionId, updatedData) => {
+    try {
+      await applyEditTx(transactionId, updatedData);
+      resetTransactionEditing();
+      console.log("✅ Transacción editada:", transactionId);
+    } catch (err) {
+      console.error("❌ Error editando transacción:", err);
+    }
   };
 
-  const deleteTransaction = (transactionId) => {
-    removeTx(transactionId);
-    resetTransactionEditing();
-    console.log("✅ Transacción eliminada:", transactionId);
+  const deleteTransaction = async (transactionId) => {
+    try {
+      await removeTx(transactionId);
+      resetTransactionEditing();
+      console.log("✅ Transacción eliminada:", transactionId);
+    } catch (err) {
+      console.error("❌ Error eliminando transacción:", err);
+    }
   };
 
   // 🆕 Refs para medir alturas dinámicamente
