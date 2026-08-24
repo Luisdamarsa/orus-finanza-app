@@ -8,6 +8,8 @@ import CategoryProgressBar from "./CategoryProgressBar";
 import ProgressBar from "./ProgressBar";
 import ErrorBoundary from "./ErrorBoundary";
 import BackButton from "./BackButton";
+import LoadingWrapper from "./LoadingWrapper";
+import { MenuListSkeleton } from "./LoadingSkeleton";
 import { getCategoryName } from "../utils/categoryUtils";
 import { getAttributeAtDate } from "../services/attributeHistoryService";
 import { getOverBudgetColor as getOverBudgetColorSvc } from "../services/colorService";
@@ -25,6 +27,9 @@ export default function MovimientosPage({
   onBack,
   pilar,
   transactions,
+  // 🆕 FASE 3A - Loading state desde Supabase
+  isLoading = false,
+  error = null,
   selectedPeriod,
   onEditTransaction, // 🆕 Callback para editar transacción
   showIncomes, // 🆕 FASE 2 - Si debe incluir saldo en el denominador
@@ -283,6 +288,23 @@ export default function MovimientosPage({
           boxSizing: "border-box",
         }}>
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
+
+        {/* 🆕 FASE 3A - Mostrar error si hay */}
+        {error && (
+          <div style={{
+            marginTop: 16,
+            padding: "12px 14px",
+            borderRadius: 12,
+            background: isDark ? "rgba(239, 68, 68, 0.15)" : "rgba(225, 29, 72, 0.1)",
+            border: `1px solid ${isDark ? "rgba(239, 68, 68, 0.3)" : "rgba(225, 29, 72, 0.2)"}`,
+            color: isDark ? "#FF8A8A" : "#E11D48",
+            fontSize: 12,
+            fontWeight: 600,
+            textAlign: "center"
+          }}>
+            ⚠️ Error cargando transacciones: {error}
+          </div>
+        )}
 
         {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
         {Object.keys(categorySpent).length > 0 && (
