@@ -1,64 +1,91 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as transactionService from "../services/transactionService";
 
 /**
- * useTransactions.js - Hook de DATOS de transacciones (contrato completo).
- *
- * A diferencia de los hooks de UI (edición/navegación), este sí lleva el
- * contrato de datos completo:
- *   { transactions, isLoading, error,
- *     addTransaction, editTransaction, deleteTransaction, loadTransactions }
- *
- * - Datos vía transactionService (hoy localStorage, mañana API/Supabase).
- * - isLoading/error expuestos desde ya → el día del backend, gratis.
- * - Acciones verbo-based, async-tolerant (no exponen setTransactions crudo).
- *
- * 🆕 FASE 2 - Soporte para userId:
- * - Si se pasa userId, filtra automáticamente las transacciones de ese usuario.
- * - Si NO se pasa userId, devuelve todas (para compatibilidad).
+ * useTransactions.js - REFACTORIZADO para Supabase
+ * 
+ * Ahora carga transacciones desde Supabase en lugar de localStorage
  */
+
 export function useTransactions(userId) {
-  const [allTransactions, setAllTransactions] = useState(() =>
-    transactionService.getInitialTransactions()
-  );
-  const [isLoading] = useState(false);
-  const [error] = useState(null);
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // 🆕 Filtrar por userId si se proporciona
-  const transactions = useMemo(() => {
-    if (userId) {
-      return transactionService.getTransactionsByUser(allTransactions, userId);
-    }
-    return allTransactions; // Compatibilidad: si no hay userId, devolver todas
-  }, [allTransactions, userId]);
-
-  // Persistir en cada cambio (hoy localStorage, mañana API/Supabase).
+  // 🆕 Cargar transacciones del usuario desde Supabase
   useEffect(() => {
-    transactionService.saveToStorage(allTransactions);
-  }, [allTransactions]);
+    if (!userId) {
+      setAllTransactions([]);
+      return;
+    }
 
-  // 🆕 Al agregar transacción, agregar userId automáticamente
-  const addTransaction = (txData) => {
-    const txWithUserId = userId ? { ...txData, userId } : txData;
-    setAllTransactions((prev) => transactionService.addTransaction(prev, txWithUserId));
-  };
+    const loadTransactions = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const txs = await transactionService.getTransactionsByUser(userId);
+        setAllTransactions(txs);
+        console.log(`📦 Cargadas ${txs.length} transacciones de ${userId}`);
+      } catch (err) {
+        console.error('Error loading transactions:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const editTransaction = (id, updatedData) =>
-    setAllTransactions((prev) => transactionService.editTransaction(prev, id, updatedData));
+    loadTransactions();
+  }, [userId]);
 
-  const deleteTransaction = (id) =>
-    setAllTransactions((prev) => transactionService.removeTransaction(prev, id));
+  // 🆕 Agregar transacción a Supabase
+  const addTransaction = useCallback(async (txData) => {
+    if (!userId) return;
+    try {
+      const newTx = await transactionService.addTransaction(userId, txData);
+      if (newTx) {
+        setAllTransactions(prev => [newTx, ...prev]);
+      }
+    } catch (err) {
+      console.error('Error adding transaction:', err);
+      setError(err.message);
+    }
+  }, [userId]);
 
-  // Rehidratar desde persistencia (usado por el arranque DEV).
-  const loadTransactions = (list) => setAllTransactions(list);
+  // 🆕 Editar transacción en Supabase
+  const editTransaction = useCallback(async (id, updatedData) => {
+    try {
+      const updated = await transactionService.editTransaction(id, updatedData);
+      if (updated) {
+        setAllTransactions(prev =>
+          prev.map(tx => tx.id === id ? updated : tx)
+        );
+      }
+    } catch (err) {
+      console.error('Error editing transaction:', err);
+      setError(err.message);
+    }
+  }, []);
+
+  // 🆕 Eliminar transacción de Supabase
+  const deleteTransaction = useCallback(async (id) => {
+    try {
+      const success = await transactionService.deleteTransaction(id);
+      if (success) {
+        setAllTransactions(prev => prev.filter(tx => tx.id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+      setError(err.message);
+    }
+  }, []);
 
   return {
-    transactions, // 🆕 Transacciones filtradas por userId (o todas si no hay userId)
+    transactions: allTransactions,
     isLoading,
     error,
     addTransaction,
     editTransaction,
     deleteTransaction,
-    loadTransactions,
+    loadTransactions: () => {} // Legacy compatibility
   };
 }
