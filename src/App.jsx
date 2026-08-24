@@ -277,9 +277,9 @@ function Dashboard() {
     };
   }, []);
 
-  // 🆕 FASE 2 - Presupuestos aislados por usuario
-  // Actualiza customBudgets[userId][mes/año][pillarId] para cada usuario
-  const editPillarBudget = (pillarId, newBudget) => {
+  // 🆕 FASE 3B - Presupuestos aislados por usuario + persistencia en Supabase
+  // Ahora es async y persiste en Supabase
+  const editPillarBudget = async (pillarId, newBudget) => {
     console.log(`\n🔧 editPillarBudget INICIO:`, { pillarId, newBudget, currentUserId, selectedPeriod });
 
     if (!currentUserId) {
@@ -293,24 +293,38 @@ function Dashboard() {
 
     const month = selectedPeriod.month || new Date().getMonth() + 1;
     const year = selectedPeriod.year || new Date().getFullYear();
-    const key = `${year}-${String(month).padStart(2, '0')}`;
+    const monthYear = `${year}-${String(month).padStart(2, '0')}`;
+    const key = monthYear;
 
-    console.log(`  ✅ Guardando: ${currentUserId}[${key}][${pillarId}] = ${newBudget}`);
+    console.log(`  ✅ Guardando en Supabase: ${currentUserId}[${key}][${pillarId}] = ${newBudget}`);
 
-    setCustomBudgets(prev => {
-      const updated = {
-        ...prev,
-        [currentUserId]: {
-          ...prev[currentUserId],
-          [key]: {
-            ...prev[currentUserId]?.[key],
-            [pillarId]: newBudget
-          }
-        }
-      };
-      console.log(`  Nuevo estado:`, updated);
-      return updated;
-    });
+    try {
+      // 🆕 Importar y usar budgetService para persistir en Supabase
+      const { default: budgetService } = await import('./services/budgetService');
+      const success = await budgetService.setPillarBudget(currentUserId, pillarId, monthYear, newBudget);
+
+      if (success) {
+        // Actualizar estado local DESPUÉS de guardar en Supabase
+        setCustomBudgets(prev => {
+          const updated = {
+            ...prev,
+            [currentUserId]: {
+              ...prev[currentUserId],
+              [key]: {
+                ...prev[currentUserId]?.[key],
+                [pillarId]: newBudget
+              }
+            }
+          };
+          console.log(`  ✅ Presupuesto guardado en Supabase y estado local actualizado`);
+          return updated;
+        });
+      } else {
+        console.error(`  ❌ Error guardando en Supabase`);
+      }
+    } catch (err) {
+      console.error(`  ❌ Error:`, err);
+    }
   };
 
   // 🆕 FASE 3B: editCategoryBudget ahora es async (setCategoryBudget es async)
