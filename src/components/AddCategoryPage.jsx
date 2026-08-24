@@ -117,7 +117,8 @@ export default function AddCategoryPage({
     return newName;
   };
 
-  const handleSave = () => {
+  // 🆕 FASE 3A: handleSave ahora es async (onSave es async)
+  const handleSave = async () => {
     if (!canSave) return;
 
     const finalName = isEditing ? description.trim() : getDeduplicatedName(description);
@@ -125,7 +126,7 @@ export default function AddCategoryPage({
     const pillarToSave = isIncome ? "ingreso" : (selectedPillar || "varios");
 
     try {
-      onSave(pillarToSave, finalName);
+      await onSave(pillarToSave, finalName);
 
       // 🆕 Mostrar popup de éxito usando el servicio
       if (isEditing) {
@@ -139,11 +140,12 @@ export default function AddCategoryPage({
     }
   };
 
-  const handleDelete = () => {
+  // 🆕 FASE 3A: handleDelete ahora es async (onDelete es async)
+  const handleDelete = async () => {
     if (isEditing && onDelete) {
       try {
         // Eliminar directamente sin confirmación
-        onDelete();
+        await onDelete();
         // 🆕 Mostrar popup de éxito usando el servicio
         popup.showDeletePopup('Categoría');
       } catch (err) {

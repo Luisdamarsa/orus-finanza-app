@@ -18,21 +18,30 @@ export default function AddCategoryScreen({
         isEditing={editingCategoryName !== null}
         editingCategoryName={editingCategoryName}
         editingPillarId={editingPillarId}
-        onSave={(pillarId, categoryName) => {
-          if (editingCategoryId) {
-            editCategory(editingCategoryId, { name: categoryName, pillar: pillarId });
-          } else {
-            createCategory(pillarId, categoryName);
+        // 🆕 FASE 3A: onSave y onDelete ahora son async (editCategory, createCategory, deleteCategory son async)
+        onSave={async (pillarId, categoryName) => {
+          try {
+            if (editingCategoryId) {
+              await editCategory(editingCategoryId, { name: categoryName, pillar: pillarId });
+            } else {
+              await createCategory(pillarId, categoryName);
+            }
+            setScreen("categories");
+            resetCategoryEditing();
+          } catch (err) {
+            console.error("❌ Error saving category:", err);
           }
-          setScreen("categories");
-          resetCategoryEditing();
         }}
-        onDelete={() => {
-          if (editingCategoryId) {
-            deleteCategory(editingCategoryId);
+        onDelete={async () => {
+          try {
+            if (editingCategoryId) {
+              await deleteCategory(editingCategoryId);
+            }
+            setScreen("categories");
+            resetCategoryEditing();
+          } catch (err) {
+            console.error("❌ Error deleting category:", err);
           }
-          setScreen("categories");
-          resetCategoryEditing();
         }}
       />
     </ScreenShell>
