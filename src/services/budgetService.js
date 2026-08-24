@@ -150,7 +150,14 @@ export async function getCategoryBudgetsForUser(userId) {
  * Establecer presupuesto de categoría (crea o actualiza)
  */
 export async function setCategoryBudget(userId, categoryId, amount) {
-  if (!userId) return false;
+  if (!userId || !categoryId) return false;
+
+  // 🆕 Validar que amount sea un número válido
+  const numAmount = parseInt(amount) || 0;
+  if (numAmount < 0) {
+    console.warn(`❌ Presupuesto negativo no permitido: ${numAmount}`);
+    return false;
+  }
 
   // 1. Obtener valor anterior (para historial)
   const oldData = await supabase
@@ -169,7 +176,7 @@ export async function setCategoryBudget(userId, categoryId, amount) {
       {
         user_id: userId,
         category_id: categoryId,
-        amount,
+        amount: numAmount,  // 🆕 Asegurar que es un número válido
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,category_id' }
@@ -181,9 +188,11 @@ export async function setCategoryBudget(userId, categoryId, amount) {
     return false;
   }
 
+  console.log(`✅ Presupuesto categoría guardado: ${categoryId}=${numAmount}`);
+
   // 3. Agregar al historial (si cambió)
-  if (oldAmount !== amount) {
-    await addBudgetHistory(userId, 'category', categoryId, 'amount', oldAmount, amount);
+  if (oldAmount !== numAmount) {
+    await addBudgetHistory(userId, 'category', categoryId, 'amount', oldAmount, numAmount);
   }
 
   return true;
