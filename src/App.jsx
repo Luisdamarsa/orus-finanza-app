@@ -20,6 +20,8 @@ import { useTransactionToast } from "./hooks/useTransactionToast";
 import ScreenRouter from "./components/ScreenRouter";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
+// 🆕 FASE 3B - Importar budgetService para presupuestos
+import * as budgetService from "./services/budgetService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
 
 // Imports desde los nuevos módulos organizados
@@ -299,8 +301,7 @@ function Dashboard() {
     console.log(`  ✅ Guardando en Supabase: ${currentUserId}[${key}][${pillarId}] = ${newBudget}`);
 
     try {
-      // 🆕 Importar y usar budgetService para persistir en Supabase
-      const { default: budgetService } = await import('./services/budgetService');
+      // 🆕 Usar budgetService para persistir en Supabase
       const success = await budgetService.setPillarBudget(currentUserId, pillarId, monthYear, newBudget);
 
       if (success) {
