@@ -39,6 +39,8 @@ export default function BudgetsScreen({
           }
         }))}
         onSaveSuccess={() => setScreen("settings")}
+        // 🆕 FASE 3B - Pasar currentUserId para setCategoryBudget
+        currentUserId={currentUserId}
       />
     </ScreenShell>
   );

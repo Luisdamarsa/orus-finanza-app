@@ -93,14 +93,30 @@ export function softDeleteCategory(categoryId) {
 
 /**
  * Actualiza el presupuesto de una categoría (con historial).
+ * 🆕 FASE 3B: Ahora async, persiste en Supabase
  */
-export function setCategoryBudget(categoryId, newBudget) {
+export async function setCategoryBudget(categoryId, newBudget, userId) {
+  // Versión en memoria (para compatibilidad)
   const category = ALL_CATS.find((cat) => cat.id === categoryId);
-  if (!category) return;
+  if (!category) return false;
+
+  // Actualizar en Supabase si userId está disponible
+  if (userId) {
+    try {
+      const { budgetService } = await import('./budgetService');
+      return await budgetService.setCategoryBudget(userId, categoryId, newBudget);
+    } catch (err) {
+      console.error("Error updating budget in Supabase:", err);
+      // Fallback: actualizar en memoria si falla Supabase
+    }
+  }
+
+  // Fallback: actualizar en memoria (si no hay userId o falla Supabase)
   if (newBudget !== category.budget) {
     addHistoryEntry(category, "budget", category.budget, newBudget);
     category.budget = newBudget;
   }
+  return true;
 }
 
 /**

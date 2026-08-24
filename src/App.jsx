@@ -313,8 +313,14 @@ function Dashboard() {
     });
   };
 
-  const editCategoryBudget = (categoryId, newBudget) => {
-    catalog.setCategoryBudget(categoryId, newBudget);
+  // 🆕 FASE 3B: editCategoryBudget ahora es async (setCategoryBudget es async)
+  const editCategoryBudget = async (categoryId, newBudget) => {
+    try {
+      await catalog.setCategoryBudget(categoryId, newBudget, currentUserId);
+      console.log(`✅ Categoría presupuesto actualizado: ${categoryId}=${newBudget}`);
+    } catch (err) {
+      console.error("Error updating category budget:", err);
+    }
   };
 
   // 🆕 FUNCIONES CRUD PARA TRANSACCIONES

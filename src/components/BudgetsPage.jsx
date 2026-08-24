@@ -17,6 +17,8 @@ export default function BudgetsPage({
   categories: categoriesFromProps,
   editPillarBudget,
   editCategoryBudget,
+  // 🆕 FASE 3B - Necesario para pasar a setCategoryBudget
+  currentUserId,
 }) {
   const { isDark } = useTheme();
   const popup = usePopup();
@@ -129,7 +131,8 @@ export default function BudgetsPage({
     return formattedInteger;
   };
 
-  const handleSave = () => {
+  // 🆕 FASE 3B: handleSave ahora es async (setCategoryBudget es async)
+  const handleSave = async () => {
     console.log(`\n🔴 BudgetsPage.handleSave() INICIO`);
     console.log(`  editPillarBudget: ${typeof editPillarBudget}`);
     console.log(`  editedBudgets:`, editedBudgets);
@@ -152,15 +155,16 @@ export default function BudgetsPage({
         console.log(`  ❌ NO editPillarBudget`);
       }
 
-      // Guardar cambios de categorías
+      // Guardar cambios de categorías (FASE 3B: ahora async)
       if (editCategoryBudget) {
-        Object.entries(categoryBudgets).forEach(([catId, newBudget]) => {
+        for (const [catId, newBudget] of Object.entries(categoryBudgets)) {
           const currentCategory = ALL_CATS.find(c => c.id === catId);
           const oldBudget = currentCategory?.budget || 0;
           if (oldBudget !== newBudget) {
-            editCategoryBudget(catId, newBudget);
+            // 🆕 Ahora editCategoryBudget es async y recibe currentUserId
+            await editCategoryBudget(catId, newBudget);
           }
-        });
+        }
       }
 
       // Guardar cambio del toggle de alertas
