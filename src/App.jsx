@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 // 🆕 Importar PopupProvider
@@ -7,6 +7,9 @@ import { PopupProvider } from "./services/PopupService";
 // 🆕 Importar ThemeProvider y useTheme
 import { ThemeProvider } from "./context/ThemeContext";
 import { useTheme } from "./hooks/useTheme";
+
+// 🆕 FASE 3C - Importar CategoryHistoryProvider
+import { CategoryHistoryProvider } from "./context/CategoryHistoryContext";
 
 // 🆕 Importar hooks
 import { useAuth } from "./hooks/useAuth";
@@ -17,12 +20,16 @@ import { useDashboardFilters } from "./hooks/useDashboardFilters";
 import { useDashboardNavigation } from "./hooks/useDashboardNavigation";
 import { useTransactions } from "./hooks/useTransactions";
 import { useTransactionToast } from "./hooks/useTransactionToast";
+import { useUserCategories } from "./hooks/useUserCategories"; // 🆕 FASE 3C - categoryMap
 import ScreenRouter from "./components/ScreenRouter";
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 // 🆕 FASE 3B - Importar budgetService para presupuestos
 import * as budgetService from "./services/budgetService";
 import { usePillarBudgets } from "./hooks/usePillarBudgets";
+import { useCategoryBudgets } from "./hooks/useCategoryBudgets"; // 🆕 FASE 3B - Presupuestos de categorías
+// 🆕 Importar servicio de usuarios
+import { getAllUsers, getUserPreferences, saveUserPreferences } from "./services/userService";
 
 // Imports desde los nuevos módulos organizados
 import {
@@ -102,6 +109,11 @@ function Dashboard() {
     showIncomes, setShowIncomes,
   } = useDashboardNavigation();
 
+  // ✅ FASE LOGIN - Leer userId desde localStorage PRIMERO (antes de usarlo en useEffect)
+  const [currentUserId, setCurrentUserId] = useState(() => {
+    return localStorage.getItem("currentUserId") || null;
+  });
+
   // 🆕 Rastrear pantalla anterior para navegación correcta (ej. Permisos → volver a Automatizaciones, no a Configuración)
   // Solo registra pantallas "principales", no pantallas hijas/modales (permissions, privacy-perms, terms, etc.)
   const [previousScreen, setPreviousScreen] = useState(null);
@@ -111,6 +123,42 @@ function Dashboard() {
       setPreviousScreen(screen);
     }
   }, [screen, previousScreen]);
+
+  // ✅ FASE LOGIN - Sincronizar currentUserId con localStorage CONSTANTEMENTE
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("currentUserId");
+    if (storedUserId && storedUserId !== currentUserId) {
+      setCurrentUserId(storedUserId);
+    }
+  }, [screen]);
+
+  // 🆕 Sincronizar localStorage constantemente (para login/logout)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const storedUserId = localStorage.getItem("currentUserId");
+      if (storedUserId !== currentUserId) {
+        setCurrentUserId(storedUserId);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [currentUserId]);
+
+  // ✅ FASE LOGIN - Validar si hay usuario logueado
+  // Si no hay userId en localStorage, forzar pantalla de login
+  useEffect(() => {
+    if (!currentUserId && screen !== "login" && screen !== "signup" && screen !== "forgot-password" && screen !== "about-login") {
+      setScreen("login");
+    }
+  }, [currentUserId, screen, setScreen]);
+
+  // 🆕 Limpiar localStorage de currentUserId al iniciar si está en login
+  useEffect(() => {
+    if (screen === "login") {
+      localStorage.removeItem("currentUserId");
+      localStorage.removeItem("currentUserEmail");
+      setCurrentUserId(null);
+    }
+  }, [screen]);
 
   // 🆕 Memoizar función de toggle para el donut
   const handleSelectPillar = useCallback((id) => {
@@ -125,30 +173,75 @@ function Dashboard() {
   const [voicePrefill, setVoicePrefill] = useState(null);
   // 🆕 Tab de la página de Categorías ("gastos" | "ingresos"); persiste al ir/volver de crear categoría
   const [categoriesTab, setCategoriesTab] = useState("gastos");
-  // 🆕 Estados de Automatizaciones (persistidos en userStorage)
-  const [microphoneEnabled, setMicrophoneEnabled] = useState(() => userStorage.get("microphoneEnabled") !== false);
-  const [notificationListenerEnabled, setNotificationListenerEnabled] = useState(() => userStorage.get("notificationListenerEnabled") === true);
-  const [iosShortcutsEnabled, setIosShortcutsEnabled] = useState(() => userStorage.get("iosShortcutsEnabled") === true);
-  // Guardar cambios en userStorage
+  // 🆕 FASE 3D - Estados de preferencias (se cargan desde BD en useEffect, después del login)
+  // Defaults: microphoneEnabled=true, notificationListenerEnabled=false, iosShortcutsEnabled=false, pushNotificationsEnabled=false
+  const [microphoneEnabled, setMicrophoneEnabled] = useState(true);
+  const [notificationListenerEnabled, setNotificationListenerEnabled] = useState(false);
+  const [pushNotificationsEnabled, setPushNotificationsEnabled] = useState(false); // 🆕 Para notificaciones push de ORUS
+  const [iosShortcutsEnabled, setIosShortcutsEnabled] = useState(false);
+  // 🆕 FASE 3D - Guardar cambios en userStorage Y Supabase
   const handleSetMicrophoneEnabled = (value) => {
     setMicrophoneEnabled(value);
     userStorage.set("microphoneEnabled", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { microphoneenabled: value });
+    }
   };
   const handleSetNotificationListenerEnabled = (value) => {
     setNotificationListenerEnabled(value);
     userStorage.set("notificationListenerEnabled", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { notificationlistenerenabled: value });
+    }
+  };
+
+  // 🆕 FASE 3D - Handler para notificaciones push (ORUS)
+  const handleSetPushNotificationsEnabled = (value) => {
+    setPushNotificationsEnabled(value);
+    userStorage.set("pushNotificationsEnabled", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { push_notifications_enabled: value });
+    }
   };
   const handleSetIosShortcutsEnabled = (value) => {
     setIosShortcutsEnabled(value);
     userStorage.set("iosShortcutsEnabled", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { iosshortcutsenabled: value });
+    }
   };
+
+  // 🆕 FASE 3D - Wrapper para setShowIncomes que guarda en BD
+  const handleSetShowIncomes = (value) => {
+    setShowIncomes(value);
+    userStorage.set("showIncomes", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { show_incomes: value });
+    }
+  };
+
+  // 🆕 FASE 3D - Wrapper para setIsDark que guarda en BD
+  const handleSetIsDark = (value) => {
+    setIsDark(value);
+    userStorage.set("isDark", value);
+    // Guardar en Supabase si hay usuario logueado
+    if (currentUserId) {
+      saveUserPreferences(currentUserId, { isdark: value });
+    }
+  };
+
   // Función para abrir Configuración → Accesibilidad
   const onOpenAccessibilitySettings = () => {
     if (window.Capacitor) {
       window.Capacitor.Plugins.App.openUrl?.({
         url: "android://settings/accessibility"
       }).catch(() => {
-        console.log("No se puede abrir Settings (dev mode)");
+        // Settings no disponible en dev mode
       });
     }
   };
@@ -161,27 +254,92 @@ function Dashboard() {
   // Obtener el usuario actual logueado y extraer su ID para filtrar transacciones
   const { user: authUser } = useAuth();
 
-  // 🆕 PASO 6 - Selector de usuario para testing (DEV ONLY)
-  // Permite cambiar entre los 3 usuarios para verificar el filtrado
-  const [devSelectedUserId, setDevSelectedUserId] = useState(null); // null = usar useAuth, no-null = forzar user
-  const MOCK_USER_OPTIONS = [
-    { id: "UA0001", name: "Luis Daniel (237 transacciones)" },
-    { id: "UB0002", name: "María García (55 transacciones)" },
-    { id: "UC0003", name: "Carlos López (50 transacciones)" },
-  ];
+  // ✅ FASE LOGIN - currentUserId ya se declara arriba
+  const [supabaseUsers, setSupabaseUsers] = useState([]); // 🆕 Traer usuarios de Supabase dinámicamente
 
-  // Mapeo de usuarios mock
-  const MOCK_USERS_MAP = {
-    "UA0001": { id: "UA0001", username: "Luis Daniel", nombre: "Luis", apellido: "Daniel", email: "test@test.com", phone: "+57 3001111111" },
-    "UB0002": { id: "UB0002", username: "María García", nombre: "María", apellido: "García", email: "test1@example.com", phone: "+57 3002222222" },
-    "UC0003": { id: "UC0003", username: "Carlos López", nombre: "Carlos", apellido: "López", email: "test2@example.com", phone: "+57 3003333333" },
-  };
+  // 🆕 Cargar usuarios de Supabase automáticamente
+  useEffect(() => {
+    const loadSupabaseUsers = async () => {
+      const users = await getAllUsers();
 
-  // Si devSelectedUserId está set, usarlo; si no, usar authUser
-  const currentUserId = devSelectedUserId || authUser?.id || "UA0001";
+      if (users.length > 0) {
+        const userOptions = users.map(user => ({
+          id: user.id,
+          nombre: user.nombre || '',
+          apellido: user.apellido || '',
+          username: user.username || user.email?.split('@')[0] || 'Usuario',
+          email: user.email || '', // 🆕 FASE 3D - Agregar email
+          phone: user.phone || '' // 🆕 FASE 3D - Agregar teléfono
+        }));
+        setSupabaseUsers(userOptions);
+      }
+    };
 
-  // Crear currentUser basado en currentUserId (si devSelectedUserId está set, buscar en MOCK_USERS_MAP)
-  const currentUser = devSelectedUserId ? MOCK_USERS_MAP[devSelectedUserId] : authUser;
+    loadSupabaseUsers();
+  }, []);
+
+  // Crear opciones del dropdown desde usuarios de Supabase
+  const MOCK_USER_OPTIONS = supabaseUsers.map(user => ({
+    id: user.id,
+    name: `${user.username} (${user.nombre} ${user.apellido})`
+  }));
+
+  // Mapeo de usuarios desde Supabase
+  const MOCK_USERS_MAP = useMemo(() => {
+    const map = {};
+    supabaseUsers.forEach(user => {
+      map[user.id] = {
+        id: user.id,
+        username: user.username,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        phone: user.phone || ''
+      };
+    });
+    return map;
+  }, [supabaseUsers]);
+
+  // 🆕 FASE LOGIN - currentUserId ya se obtiene de localStorage
+
+  // 🆕 Crear currentUser desde supabaseUsers (basado en currentUserId de localStorage)
+  const currentUser = useMemo(() => {
+    if (currentUserId && supabaseUsers.length > 0) {
+      const user = supabaseUsers.find(u => u.id === currentUserId);
+      if (user) return user;
+    }
+    return null;
+  }, [currentUserId, supabaseUsers]);
+
+  // 🆕 FASE 3D - Cargar preferencias del usuario desde Supabase cuando cambia currentUserId
+  // También resetea selectedPeriod al mes actual en login
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    // Resetear periodo al mes actual en login
+    const today = new Date();
+    const newPeriod = {
+      month: today.getMonth() + 1,
+      year: today.getFullYear()
+    };
+    setSelectedPeriod(newPeriod);
+
+    const loadUserPreferences = async () => {
+      const prefs = await getUserPreferences(currentUserId);
+      if (prefs) {
+        // Actualizar estados locales desde BD
+        setMicrophoneEnabled(prefs.microphoneenabled !== false);
+        setNotificationListenerEnabled(prefs.notificationlistenerenabled === true);
+        setPushNotificationsEnabled(prefs.push_notifications_enabled === true); // 🆕 FASE 3D
+        setIosShortcutsEnabled(prefs.iosshortcutsenabled === true);
+        setShowIncomes(prefs.show_incomes === true);
+        setIsDark(prefs.isdark !== false);
+        // TODO: Aquí también podrías cargar idioma y moneda si lo necesitas
+      }
+    };
+
+    loadUserPreferences();
+  }, [currentUserId]);
 
   // 🆕 Pilar seleccionado para la página de movimientos
   const [customConcepts, setCustomConcepts] = useState([]);
@@ -196,24 +354,15 @@ function Dashboard() {
   } = useTransactions(currentUserId); // 🆕 FASE 2: Pasar userId para filtrar transacciones
   // 🆕 FASE 3A: Ahora addTx, applyEditTx, removeTx son async
 
-  // 🆕 Console logs para debugging FASE 2 (DESPUÉS de useTransactions)
-  useEffect(() => {
-    console.log(`\n🆕 FASE 2 - USUARIO ACTUAL: ${currentUserId} (${currentUser?.nombre})`);
-    console.log(`  Transacciones del usuario: ${transactions.length}`);
-
-    // Desglose de transacciones por pilar
-    const txByPillar = {};
-    transactions.forEach(tx => {
-      if (!txByPillar[tx.pillar]) txByPillar[tx.pillar] = 0;
-      txByPillar[tx.pillar]++;
-    });
-    console.log(`  Distribución: `, txByPillar);
-  }, [currentUserId, currentUser, transactions]);
 
   // 🆕 Categorías: toda la lógica (crear/reutilizar/editar/borrar/varios) vive en el hook.
   // 🆕 FASE 2: Pasar userId para filtrar categorías por usuario
   // 🆕 FASE 3A: Ahora createCategory, editCategory, deleteCategory son async
   const { categories, createCategory, getOrCreateCategory, ensureVariosCategory, editCategory, deleteCategory, isLoading: catLoading, error: catError } = useCategories(currentUserId);
+
+  // 🆕 FASE 3C - CategoryMap para mostrar nombres en pilares
+  const categoryMap = useUserCategories(currentUserId);
+
   // 🆕 Inicia con el último mes que tiene datos (sin hardcodear)
   // 🆕 Filtro de Gastado/Ingresos
   // 🆕 Rastrear cómo se abrió Estado 2 (por cuál "puerta")
@@ -221,10 +370,11 @@ function Dashboard() {
   // 🆕 FASE 2: Pasar userId para filtrar presupuestos por usuario
   const { customBudgets, setCustomBudgets } = usePillarBudgets(currentUserId);
 
-  // 🆕 DEBUG: Loguear presupuestos del usuario
-  useEffect(() => {
-    console.log(`\n💰 Presupuestos para ${currentUserId}:`, customBudgets[currentUserId] || {});
-  }, [currentUserId, customBudgets]);
+  // 🆕 FASE 3D - Presupuestos de categorías (MENSUALES como pilares)
+  // Construir monthYear a partir de selectedPeriod
+  const categoryBudgetsMonthYear = selectedPeriod ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}` : null;
+  const { categoryBudgets } = useCategoryBudgets(currentUserId, categoryBudgetsMonthYear);
+
 
   // 🆕 Estados de loading para diferentes secciones
   const { isLoading, startLoading, stopLoading } = useMultipleLoading({
@@ -282,59 +432,45 @@ function Dashboard() {
   // 🆕 FASE 3B - Presupuestos aislados por usuario + persistencia en Supabase
   // Ahora es async y persiste en Supabase
   const editPillarBudget = async (pillarId, newBudget) => {
-    console.log(`\n🔧 editPillarBudget INICIO:`, { pillarId, newBudget, currentUserId, selectedPeriod });
-
-    if (!currentUserId) {
-      console.log(`  ❌ NO currentUserId`);
-      return;
-    }
-    if (!selectedPeriod) {
-      console.log(`  ❌ NO selectedPeriod`);
-      return;
-    }
+    if (!currentUserId || !selectedPeriod) return;
 
     const month = selectedPeriod.month || new Date().getMonth() + 1;
     const year = selectedPeriod.year || new Date().getFullYear();
     const monthYear = `${year}-${String(month).padStart(2, '0')}`;
     const key = monthYear;
 
-    console.log(`  ✅ Guardando en Supabase: ${currentUserId}[${key}][${pillarId}] = ${newBudget}`);
-
     try {
-      // 🆕 Usar budgetService para persistir en Supabase
       const success = await budgetService.setPillarBudget(currentUserId, pillarId, monthYear, newBudget);
-
       if (success) {
-        // Actualizar estado local DESPUÉS de guardar en Supabase
-        setCustomBudgets(prev => {
-          const updated = {
-            ...prev,
-            [currentUserId]: {
-              ...prev[currentUserId],
-              [key]: {
-                ...prev[currentUserId]?.[key],
-                [pillarId]: newBudget
-              }
+        setCustomBudgets(prev => ({
+          ...prev,
+          [currentUserId]: {
+            ...prev[currentUserId],
+            [key]: {
+              ...prev[currentUserId]?.[key],
+              [pillarId]: newBudget
             }
-          };
-          console.log(`  ✅ Presupuesto guardado en Supabase y estado local actualizado`);
-          return updated;
-        });
-      } else {
-        console.error(`  ❌ Error guardando en Supabase`);
+          }
+        }));
       }
     } catch (err) {
-      console.error(`  ❌ Error:`, err);
     }
   };
 
   // 🆕 FASE 3B: editCategoryBudget ahora es async (setCategoryBudget es async)
+  // 🆕 FASE 3D: Pasar monthYear para presupuestos mensuales
   const editCategoryBudget = async (categoryId, newBudget) => {
     try {
-      await catalog.setCategoryBudget(categoryId, newBudget, currentUserId);
-      console.log(`✅ Categoría presupuesto actualizado: ${categoryId}=${newBudget}`);
+      if (!currentUserId || !selectedPeriod) {
+        throw new Error("Usuario o período no disponible");
+      }
+      const month = selectedPeriod.month || new Date().getMonth() + 1;
+      const year = selectedPeriod.year || new Date().getFullYear();
+      const monthYear = `${year}-${String(month).padStart(2, '0')}`;
+
+      await catalog.setCategoryBudget(categoryId, newBudget, currentUserId, monthYear);
     } catch (err) {
-      console.error("Error updating category budget:", err);
+      throw err; // 🆕 Relanzar el error para que BudgetsPage lo capture
     }
   };
 
@@ -344,9 +480,7 @@ function Dashboard() {
     try {
       await applyEditTx(transactionId, updatedData);
       resetTransactionEditing();
-      console.log("✅ Transacción editada:", transactionId);
     } catch (err) {
-      console.error("❌ Error editando transacción:", err);
     }
   };
 
@@ -354,9 +488,7 @@ function Dashboard() {
     try {
       await removeTx(transactionId);
       resetTransactionEditing();
-      console.log("✅ Transacción eliminada:", transactionId);
     } catch (err) {
-      console.error("❌ Error eliminando transacción:", err);
     }
   };
 
@@ -378,21 +510,14 @@ function Dashboard() {
   useEffect(() => {
     // 🔄 DEV VERSION: Limpiar datos de DEV al inicio de la sesión
     // Esto asegura que los cambios en Perfil (displayName, currency, idioma) no persistan
-    console.log("🧹 DEV: Limpiando datos DEV con prefijo 'orus_dev_'...");
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("orus_dev_") || key === "orus_custom_budgets" || key === "orus_pillar_budgets" || key === "orus_category_budgets") {
         localStorage.removeItem(key);
-        console.log(`🗑️ Limpiado: ${key}`);
       }
     });
 
     // 🔄 DEV VERSION: Siempre cargar datos dummy de desarrollo
-    console.log("📊 DEV: Cargando DUMMY_TRANSACTIONS al localStorage...");
     localStorage.setItem("orus_transactions", JSON.stringify(DUMMY_TRANSACTIONS));
-
-    // 🆕 FASE 2 - Verificar filtrado por userId
-    console.log(`🆕 FASE 2 - Usuario actual: ${currentUserId}`);
-    console.log(`🆕 FASE 2 - Transacciones cargadas para usuario: ${transactions.length}`);
 
     // Cargar transacciones desde localStorage si ya existen
     const isFirstLoad = !localStorage.getItem("orus_transactions");
@@ -403,7 +528,6 @@ function Dashboard() {
           loadTransactions(JSON.parse(stored));
         }
       } catch (e) {
-        console.error("Error loading transactions:", e);
       }
     }
 
@@ -543,10 +667,12 @@ function Dashboard() {
     setScreen, screen,
     ensureVariosCategory,
     getOrCreateCategory,
+    categories, // 🆕 FASE 3C - Para obtener nombres de categorías
   });
 
   // 🆕 HU-1: valor del contexto del Dashboard (estado + métricas). Se expande por HU.
-  const dashboard = {
+  // 🆕 FASE 3C - Usar useMemo para asegurar que dashboard se actualiza cuando categoryMap cambia
+  const dashboard = useMemo(() => ({
     newTxnToast,
     isDark, t, monthHasData, getBudgetForMonth,
     donutRef, donutContainerRef, pillarsGridRef,
@@ -574,79 +700,46 @@ function Dashboard() {
     startTransactionEditing, resetTransactionEditing,
     // 🆕 FASE 2 - Usuario actual
     currentUser, currentUserId,
+    // 🆕 FASE 3C - CategoryMap para mostrar nombres
+    categoryMap,
     ...dashboardMetrics,
-  };
+  }), [categoryMap, newTxnToast, isDark, t, monthHasData, getBudgetForMonth, donutRef, donutContainerRef, pillarsGridRef, colorBarRef, pillarButtonsRef, headerRef, stickyZoneRef, stickyH, p1, scrollY, setScrollY, selectedPeriod, setSelectedPeriod, filterType, setFilterType, filteredPillar, setFilteredPillar, activeId, setActiveId, isMovementOpen, setIsMovementOpen, movementOpenedFrom, setMovementOpenedFrom, screen, setScreen, selectedPillarDetail, setSelectedPillarDetail, selectedPillarForMovements, setSelectedPillarForMovements, showPillarBars, setShowPillarBars, showUpdateBalance, setShowUpdateBalance, showPeriodPicker, setShowPeriodPicker, showIncomes, setShowIncomes, handleSelectPillar, pressingFAB, setPressingFAB, txnActions, searchOpen, setSearchOpen, searchQuery, setSearchQuery, setVoicePrefill, pressingSegmentId, setPressingSegmentId, customConcepts, setCustomConcepts, transactions, categories, customBudgets, setCustomBudgets, isLoading, startLoading, stopLoading, txLoading, txError, catLoading, catError, editingCategoryId, editingCategoryName, editingPillarId, startCategoryEditing, resetCategoryEditing, editingTransactionId, selectedTransactionForEdit, startTransactionEditing, resetTransactionEditing, currentUser, currentUserId, dashboardMetrics]);
 
   const routerProps = {
-    screen, isDark, t, setTheme,
+    screen, isDark, t, setTheme: handleSetIsDark, // 🆕 FASE 3D - Guardar en BD
     selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
     categories, customConcepts, txnActions, voicePrefill,
     // 🆕 FASE 3A - Loading states de Supabase
     txLoading, txError, catLoading, catError,
     editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
-    showIncomes, setShowIncomes,
+    showIncomes, setShowIncomes: handleSetShowIncomes, // 🆕 FASE 3D - Guardar en BD
     selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
+    categoryBudgets, // 🆕 FASE 3B - Presupuestos de categorías
     selectedPillarForMovements, startTransactionEditing,
     resetCategoryEditing, startCategoryEditing,
     editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
     categoriesTab, setCategoriesTab,
     microphoneEnabled, setMicrophoneEnabled: handleSetMicrophoneEnabled,
     notificationListenerEnabled, setNotificationListenerEnabled: handleSetNotificationListenerEnabled,
+    pushNotificationsEnabled, setPushNotificationsEnabled: handleSetPushNotificationsEnabled, // 🆕 FASE 3D
     iosShortcutsEnabled, setIosShortcutsEnabled: handleSetIosShortcutsEnabled,
     onOpenAccessibilitySettings,
     previousScreen,
     currentUser, currentUserId, // 🆕 FASE 2
+    categoryMap, // 🆕 FASE 3C - Pasar categoryMap a ScreenRouter
     setScreen,
   };
 
   return (
     <>
-      {/* 🆕 PASO 6 - Selector de usuario (DEV ONLY) - Esquina inferior izquierda */}
-      <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        left: '20px',
-        zIndex: 1000,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        color: '#fff',
-        padding: '8px 12px',
-        borderRadius: '6px',
-        fontSize: '11px',
-        fontFamily: 'monospace',
-        maxWidth: '220px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-        pointerEvents: 'auto'
-      }}>
-        <div style={{ marginBottom: '6px', fontWeight: 'bold', fontSize: '10px' }}>CAMBIAR USUARIO:</div>
-        <select
-          value={devSelectedUserId || ''}
-          onChange={(e) => setDevSelectedUserId(e.target.value || null)}
-          style={{
-            width: '100%',
-            padding: '4px',
-            marginBottom: '6px',
-            borderRadius: '4px',
-            border: '1px solid #555',
-            backgroundColor: '#1a1a1a',
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: '11px'
-          }}
-        >
-          <option value="">Auto (useAuth)</option>
-          {MOCK_USER_OPTIONS.map(u => (
-            <option key={u.id} value={u.id}>{u.name}</option>
-          ))}
-        </select>
-        <div style={{ fontSize: '10px', color: '#888', lineHeight: '1.4' }}>
-          <div>ID: {currentUserId}</div>
-          <div>TXS: {transactions.length}</div>
-        </div>
-      </div>
+      {/* ✅ FASE LOGIN - Selector de usuarios removido */}
 
-      <DashboardContext.Provider value={dashboard}>
-        <ScreenRouter {...routerProps} />
-      </DashboardContext.Provider>
+      {/* 🆕 FASE 3C - CategoryHistoryProvider envuelve todo para acceso global a categorías con historial */}
+      <CategoryHistoryProvider userId={currentUserId}>
+        <DashboardContext.Provider value={dashboard}>
+          <ScreenRouter {...routerProps} />
+        </DashboardContext.Provider>
+      </CategoryHistoryProvider>
     </>
   );
 }

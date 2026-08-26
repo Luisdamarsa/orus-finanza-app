@@ -4,8 +4,7 @@ import { DARK, LIGHT, SHADOWS } from "../constants/tokens";
 import { fmt } from "../utils/formatters";
 import CatBar from "./CatBar";
 import { getCategoryName } from "../utils/categoryUtils";
-import { ALL_CATS } from "../constants/index.js";
-import { getAttributeAtDate } from "../services/attributeHistoryService";
+import { getAttributeAtDate } from "../services/attributeHistoryService"; // 🆕 FASE 3C - Para obtener nombres históricos
 
 /**
  * PillarBarsPopup.jsx
@@ -40,6 +39,9 @@ export default function PillarBarsPopup({
   currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
   customBudgets, // 🆕 FASE 2 - Pasar presupuestos personalizados
   getBudgetForMonth, // 🆕 FASE 2 - Calcular presupuesto del mes
+  categories = {}, // 🆕 FASE 3B - Categorías del usuario desde DashboardContext
+  categoryMap = {}, // 🆕 FASE 3C - Mapa de ID → nombre desde Supabase
+  categoriesWithHistory = {}, // 🆕 FASE 3C - Categorías con historial para getAttributeAtDate()
 }) {
   // 🆕 Hook para animación de press en botón de ver movimientos
   const pressViewMovements = usePress();
@@ -49,6 +51,19 @@ export default function PillarBarsPopup({
   const dragStartRef = useRef(null);
   const categoriesRef = useRef(null);
 
+  // 🆕 FASE 3C - Función helper para obtener nombre de categoría en fecha específica
+  const getCategoryNameAtDate = (catId, dateStr) => {
+    if (categoriesWithHistory[catId]) {
+      return getAttributeAtDate(categoriesWithHistory[catId], "name", dateStr);
+    }
+    return getCategoryName(catId, categoryMap); // Fallback si no hay historial
+  };
+
+  // 🆕 Calcular fecha consultada: primer día del mes seleccionado
+  const queryDate = selectedPeriod
+    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-01`
+    : new Date().toISOString().split('T')[0];
+
   // 🆕 Handlers para detectar drag
   const handleDragStart = (e) => {
     // Ignorar botones (cerrar + ver movimientos)
@@ -57,7 +72,6 @@ export default function PillarBarsPopup({
     if (!isExpanded && categoriesRef.current?.contains(e.target)) return;
     // Almacenar posición Y + estado expandido actual
     dragStartRef.current = { y: e.clientY, wasExpanded: isExpanded };
-    console.log(`🎯 Drag iniciado - Estado: ${isExpanded ? "EXPANDIDO" : "COLAPSADO"}`);
   };
 
   // 🆕 Detectar drag a nivel de documento
@@ -69,18 +83,15 @@ export default function PillarBarsPopup({
 
       if (diff > 8) {
         // Jalar hacia arriba → expandir
-        console.log("⬆️  Jalado hacia ARRIBA - EXPANDIENDO");
         setIsExpanded(true);
         dragStartRef.current = null;
       } else if (diff < -8) {
         // Jalar hacia abajo
         if (wasExpanded) {
           // Si estaba expandido → colapsar
-          console.log("⬇️  Jalado hacia ABAJO - COLAPSANDO (estaba expandido)");
           setIsExpanded(false);
         } else {
           // Si estaba colapsado → cerrar
-          console.log("⬇️  Jalado hacia ABAJO - CERRANDO (estaba colapsado)");
           onClose();
         }
         dragStartRef.current = null;
@@ -133,16 +144,12 @@ export default function PillarBarsPopup({
   const budgetForMonth = getBudgetForMonth
     ? getBudgetForMonth(pillar.id, currentMonth, currentYear, customBudgets, currentUserId)
     : pillar.budget;
-  const pillarCategoryIds = ALL_CATS
-    .filter((cat) => cat.pillar === pillar.id)
-    .filter((cat) => cat.userId === currentUserId) // 🆕 FASE 2 - Filtrar por userId para evitar duplicados
-    .filter((cat) => {
-      if (!periodKey) return !cat.deletedAt;
-      const createdOk = !cat.createdAt || cat.createdAt.slice(0, 7) <= periodKey;
-      const notDeleted = !cat.deletedAt || cat.deletedAt.slice(0, 7) > periodKey;
-      return createdOk && notDeleted;
-    })
-    .map((cat) => cat.id);
+
+  // 🆕 FASE 3B: Usar `categories` del usuario (desde Supabase) en lugar de ALL_CATS
+  const pillarCategoryIds = (categories[pillar.id] || []).map((cat) => {
+    // Soportar tanto objetos {id, name} como IDs string
+    return typeof cat === 'string' ? cat : cat.id;
+  });
 
   // 🆕 Calcular gastos dinámicamente por período (usando IDs)
   const categorySpent = {};
@@ -175,6 +182,7 @@ export default function PillarBarsPopup({
 
   const totalSpent = Object.values(categorySpent).reduce((sum, v) => sum + v, 0);
 
+
   // Si es inline, solo renderizar la tarjeta sin overlay
   if (isInline) {
     return (
@@ -189,7 +197,7 @@ export default function PillarBarsPopup({
             {(() => { const isOver = totalSpent > budgetForMonth; const gastoColor = isOver ? (pillar.id === "ahorro" ? "#22C55E" : "#EF4444") : "#F5F3FF"; return <div style={{ textAlign: "right" }}><div style={{ fontSize: 16, fontWeight: 800, color: gastoColor, lineHeight: 1.2 }}>{fmt(totalSpent)}</div>{isMonthPeriod && <div style={{ fontSize: 10, fontWeight: 700, color: "#8B87A3", lineHeight: 1.2 }}>de {fmt(budgetForMonth)}</div>}</div>; })()}
           </div>
         )}
-        <div style={{ maxHeight: "230px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const category = ALL_CATS.find(cat => cat.id === catId); let catName = getCategoryName(catId); if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) { const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`; catName = getAttributeAtDate(category, "name", queryDate); } return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
+        <div style={{ maxHeight: "230px", overflowY: "auto", scrollbarWidth: "none", paddingRight: 4, marginBottom: 12 }}><style>{`::-webkit-scrollbar { display: none; }`}</style>{Object.keys(categorySpent).sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0)).map((catId) => { const catName = getCategoryNameAtDate(catId, queryDate); return <CatBar key={catId} catId={catId} catName={catName} spent={categorySpent[catId] || 0} budget={null} color={pillar.color} isDark={isDark} pillarSpent={totalSpent} />; })}</div>
         <button onClick={onViewMovements} {...pressViewMovements.handlers} style={{ width: "100%", padding: 13, borderRadius: 14, border: "none", background: "rgba(155,109,255,0.16)", color: "#9B6DFF", fontSize: 13, fontWeight: 800, cursor: "pointer", marginTop: "auto", flexShrink: 0, ...pressViewMovements.getPressStyle() }}>Ver movimientos →</button>
       </div>
     );
@@ -290,15 +298,8 @@ export default function PillarBarsPopup({
           {Object.keys(categorySpent)
             .sort((a, b) => (categorySpent[b] || 0) - (categorySpent[a] || 0))
             .map((catId) => {
-              // 🆕 Obtener nombre histórico de la categoría en la fecha del período
-              const category = ALL_CATS.find(cat => cat.id === catId);
-              let catName = getCategoryName(catId);
-
-              if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
-                // Crear fecha en el medio del mes seleccionado
-                const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
-                catName = getAttributeAtDate(category, "name", queryDate);
-              }
+              // 🆕 FASE 3C - Obtener nombre histórico de la categoría en la fecha consultada
+              const catName = getCategoryNameAtDate(catId, queryDate);
 
               return (
                 <CatBar

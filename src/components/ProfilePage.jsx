@@ -3,8 +3,12 @@ import { userStorage } from "../utils/userStorage";
 import { usePopup } from "../services/PopupService";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
+import * as userService from "../services/userService"; // 🆕 FASE 3C
 import HeaderBar from "./HeaderBar";
 import DeleteAccountModal from "./DeleteAccountModal";
+
+// 🆕 FASE 3D - Importar soft delete
+import { softDeleteUser } from "../services/userService";
 
 /**
  * Página de Perfil del usuario
@@ -84,18 +88,25 @@ export default function ProfilePage({
       setCopiedUserId(true);
       setTimeout(() => setCopiedUserId(false), 2000);
     } catch (err) {
-      console.error("Error al copiar:", err);
     }
   };
 
-  const handleSave = () => {
-    if (!hasChanged) return;
+  const handleSave = async () => {
+    if (!hasChanged || !user) return;
     try {
+      // 🆕 FASE 3C - Guardar en Supabase
+      if (currentUser) {
+        const success = await userService.updateUsername(currentUser.id, displayName);
+        if (!success) {
+          throw new Error('No se pudo guardar en Supabase');
+        }
+      }
+
+      // Guardar también en localStorage como fallback
       userStorage.updateUser({ displayName });
       setHasChanged(false);
       popup.showEditPopup('Perfil');
     } catch (err) {
-      console.error("Error al actualizar perfil:", err);
       popup.showErrorPopup("No se pudo actualizar el perfil");
     }
   };
@@ -146,7 +157,13 @@ export default function ProfilePage({
 
           {/* Botón Cerrar Sesión a la derecha */}
           <button
-            onClick={() => setScreen("onboarding")}
+            onClick={() => {
+              // Limpiar localStorage
+              localStorage.removeItem("currentUserId");
+              localStorage.removeItem("currentUserEmail");
+              // Ir a login
+              setScreen("login");
+            }}
             {...pressLogout.handlers}
             style={{
               padding: "6px 12px",
@@ -242,7 +259,7 @@ export default function ProfilePage({
             </label>
             <input
               type="text"
-              value={user.firstName || ""}
+              value={user.nombre || ""}
               disabled
               style={{
                 width: "100%",
@@ -267,7 +284,7 @@ export default function ProfilePage({
             </label>
             <input
               type="text"
-              value={user.lastName || ""}
+              value={user.apellido || ""}
               disabled
               style={{
                 width: "100%",
@@ -370,8 +387,18 @@ export default function ProfilePage({
         isDark={isDark}
         isOpen={deleteAccountModalOpen}
         onCancel={() => setDeleteAccountModalOpen(false)}
-        onConfirm={() => {
-          popup.showDeletePopup('cuenta');
+        onConfirm={async () => {
+          // 🆕 FASE 3D - Soft delete: marcar usuario como inactivo
+          const success = await softDeleteUser(currentUser?.id);
+          if (success) {
+            popup.showDeletePopup('cuenta');
+            // Limpiar localStorage y redirigir a login
+            localStorage.removeItem("currentUserId");
+            localStorage.removeItem("currentUserEmail");
+            setTimeout(() => setScreen("login"), 1500);
+          } else {
+            popup.showErrorPopup("Error al eliminar la cuenta");
+          }
           setDeleteAccountModalOpen(false);
         }}
       />

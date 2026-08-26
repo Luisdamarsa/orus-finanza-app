@@ -314,15 +314,12 @@ export default function MyReportsPage({ onBack }) {
                   const result = openReportInBrowser(normalizedName);
 
                   if (result.success) {
-                    console.log(`✅ Abierto en navegador: ${result.filename}`);
                     // Mantener verde por 2 segundos
                     setTimeout(() => setDownloadingReportId(null), 2000);
                   } else {
-                    console.error(`❌ Error: ${result.error}`);
                     setDownloadingReportId(null);
                   }
                 } catch (error) {
-                  console.error("Error abriendo informe:", error);
                   setDownloadingReportId(null);
                 }
               };

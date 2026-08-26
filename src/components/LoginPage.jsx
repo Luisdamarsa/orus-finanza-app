@@ -3,6 +3,7 @@ import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
 import { DARK, LIGHT } from "../constants/tokens";
 import { getClayShadow } from "../utils/clayStyles";
+import * as authService from "../services/authService";
 
 // Google Logo SVG - official 4-color
 const GoogleLogoSvg = () => (
@@ -42,23 +43,30 @@ export default function LoginPage({ setScreen }) {
     setError("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (email && password) {
-        setError("Usuario o contraseña incorrectos");
-      }
+    try {
+      // Validar email + password contra Supabase
+      const user = await authService.loginUser(email, password);
+
+      // Guardar userId en localStorage para la sesión
+      localStorage.setItem("currentUserId", user.id);
+      localStorage.setItem("currentUserEmail", user.email);
+
+      // 🆕 Esperar a que React sincronice con localStorage
+      setTimeout(() => {
+        setScreen("dashboard");
+      }, 150);
+    } catch (err) {
+      setError(err.message || "Usuario o contraseña incorrectos");
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   const handleSignup = () => {
-    console.log("✅ Signup button clicked");
-    console.log("🔄 Navigating to signup...");
     setScreen("signup");
-    console.log("✅ setScreen called with 'signup'");
   };
 
   const handleOAuth = (provider) => {
-    console.log(`OAuth: ${provider}`);
   };
 
   const handleForgotPassword = () => {

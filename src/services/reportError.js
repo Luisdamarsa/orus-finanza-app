@@ -1,7 +1,6 @@
 /**
  * reportError.js — capa ÚNICA de reporte de errores.
  *
- * HOY: solo `console.error`. MAÑANA (fase BD/deploy): reemplazar el cuerpo por
  * Sentry.captureException(error, { extra: context }) — con scrubbing de datos
  * sensibles (montos / PII; finanzas + Ley 1581). Nada más del código cambia.
  *
@@ -12,7 +11,6 @@
  */
 export function reportError(error, context = {}) {
   // TODO (fase BD): Sentry.captureException(error, { extra: context });
-  console.error("[reportError]", error, context);
 }
 
 let installed = false;

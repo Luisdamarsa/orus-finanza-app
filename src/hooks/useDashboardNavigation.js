@@ -13,7 +13,8 @@ import { useState } from "react";
  * para no tocar los sitios que los consumen.
  */
 export function useDashboardNavigation() {
-  const [screen, setScreen] = useState("dashboard");
+  // ✅ FASE LOGIN - Empieza en login, no en dashboard
+  const [screen, setScreen] = useState("login");
   const [selectedPillarDetail, setSelectedPillarDetail] = useState(null);
   const [selectedPillarForMovements, setSelectedPillarForMovements] = useState(null);
   const [showPillarBars, setShowPillarBars] = useState(false);

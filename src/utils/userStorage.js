@@ -112,7 +112,6 @@ export const userStorage = {
       // Backfill: usuarios guardados antes de tener role/subscription/theme
       return { role: "user", subscription: "FREE", theme: "dark", ...parsed };
     } catch (error) {
-      console.error("Error reading user from localStorage:", error);
       return DEFAULT_USER;
     }
   },
@@ -128,7 +127,6 @@ export const userStorage = {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     } catch (error) {
-      console.error("Error updating user in localStorage:", error);
       return null;
     }
   },

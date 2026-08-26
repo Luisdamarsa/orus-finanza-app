@@ -33,7 +33,6 @@ export function getPillarLabel(pillarId) {
 export function recordPillarEdit(pillarId, changes, changedBy) {
   const pillar = getPillarById(pillarId);
   if (!pillar) {
-    console.warn(`⚠️  Pilar no encontrado: ${pillarId}`);
     return;
   }
 
@@ -48,7 +47,6 @@ export function recordPillarEdit(pillarId, changes, changedBy) {
 
   pillar.updatedAt = new Date().toISOString();
 
-  console.log(`📝 Cambio registrado en pilar ${pillarId}:`, changes);
 }
 
 /**

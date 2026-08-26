@@ -8,7 +8,11 @@ const PERMISSIONS = [
   { id: "mic", name: "Micrófono", why: "Para registrar gastos por voz: gasté 20 mil en el súper.", kind: "mic", req: "ÓPTIMO" },
 ];
 
-export default function PermissionsPage({ onBack, onOpenPrivacy }) {
+export default function PermissionsPage({
+  onBack, onOpenPrivacy, currentUserId,
+  microphoneEnabled, onSetMicrophoneEnabled,
+  pushNotificationsEnabled, onSetPushNotificationsEnabled // 🆕 FASE 3D - Notificaciones push de ORUS
+}) {
   const { isDark } = useTheme();
   const tokens = isDark ? DARK : LIGHT;
 
@@ -21,32 +25,23 @@ export default function PermissionsPage({ onBack, onOpenPrivacy }) {
     accentSoft: isDark ? "rgba(155,109,255,0.2)" : "rgba(124,77,255,0.15)",
     raised: isDark ? "rgba(255,255,255,0.04)" : "rgba(30,20,60,0.04)",
     shadowSm: isDark ? "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 10px 22px -10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(0,0,0,0.04)",
+    green: "#22C55E",
   };
 
-  const [status, setStatus] = useState({});
-
-  const set = (id, v) => setStatus((s) => ({ ...s, [id]: v }));
-
-  const requestMic = () => {
-    if (!navigator.mediaDevices?.getUserMedia) return set("mic", "No disponible");
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream) => { stream.getTracks().forEach((tr) => tr.stop()); set("mic", "Permitido"); })
-      .catch(() => set("mic", "Bloqueado"));
+  // 🆕 FASE 3D - Toggle de permisos desde BD (no desde estado local)
+  const handleToggleMicrophone = () => {
+    const newValue = !microphoneEnabled;
+    if (onSetMicrophoneEnabled) onSetMicrophoneEnabled(newValue);
   };
 
-  const requestNotif = () => {
-    if (!("Notification" in window)) return set("notif-push", "No disponible");
-    Notification.requestPermission().then((p) => set("notif-push", p === "granted" ? "Permitido" : "Bloqueado"));
-  };
-
-  const handlePermitClick = (p) => {
-    if (p.kind === "mic") requestMic();
-    else requestNotif();
+  const handleTogglePushNotifications = () => {
+    const newValue = !pushNotificationsEnabled;
+    if (onSetPushNotificationsEnabled) onSetPushNotificationsEnabled(newValue);
   };
 
   const renderPermissionCard = (p) => {
-    const v = status[p.id];
-    const isGranted = v === "Permitido";
+    // 🆕 FASE 3D - Obtener estado desde BD (props)
+    const isGranted = p.kind === "mic" ? microphoneEnabled : pushNotificationsEnabled;
 
     return (
       <div key={p.id} style={{ padding: 16, borderRadius: 18, background: t.surface, boxShadow: t.shadowSm, display: "flex", alignItems: "flex-start", gap: 12 }}>
@@ -90,23 +85,32 @@ export default function PermissionsPage({ onBack, onOpenPrivacy }) {
           </div>
         </div>
 
-        {/* Button */}
+        {/* 🆕 FASE 3D - Toggle ON/OFF (Morado) */}
         <button
-          onClick={() => handlePermitClick(p)}
-          disabled={isGranted}
+          onClick={() => p.kind === "mic" ? handleToggleMicrophone() : handleTogglePushNotifications()}
           style={{
             flexShrink: 0,
-            padding: "8px 16px",
-            borderRadius: 12,
+            width: 50,
+            height: 28,
+            borderRadius: 14,
             border: "none",
-            background: isGranted ? "transparent" : "linear-gradient(155deg,#B18CFF,#8B5CF6)",
-            color: isGranted ? "#22C55E" : "#fff",
-            fontSize: "11.5px",
-            fontWeight: 800,
-            cursor: isGranted ? "default" : "pointer",
-            whiteSpace: "nowrap",
+            background: isGranted ? "linear-gradient(155deg,#B18CFF,#8B5CF6)" : "rgba(139,135,163,0.3)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            padding: isGranted ? "2px 2px 2px 24px" : "2px 24px 2px 2px",
+            transition: "all 0.3s ease",
+            boxShadow: isGranted ? "0 8px 16px -4px rgba(139,92,246,0.4)" : "none",
           }}>
-          {isGranted ? "Permitido" : v === "Bloqueado" ? "Reintentar" : "Permitir"}
+          {/* Toggle dot */}
+          <div style={{
+            width: 24,
+            height: 24,
+            borderRadius: 12,
+            background: "#fff",
+            flexShrink: 0,
+            transition: "all 0.3s ease",
+          }} />
         </button>
       </div>
     );
@@ -128,7 +132,7 @@ export default function PermissionsPage({ onBack, onOpenPrivacy }) {
       />
 
       {/* Contenido scrollable */}
-      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 50px", boxSizing: "border-box" }}>
+      <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none", padding: "22px 22px 22px", boxSizing: "border-box" }}>
 
       {/* Subtitle */}
       <div style={{ fontSize: "12px", fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.5, marginBottom: 22, marginTop: 0 }}>
@@ -146,15 +150,17 @@ export default function PermissionsPage({ onBack, onOpenPrivacy }) {
           ¿Recibes tus movimientos por correo? La conexión de correo bancario se configura en Automatización; ahí no se pide ningún permiso del teléfono.
         </div>
       </div>
-
-      {/* Privacy Footer */}
-      <div style={{ fontSize: "11px", fontWeight: 600, color: t.sub, textAlign: "center", marginTop: 22, lineHeight: 1.6 }}>
-        ORUS solo usa estos datos para registrar y organizar tus finanzas. Ver la{" "}
-        <span onClick={onOpenPrivacy} style={{ color: t.accent, fontWeight: 700, cursor: "pointer" }}>
-          Política de Privacidad
-        </span>
-        .
       </div>
+
+      {/* 🆕 Privacy Footer fijo en el bottom */}
+      <div style={{ padding: "16px 22px 22px", borderTop: `1px solid ${t.raised}`, background: t.bg }}>
+        <div style={{ fontSize: "11px", fontWeight: 600, color: t.sub, textAlign: "center", lineHeight: 1.6 }}>
+          ORUS solo usa estos datos para registrar y organizar tus finanzas. Ver la{" "}
+          <span onClick={onOpenPrivacy} style={{ color: t.accent, fontWeight: 700, cursor: "pointer" }}>
+            Política de Privacidad
+          </span>
+          .
+        </div>
       </div>
     </div>
   );

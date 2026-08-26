@@ -13,7 +13,7 @@ import { getCategoryName } from "../utils/categoryUtils";
  * Recibe `toast = { isIncome, pillarId, categoryId, amount }` o null.
  * Va posicionado absoluto y centrado dentro de la fila "Saldo y Mes" (que es position:relative).
  */
-export default function NewTransactionToast({ toast, isDark = true }) {
+export default function NewTransactionToast({ toast, isDark = true, categoryMap = {} }) {
   if (!toast) return null;
 
   const { isIncome, pillarId, categoryId, amount } = toast;
@@ -52,7 +52,7 @@ export default function NewTransactionToast({ toast, isDark = true }) {
         ) : (
           <>
             <span style={{ fontSize: 13 }}>{pillar?.icon}</span>
-            <span style={{ color: catColor }}>{getCategoryName(categoryId)}</span>
+            <span style={{ color: catColor }}>{getCategoryName(categoryId, categoryMap)}</span>
             <span style={{ color: pillarId === "ahorro" ? "#86EFAC" : "#FCA5A5" }}>-{fmt(amountAbs)}</span>
           </>
         )}

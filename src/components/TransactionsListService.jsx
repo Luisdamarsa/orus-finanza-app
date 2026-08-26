@@ -14,8 +14,12 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  * - transactions: array de transacciones YA FILTRADAS (no filtra internamente)
  * - stickyTop: número (opcional) - top value para las fechas sticky (default: 0)
  * - onEditTransaction: function(transaction) - callback al hacer click en una transacción
+ * - categoriesWithHistory: object (opcional) - {categoryId: categoryObj} con historial (NUEVO)
+ * - categoryMap: object (opcional) - LEGACY - mapping {categoryId: categoryName}
  */
-export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction }) {
+export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction, categoriesWithHistory = {}, categoryMap = {} }) {
+  // 🆕 DEBUG - Ver qué recibe categoriesWithHistory
+
   // 🆕 Estado para trackear qué transacción está siendo presionada
   const [pressingTransactionId, setPressingTransactionId] = useState(null);
   const t = isDark
@@ -162,8 +166,8 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                         style={{
                           fontSize: 9,
                           fontWeight: 700,
-                          color: t.sub,
-                          background: t.raised,
+                          color: method.color, // 🆕 Color del método (Banco, Tarjeta, etc.)
+                          background: isDark ? `${method.color}22` : method.bg, // 🆕 Fondo con opacidad
                           padding: "1px 6px",
                           borderRadius: 8,
                         }}>
@@ -184,11 +188,9 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                           </span>
                           {tx.category ? (
                             <span style={{ fontSize: 10, color: "#22C55E", fontWeight: 600 }}>
-                              {(() => {
-                                const category = ALL_CATS.find((cat) => cat.id === tx.category);
-                                if (!category) return tx.category;
-                                return getAttributeAtDate(category, "name", tx.date);
-                              })()}
+                              {categoriesWithHistory[tx.category]
+                                ? getAttributeAtDate(categoriesWithHistory[tx.category], "name", tx.date)
+                                : categoryMap[tx.category] || tx.category}
                             </span>
                           ) : null}
                         </span>
@@ -204,12 +206,9 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
                           {tx.category ? (
                             <>
                               {" → "}
-                              {(() => {
-                                // 🆕 Obtener nombre histórico de la categoría en la fecha de la transacción
-                                const category = ALL_CATS.find(cat => cat.id === tx.category);
-                                if (!category) return tx.category;
-                                return getAttributeAtDate(category, "name", tx.date);
-                              })()}
+                              {categoriesWithHistory[tx.category]
+                                ? getAttributeAtDate(categoriesWithHistory[tx.category], "name", tx.date)
+                                : categoryMap[tx.category] || tx.category}
                             </>
                           ) : null}
                         </span>

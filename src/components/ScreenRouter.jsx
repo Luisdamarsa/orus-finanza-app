@@ -39,18 +39,20 @@ export default function ScreenRouter({
   editingTransactionId, selectedTransactionForEdit, resetTransactionEditing,
   showIncomes, setShowIncomes,
   selectedPeriod, customBudgets, setCustomBudgets, editPillarBudget, editCategoryBudget, getBudgetForMonth,
+  categoryBudgets, // 🆕 FASE 3B - Presupuestos de categorías
   selectedPillarForMovements, startTransactionEditing,
   resetCategoryEditing, startCategoryEditing,
   editingCategoryName, editingPillarId, editingCategoryId, editCategory, createCategory, deleteCategory,
   categoriesTab, setCategoriesTab,
   microphoneEnabled, setMicrophoneEnabled, notificationListenerEnabled, setNotificationListenerEnabled,
+  pushNotificationsEnabled, setPushNotificationsEnabled, // 🆕 FASE 3D
   iosShortcutsEnabled, setIosShortcutsEnabled,
   onOpenAccessibilitySettings,
   previousScreen,
   currentUser, currentUserId, // 🆕 FASE 2
+  categoryMap, // 🆕 FASE 3C - CategoryMap para mostrar nombres
   setScreen,
 }) {
-  console.log("📺 ScreenRouter rendering with screen:", screen);
   if (screen === "pillar-detail" && selectedPillarDetail) {
     return (
       <ScreenShell bg={t.bg}>
@@ -65,12 +67,12 @@ export default function ScreenRouter({
   }
 
   if (screen === "new-transaction") {
-    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} prefill={voicePrefill} onBack={() => setScreen("dashboard")} />;
+    return <TransactionScreen mode="new" isDark={isDark} t={t} categories={categories} customConcepts={customConcepts} actions={txnActions} prefill={voicePrefill} onBack={() => setScreen("dashboard")} currentUserId={currentUserId} />;
   }
 
   // Editar transacción
   if (editingTransactionId && selectedTransactionForEdit) {
-    return <TransactionScreen mode="edit" isDark={isDark} t={t} categories={categories} editingTransaction={selectedTransactionForEdit} actions={txnActions} onBack={() => resetTransactionEditing()} />;
+    return <TransactionScreen mode="edit" isDark={isDark} t={t} categories={categories} editingTransaction={selectedTransactionForEdit} actions={txnActions} onBack={() => resetTransactionEditing()} currentUserId={currentUserId} />;
   }
 
   if (screen === "settings") {
@@ -91,7 +93,9 @@ export default function ScreenRouter({
 
   if (screen === "movimientos" && selectedPillarForMovements) {
     // 🆕 FASE 3A - Pasar txLoading, txError
-    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} txLoading={txLoading} txError={txError} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} showIncomes={showIncomes} />;
+    // 🆕 FASE 3C - Pasar categoryMap y categories para mostrar nombres
+    // 🆕 FASE 3B - Pasar getBudgetForMonth, customBudgets y categoryBudgets para obtener presupuestos de Supabase
+    return <MovimientosScreen isDark={isDark} t={t} selectedPillarForMovements={selectedPillarForMovements} transactions={transactions} txLoading={txLoading} txError={txError} selectedPeriod={selectedPeriod} setScreen={setScreen} startTransactionEditing={startTransactionEditing} showIncomes={showIncomes} currentUserId={currentUserId} categoryMap={categoryMap} categories={categories} getBudgetForMonth={getBudgetForMonth} customBudgets={customBudgets} categoryBudgets={categoryBudgets} />;
   }
 
   if (screen === "categories") {
@@ -131,7 +135,15 @@ export default function ScreenRouter({
     const backTarget = previousScreen === "automatizaciones" ? "automatizaciones" : "settings";
     return (
       <ScreenShell bg={t.bg}>
-        <PermissionsPage onBack={() => setScreen(backTarget)} onOpenPrivacy={() => setScreen("privacy-perms")} />
+        <PermissionsPage
+          onBack={() => setScreen(backTarget)}
+          onOpenPrivacy={() => setScreen("privacy-perms")}
+          currentUserId={currentUserId}
+          microphoneEnabled={microphoneEnabled}
+          onSetMicrophoneEnabled={setMicrophoneEnabled}
+          pushNotificationsEnabled={pushNotificationsEnabled}
+          onSetPushNotificationsEnabled={setPushNotificationsEnabled}
+        />
       </ScreenShell>
     );
   }

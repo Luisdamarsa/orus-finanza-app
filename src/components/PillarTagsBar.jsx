@@ -39,33 +39,26 @@ export default function PillarTagsBar({
         // 🆕 Color dinámico del pilar según tema
         const c = getPillarColor(p.id, isDarkTheme);
         const isPressing = pressingId === p.id; // 🆕 Verificar si este tag está siendo presionado
-        if (isPressing) console.log("🎯 RENDERING TAG PRESSED:", p.id, "isPressing:", isPressing);
 
         return (
           <button
             key={p.id}
             onMouseDown={() => {
-              console.log("🔻 TAG PRESS DOWN:", p.id);
               setPressingId(p.id);
             }} // 🆕 Al presionar (desktop)
             onMouseUp={() => {
-              console.log("🔺 TAG PRESS UP:", p.id);
               setPressingId(null);
             }} // 🆕 Al soltar (desktop)
             onMouseLeave={() => {
-              console.log("🚫 TAG MOUSE LEAVE:", p.id);
               setPressingId(null);
             }} // 🆕 Si el mouse deja el elemento (desktop)
             onTouchStart={() => {
-              console.log("👆 TAG TOUCH START:", p.id);
               setPressingId(p.id);
             }} // 🆕 Al presionar (móvil)
             onTouchEnd={() => {
-              console.log("👆 TAG TOUCH END:", p.id);
               setPressingId(null);
             }} // 🆕 Al soltar (móvil)
             onTouchCancel={() => {
-              console.log("👆 TAG TOUCH CANCEL:", p.id);
               setPressingId(null);
             }} // 🆕 Si se cancela el touch (móvil)
             onClick={() => {

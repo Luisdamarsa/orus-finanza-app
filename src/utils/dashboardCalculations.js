@@ -75,17 +75,6 @@ export const calculateDashboard = (filteredByPeriod, PILLARS, SALDO_COLOR, isDar
   const directPcts = rawPcts.map(pct => Math.round(pct));
   const directSaldoPct = Math.round(saldoPct);
 
-  // 🔴 DEBUG: Ver qué está pasando
-  console.log("🔴 dashboardCalculations DEBUG:");
-  console.log("  - totalSpent:", totalSpent);
-  console.log("  - saldoForDonut:", saldoForDonut);
-  console.log("  - baseTotal:", baseTotal);
-  console.log("  - showIncomes:", showIncomes);
-  console.log("  - rawPcts:", rawPcts);
-  console.log("  - saldoPct:", saldoPct);
-  console.log("  - directPcts:", directPcts);
-  console.log("  - directSaldoPct:", directSaldoPct);
-
   // PASO 3B: Aplicar Largest Remainder Method SOLO para el donut (si es necesario que sume 100%)
   const allFloorPcts = allRawPcts.map(Math.floor);
   const toAdd = baseTotal > 0 ? 100 - allFloorPcts.reduce((a, b) => a + b, 0) : 0;

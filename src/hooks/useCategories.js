@@ -25,10 +25,7 @@ export function useCategories(userId) {
       try {
         const cats = await categoryService.getInitialCategories(userId);
         setCategories(cats);
-        const totalCats = Object.values(cats).flat().length;
-        console.log(`📦 Cargadas ${totalCats} categorías de ${userId}`);
       } catch (err) {
-        console.error('Error loading categories:', err);
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -41,7 +38,7 @@ export function useCategories(userId) {
   // 🆕 Crear categoría en Supabase
   const createCategory = useCallback(
     async (pillarId, categoryName) => {
-      if (!userId) return null;
+      if (!userId) throw new Error('No userId');
       try {
         const newId = await categoryService.createCategory(
           userId,
@@ -49,15 +46,21 @@ export function useCategories(userId) {
           categoryName
         );
         if (newId) {
+          // 🆕 Pasar objeto completo con id y name
+          const categoryObj = {
+            id: newId,
+            name: categoryName,
+            spent: 0,
+            budget: null
+          };
           setCategories(prev =>
-            categoryService.addCategory(prev, pillarId, newId)
+            categoryService.addCategory(prev, pillarId, categoryObj)
           );
         }
         return newId;
       } catch (err) {
-        console.error('Error creating category:', err);
         setError(err.message);
-        return null;
+        throw err; // 🆕 Re-lanzar para que AddCategoryScreen lo atrape
       }
     },
     [userId]
@@ -78,7 +81,6 @@ export function useCategories(userId) {
         }
         return await createCategory(pillarId, categoryName);
       } catch (err) {
-        console.error('Error in getOrCreateCategory:', err);
         setError(err.message);
         return null;
       }
@@ -102,7 +104,6 @@ export function useCategories(userId) {
         const cats = await categoryService.getInitialCategories(userId);
         setCategories(cats);
       } catch (err) {
-        console.error('Error editing category:', err);
         setError(err.message);
       }
     },
@@ -119,7 +120,6 @@ export function useCategories(userId) {
         const cats = await categoryService.getInitialCategories(userId);
         setCategories(cats);
       } catch (err) {
-        console.error('Error deleting category:', err);
         setError(err.message);
       }
     },

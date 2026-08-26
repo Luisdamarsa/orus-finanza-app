@@ -51,34 +51,27 @@ export default function PillarCardsGrid({
   // 🆕 Tema desde ThemeContext para colores dinámicos
   const { isDark: isDarkTheme } = useTheme();
 
-  // 🆕 DEBUG: Verificar que directPcts se está recibiendo correctamente
-  console.log("🎯 PillarCardsGrid - chipPcts:", chipPcts, "directPcts:", directPcts, "saldoPctFinal:", saldoPctFinal, "directSaldoPct:", directSaldoPct);
-  console.log("🎯 PillarCardsGrid - currentUserId:", currentUserId, "customBudgets:", customBudgets);
 
   // 🆕 Estado para trackear qué pilar está siendo presionado
   const [pressingId, setPressingId] = useState(null);
 
   // 🆕 Handler para visual press (solo setPressingId, sin acción)
   const handlePillarPress = (pillarId) => {
-    console.log("🔻 POINTER DOWN - Presionando visualmente:", pillarId);
     setPressingId(pillarId);
   };
 
   // 🆕 Handler para acción real (toggle: mismo pilar = deselecciona, otro pilar = selecciona)
   const handlePillarSelect = (pillarId) => {
-    console.log("✅ CLICK - Toggle pilar:", pillarId, "activeId actual:", activeId);
     // Toggle: si es el mismo pilar, deselecciona (null); si no, selecciona
     setActiveId((prev) => (prev === pillarId ? null : pillarId));
   };
 
   const handlePillarPointerUp = () => {
-    console.log("🔺 POINTER UP - Soltado, setPressingId: null");
     setPressingId(null);
   };
 
   // 🆕 Cuando el mouse deja el elemento mientras está presionado, también soltar
   const handlePillarPointerLeave = () => {
-    console.log("🚫 POINTER LEAVE - Mouse salió");
     setPressingId(null);
   };
 
@@ -132,7 +125,6 @@ export default function PillarCardsGrid({
           // 🔴 FIX: Usar el índice REAL del pilar en PILLARS, no el índice de iteración
           const pillarIndex = PILLARS.findIndex(pillar => pillar.id === p.id);
           const pctTotal = directPcts[pillarIndex] || chipPcts[pillarIndex];  // Usar índice correcto
-          console.log(`🎯 Pilar ${p.id} (iteración ${i}, PILLARS índice ${pillarIndex}): pctTotal=${pctTotal}, directPcts[${pillarIndex}]=${directPcts[pillarIndex]}, chipPcts[${pillarIndex}]=${chipPcts[pillarIndex]}, hasBudget=${hasBudget}, pc=${pc}`);
           const grayTrack = isDark ? "#2D2D3A" : "#E5E3F5"; // "no gastado"
           const overColor = p.id === "ahorro" ? "#22C55E" : "#EF4444"; // exceso: verde FUERTE en Ahorro (distinto del pastel), rojo en el resto
           // Barra que se escala sola: dentro del presupuesto → color + gris; pasado → color(presupuesto) + rojo(exceso).

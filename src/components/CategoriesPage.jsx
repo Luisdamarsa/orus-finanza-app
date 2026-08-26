@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PILLARS } from "../constants";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
+import { usePopup } from "../services/PopupService";
 import HeaderBar from "./HeaderBar";
 import { getCategoryName } from "../utils/categoryUtils";
 import LoadingWrapper from "./LoadingWrapper";
@@ -20,7 +21,15 @@ export default function CategoriesPage({
   error = null,
 }) {
   const { isDark } = useTheme();
+  const popup = usePopup();
   const tokens = isDark ? DARK : LIGHT;
+
+  // 🆕 Mostrar popup de error cuando hay error
+  useEffect(() => {
+    if (error) {
+      popup.showErrorPopup("No se pudieron cargar las categorías");
+    }
+  }, [error, popup]);
 
   const t = {
     bg: tokens.bg,
@@ -94,22 +103,6 @@ export default function CategoriesPage({
           ))}
         </div>
 
-        {/* 🆕 FASE 3A - Mostrar error si hay */}
-        {error && (
-          <div style={{
-            marginTop: 16,
-            padding: "12px 14px",
-            borderRadius: 12,
-            background: isDark ? "rgba(239, 68, 68, 0.15)" : "rgba(225, 29, 72, 0.1)",
-            border: `1px solid ${isDark ? "rgba(239, 68, 68, 0.3)" : "rgba(225, 29, 72, 0.2)"}`,
-            color: isDark ? "#FF8A8A" : "#E11D48",
-            fontSize: 12,
-            fontWeight: 600,
-            textAlign: "center"
-          }}>
-            ⚠️ Error cargando categorías: {error}
-          </div>
-        )}
 
         <LoadingWrapper isLoading={isLoading} skeleton={<MenuListSkeleton isDark={isDark} itemCount={12} />} isDark={isDark}>
           {tab === "gastos" && (
@@ -127,35 +120,40 @@ export default function CategoriesPage({
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {pillarCategories.length > 0 ? (
-                        pillarCategories.map((catId) => (
-                          <button
-                            key={catId}
-                            onClick={() => onEditCategory(catId, pillar.id)}
-                            onPointerDown={() => setPressingCategoryId(catId)}
-                            onPointerUp={() => setPressingCategoryId(null)}
-                            onPointerLeave={() => setPressingCategoryId(null)}
-                            style={{
-                              width: "100%",
-                              textAlign: "left",
-                              padding: "13px 16px",
-                              borderRadius: 14,
-                              border: "none",
-                              background: isDark
-                                ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
-                                : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
-                              color: t.text,
-                              fontSize: 13,
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
-                              fontFamily: "Manrope",
-                              transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
-                              transition: "all 0.1s",
-                            }}
-                          >
-                            {getCategoryName(catId)}
-                          </button>
-                        ))
+                        pillarCategories.map((cat) => {
+                          // 🆕 cat puede ser {id, name} o solo string ID (backwards compat)
+                          const catId = typeof cat === 'string' ? cat : cat.id;
+                          const catName = typeof cat === 'string' ? getCategoryName(cat) : cat.name;
+                          return (
+                            <button
+                              key={catId}
+                              onClick={() => onEditCategory(catId, catName, pillar.id)}
+                              onPointerDown={() => setPressingCategoryId(catId)}
+                              onPointerUp={() => setPressingCategoryId(null)}
+                              onPointerLeave={() => setPressingCategoryId(null)}
+                              style={{
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "13px 16px",
+                                borderRadius: 14,
+                                border: "none",
+                                background: isDark
+                                  ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
+                                  : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
+                                color: t.text,
+                                fontSize: 13,
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                                fontFamily: "Manrope",
+                                transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
+                                transition: "all 0.1s",
+                              }}
+                            >
+                              {catName}
+                            </button>
+                          );
+                        })
                       ) : (
                         <div style={{ padding: "12px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
                           Sin categorías
@@ -171,35 +169,40 @@ export default function CategoriesPage({
           {tab === "ingresos" && (
             <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 8 }}>
               {incomeCategories.length > 0 ? (
-                incomeCategories.map((catId) => (
-                  <button
-                    key={catId}
-                    onClick={() => onEditCategory(catId, "ingreso")}
-                    onPointerDown={() => setPressingCategoryId(catId)}
-                    onPointerUp={() => setPressingCategoryId(null)}
-                    onPointerLeave={() => setPressingCategoryId(null)}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "13px 16px",
-                      borderRadius: 14,
-                      border: "none",
-                      background: isDark
-                        ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
-                        : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
-                      color: t.text,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
-                      fontFamily: "Manrope",
-                      transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
-                      transition: "all 0.1s",
-                    }}
-                  >
-                    {getCategoryName(catId)}
-                  </button>
-                ))
+                incomeCategories.map((cat) => {
+                  // 🆕 cat puede ser {id, name} o solo string ID (backwards compat)
+                  const catId = typeof cat === 'string' ? cat : cat.id;
+                  const catName = typeof cat === 'string' ? getCategoryName(cat) : cat.name;
+                  return (
+                    <button
+                      key={catId}
+                      onClick={() => onEditCategory(catId, catName, "ingreso")}
+                      onPointerDown={() => setPressingCategoryId(catId)}
+                      onPointerUp={() => setPressingCategoryId(null)}
+                      onPointerLeave={() => setPressingCategoryId(null)}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "13px 16px",
+                        borderRadius: 14,
+                        border: "none",
+                        background: isDark
+                          ? "linear-gradient(155deg,#211d2c 0%,#141220 100%)"
+                          : "linear-gradient(155deg,#ffffff 0%,#eeeaf7 100%)",
+                        color: t.text,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
+                        fontFamily: "Manrope",
+                        transform: pressingCategoryId === catId ? "scale(0.98) translateY(1px)" : "scale(1)",
+                        transition: "all 0.1s",
+                      }}
+                    >
+                      {catName}
+                    </button>
+                  );
+                })
               ) : (
                 <div style={{ padding: "18px 16px", fontSize: 13, color: t.sub, fontStyle: "italic", textAlign: "center" }}>
                   Aun no tienes categorias de ingreso. Toca "+ Anadir categoria".

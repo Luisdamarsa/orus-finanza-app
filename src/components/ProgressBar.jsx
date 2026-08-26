@@ -103,7 +103,6 @@ export default function ProgressBar({
     if (containerRef.current) {
       const containerWidth = containerRef.current.getBoundingClientRect().width;
       const barWidthPx = (barFillPercentage / 100) * containerWidth - (showDashedBorder ? 4 : 0);
-      console.log(`[ProgressBar] ${categoryName}: containerWidth=${containerWidth.toFixed(1)}px, barFillPercentage=${barFillPercentage.toFixed(1)}%, barWidthPx=${barWidthPx.toFixed(1)}px, showDashedBorder=${showDashedBorder}`);
     }
   }, [categoryName, barFillPercentage, showDashedBorder]);
 

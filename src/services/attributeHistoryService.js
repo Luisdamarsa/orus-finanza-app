@@ -39,31 +39,41 @@ export function getAttributeAtDate(entity, field, date) {
   queryDate.setUTCHours(0, 0, 0, 0);  // Medianoche UTC
 
   // 🆕 LÓGICA CORRECTA:
-  // 1. Buscar si hay cambios DESPUÉS de la fecha consultada (comparando solo fechas, no horas)
-  // 2. Si SÍ hay cambios después, retornar el OLD value del cambio más antiguo después de la fecha
-  // 3. Si NO hay cambios después, retornar el valor actual (ya ocurrieron todos los cambios)
+  // 1. Buscar si hay cambios DESPUÉS de la fecha consultada
+  //    → Si SÍ, retornar el OLD value del cambio más antiguo después
+  // 2. Si NO hay cambios DESPUÉS, buscar cambios ANTES
+  //    → Si SÍ, retornar el NEW value del cambio más reciente ANTES
+  // 3. Si NO hay cambios en absoluto, retornar valor actual
 
   // Ordenar por fecha (más antigua primero)
   fieldHistory.sort((a, b) => new Date(a.changedAt) - new Date(b.changedAt));
 
-  // Buscar el PRIMER cambio que ocurrió DESPUÉS de la fecha consultada
+  // PASO 1: Buscar cambios DESPUÉS de la fecha consultada
   for (const change of fieldHistory) {
     const changeDate = new Date(change.changedAt);
-    // 🆕 Normalizar la fecha del cambio a MEDIANOCHE UTC también
-    // Esto permite comparar solo fechas, no horas
     const changeDateMidnight = new Date(changeDate);
     changeDateMidnight.setUTCHours(0, 0, 0, 0);
 
     if (changeDateMidnight > queryDate) {
-      // Este cambio ocurrió en una fecha POSTERIOR a la fecha consultada
-      // Significa que en esa fecha aún no había ocurrido
-      // Retornar el valor ANTERIOR (lo que tenía ANTES del cambio)
+      // Este cambio ocurrió DESPUÉS → retornar el valor ANTERIOR (antes del cambio)
       return change.old;
     }
   }
 
-  // Si no hay cambios DESPUÉS de la fecha, significa que todos ya ocurrieron
-  // Retornar el valor actual
+  // PASO 2: Si no hay cambios DESPUÉS, buscar cambios ANTES (en orden inverso)
+  for (let i = fieldHistory.length - 1; i >= 0; i--) {
+    const change = fieldHistory[i];
+    const changeDate = new Date(change.changedAt);
+    const changeDateMidnight = new Date(changeDate);
+    changeDateMidnight.setUTCHours(0, 0, 0, 0);
+
+    if (changeDateMidnight <= queryDate) {
+      // Este cambio ocurrió ANTES o EL MISMO DÍA → retornar el NEW value (el resultado del cambio)
+      return change.new;
+    }
+  }
+
+  // PASO 3: Si no hay cambios en absoluto, retornar valor actual
   return entity[field];
 }
 

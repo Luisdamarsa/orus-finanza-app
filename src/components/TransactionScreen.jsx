@@ -20,6 +20,7 @@ export default function TransactionScreen({
   actions,
   onBack,
   prefill,
+  currentUserId, // 🆕 FASE 3C - Para cargar categorías de Supabase
 }) {
   const isEditing = mode === "edit";
   return (
@@ -34,6 +35,7 @@ export default function TransactionScreen({
         categories={categories}
         customConcepts={isEditing ? undefined : customConcepts}
         prefill={isEditing ? undefined : prefill}
+        currentUserId={currentUserId}
       />
     </ScreenShell>
   );

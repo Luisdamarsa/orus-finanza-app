@@ -10,20 +10,69 @@
  * - monthHasData: function (mes, año) => boolean (verificar si mes tiene datos)
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DARK, LIGHT } from "../constants/tokens";
 import { MONTHS_SHORT } from "../constants";
 import { usePress } from "../hooks/usePress";
 
-export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClose, monthHasData }) {
+export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClose, monthHasData, transactions = [] }) {
   const tokens = isDark ? DARK : LIGHT;
 
+  // 🆕 Calcular años dinámicamente desde las transacciones del usuario
+  const availableYears = Array.from(
+    new Set(transactions.map(t => new Date(t.date).getFullYear()))
+  ).sort((a, b) => a - b);
+
+  // Si no hay años con datos, usar 2026 como fallback
+  const defaultYear = availableYears.length > 0 ? availableYears[0] : 2026;
+
   // Estado local para el año seleccionado en el picker
-  const [pickerYear, setPickerYear] = useState(selectedPeriod?.year || 2026);
+  const [pickerYear, setPickerYear] = useState(selectedPeriod?.year || defaultYear);
   const pressAllTime = usePress();
   const pressClose = usePress();
-  const pressYears = {};
-  const pressMonths = {};
+
+  // ✅ Crear hooks de usePress AL NIVEL SUPERIOR (no dentro de useMemo)
+  // Años 2020-2030
+  const pressYear2020 = usePress();
+  const pressYear2021 = usePress();
+  const pressYear2022 = usePress();
+  const pressYear2023 = usePress();
+  const pressYear2024 = usePress();
+  const pressYear2025 = usePress();
+  const pressYear2026 = usePress();
+  const pressYear2027 = usePress();
+  const pressYear2028 = usePress();
+  const pressYear2029 = usePress();
+  const pressYear2030 = usePress();
+
+  // Meses 1-12
+  const pressMonth1 = usePress();
+  const pressMonth2 = usePress();
+  const pressMonth3 = usePress();
+  const pressMonth4 = usePress();
+  const pressMonth5 = usePress();
+  const pressMonth6 = usePress();
+  const pressMonth7 = usePress();
+  const pressMonth8 = usePress();
+  const pressMonth9 = usePress();
+  const pressMonth10 = usePress();
+  const pressMonth11 = usePress();
+  const pressMonth12 = usePress();
+
+  // Map para acceder fácilmente
+  const pressYears = useMemo(() => ({
+    'year-2020': pressYear2020, 'year-2021': pressYear2021, 'year-2022': pressYear2022,
+    'year-2023': pressYear2023, 'year-2024': pressYear2024, 'year-2025': pressYear2025,
+    'year-2026': pressYear2026, 'year-2027': pressYear2027, 'year-2028': pressYear2028,
+    'year-2029': pressYear2029, 'year-2030': pressYear2030,
+  }), [pressYear2020, pressYear2021, pressYear2022, pressYear2023, pressYear2024, pressYear2025, pressYear2026, pressYear2027, pressYear2028, pressYear2029, pressYear2030]);
+
+  const pressMonths = useMemo(() => ({
+    'month-1': pressMonth1, 'month-2': pressMonth2, 'month-3': pressMonth3,
+    'month-4': pressMonth4, 'month-5': pressMonth5, 'month-6': pressMonth6,
+    'month-7': pressMonth7, 'month-8': pressMonth8, 'month-9': pressMonth9,
+    'month-10': pressMonth10, 'month-11': pressMonth11, 'month-12': pressMonth12,
+  }), [pressMonth1, pressMonth2, pressMonth3, pressMonth4, pressMonth5, pressMonth6, pressMonth7, pressMonth8, pressMonth9, pressMonth10, pressMonth11, pressMonth12]);
 
   const isSel = (month) => selectedPeriod && selectedPeriod.year === pickerYear && selectedPeriod.month === month;
 
@@ -116,57 +165,65 @@ export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClo
           </div>
         </div>
 
-        {/* BOTONES DE AÑO */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
-          {[2025, 2026].map((year) => {
-            const isYearActive = pickerYear === year;
-            if (!pressYears[`year-${year}`]) {
-              pressYears[`year-${year}`] = usePress();
-            }
-            const press = pressYears[`year-${year}`];
-            return (
-              <button
-                key={year}
-                onClick={() => setPickerYear(year)}
-                {...press.handlers}
-                style={{
-                  flex: 1,
-                  padding: "8px 12px",
-                  borderRadius: 12,
-                  border: isYearActive ? "1.5px solid #9B6DFF" : "1.5px solid transparent",
-                  background: isYearActive ? "rgba(155,109,255,0.2)" : tokens.raised,
-                  color: isYearActive ? "#9B6DFF" : "#8B87A3",
-                  fontSize: 12,
-                  fontWeight: isYearActive ? 800 : 600,
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                  ...press.getPressStyle(),
-                }}>
-                {year}
-              </button>
-            );
-          })}
-        </div>
+        {/* 🆕 BOTONES DE AÑO - Solo si hay 2+ años */}
+        {availableYears.length > 1 && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            {availableYears.map((year) => {
+              const isYearActive = pickerYear === year;
+              const press = pressYears[`year-${year}`];
+              return (
+                <button
+                  key={year}
+                  onClick={() => setPickerYear(year)}
+                  {...press.handlers}
+                  style={{
+                    flex: 1,
+                    padding: "8px 12px",
+                    borderRadius: 12,
+                    border: isYearActive ? "1.5px solid #9B6DFF" : "1.5px solid transparent",
+                    background: isYearActive ? "rgba(155,109,255,0.2)" : tokens.raised,
+                    color: isYearActive ? "#9B6DFF" : "#8B87A3",
+                    fontSize: 12,
+                    fontWeight: isYearActive ? 800 : 600,
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    ...press.getPressStyle(),
+                  }}>
+                  {year}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* TEXTO AÑO SELECCIONADO + BOTÓN TODO EL AÑO */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <span style={{ fontSize: 10, fontWeight: 800, color: tokens.sub }}>{pickerYear}</span>
-          <button
-            onClick={() => { onSelect({ year: pickerYear, month: null }); onClose(); }}
-            style={{
-              padding: "6px 10px",
-              borderRadius: 10,
-              border: "none",
-              background: tokens.raised,
-              color: tokens.text,
-              fontSize: 10,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.15s",
-            }}>
-            Todo el año
-          </button>
-        </div>
+        {/* TEXTO AÑO SELECCIONADO + BOTÓN TODO EL AÑO (solo si 2+ años) */}
+        {availableYears.length > 1 && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: tokens.sub }}>{pickerYear}</span>
+            <button
+              onClick={() => { onSelect({ year: pickerYear, month: null }); onClose(); }}
+              style={{
+                padding: "6px 10px",
+                borderRadius: 10,
+                border: "none",
+                background: tokens.raised,
+                color: tokens.text,
+                fontSize: 10,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}>
+              Todo el año
+            </button>
+          </div>
+        )}
+
+        {/* 🆕 Solo mostrar año si hay 1 año */}
+        {availableYears.length === 1 && (
+          <div style={{ marginBottom: 12 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: tokens.sub }}>{pickerYear}</span>
+          </div>
+        )}
 
         {/* GRILLA DE MESES */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
@@ -174,9 +231,6 @@ export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClo
             const month = idx + 1;
             const sel = isSel(month);
             const hasData = monthHasData(month, pickerYear);
-            if (!pressMonths[`month-${month}`] && hasData) {
-              pressMonths[`month-${month}`] = usePress();
-            }
             const press = pressMonths[`month-${month}`];
 
             return (

@@ -25,9 +25,7 @@ export function useTransactions(userId) {
       try {
         const txs = await transactionService.getTransactionsByUser(userId);
         setAllTransactions(txs);
-        console.log(`📦 Cargadas ${txs.length} transacciones de ${userId}`);
       } catch (err) {
-        console.error('Error loading transactions:', err);
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -46,7 +44,6 @@ export function useTransactions(userId) {
         setAllTransactions(prev => [newTx, ...prev]);
       }
     } catch (err) {
-      console.error('Error adding transaction:', err);
       setError(err.message);
     }
   }, [userId]);
@@ -54,17 +51,17 @@ export function useTransactions(userId) {
   // 🆕 Editar transacción en Supabase
   const editTransaction = useCallback(async (id, updatedData) => {
     try {
-      const updated = await transactionService.editTransaction(id, updatedData);
+      // 🆕 FASE 3C - Pasar userId para registrar historial
+      const updated = await transactionService.editTransaction(id, updatedData, null, userId);
       if (updated) {
         setAllTransactions(prev =>
           prev.map(tx => tx.id === id ? updated : tx)
         );
       }
     } catch (err) {
-      console.error('Error editing transaction:', err);
       setError(err.message);
     }
-  }, []);
+  }, [userId]);
 
   // 🆕 Eliminar transacción de Supabase
   const deleteTransaction = useCallback(async (id) => {
@@ -74,7 +71,6 @@ export function useTransactions(userId) {
         setAllTransactions(prev => prev.filter(tx => tx.id !== id));
       }
     } catch (err) {
-      console.error('Error deleting transaction:', err);
       setError(err.message);
     }
   }, []);

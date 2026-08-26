@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import * as userService from "../services/userService"; // 🆕 FASE 3D - Para crear usuarios en Supabase
 
 /**
  * useAuth.js — Hook de autenticación
@@ -14,10 +15,10 @@ import { useState, useCallback } from "react";
  */
 
 // ===== USUARIOS DE PRUEBA (LOCAL) =====
-// IDs alphanuméricos: UA0001, UB0002, UC0003 (memorable, escalable, legible en ProfilePage)
+// 🆕 UUIDs v4 válidos (Supabase requiere UUID, no strings alphanuméricos)
 const MOCK_USERS = [
   {
-    id: "UA0001",
+    id: "550e8400-e29b-41d4-a716-446655440001",
     username: "Luis Daniel",
     nombre: "Luis",
     apellido: "Daniel",
@@ -27,7 +28,7 @@ const MOCK_USERS = [
     createdAt: "2025-01-01"
   },
   {
-    id: "UB0002",
+    id: "550e8400-e29b-41d4-a716-446655440002",
     username: "María García",
     nombre: "María",
     apellido: "García",
@@ -37,7 +38,7 @@ const MOCK_USERS = [
     createdAt: "2026-01-15"
   },
   {
-    id: "UC0003",
+    id: "550e8400-e29b-41d4-a716-446655440003",
     username: "Carlos López",
     nombre: "Carlos",
     apellido: "López",
@@ -121,6 +122,28 @@ export function useAuth() {
         throw new Error("El correo electrónico ya está registrado");
       }
 
+      // 🆕 Validar email duplicado en Supabase ANTES de registrar
+      // TODO: Descomentar cuando Supabase Auth esté listo
+      // try {
+      //   const { data: existingUser, error } = await supabase
+      //     .from('usuarios')
+      //     .select('email')
+      //     .eq('email', email)
+      //     .maybeSingle();
+      //
+      //   if (error && error.code !== 'PGRST116') {
+      //     throw error;
+      //   }
+      //
+      //   if (existingUser) {
+      //     throw new Error("El correo electrónico ya está registrado");
+      //   }
+      // } catch (err) {
+      //   if (err.message.includes("ya está registrado")) {
+      //     throw err;
+      //   }
+      // }
+
       // TODO: Remplazar con Supabase Auth
       // const { data, error } = await supabase.auth.signUp({
       //   email: email,
@@ -135,31 +158,28 @@ export function useAuth() {
       //   }
       // });
 
-      // Simulación local (remove cuando conectes Supabase)
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Generar ID único simple
-      const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      const newUser = {
-        id: newId,
-        username,
+      // 🆕 FASE 3D - Crear usuario en Supabase
+      const result = await userService.createUser({
         nombre,
         apellido,
         email,
         phone: phone || "",
-        password, // TODO: remover esto cuando uses Supabase (las passwords se guardan en Supabase, no localmente)
-        createdAt: new Date().toISOString().split("T")[0]
-      };
+        password,
+        username
+      });
 
-      // Agregar usuario a la lista local
-      MOCK_USERS.push(newUser);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       // Log in automáticamente
-      const { password: _, ...userWithoutPassword } = newUser;
-      setUser(userWithoutPassword);
+      setUser(result.user);
 
-      return { success: true, user: userWithoutPassword };
+      // Guardar en localStorage
+      localStorage.setItem("currentUserId", result.user.id);
+      localStorage.setItem("currentUserEmail", result.user.email);
+
+      return { success: true, user: result.user };
     } catch (err) {
       const errorMsg = err.message || "Error al registrar";
       setError(errorMsg);

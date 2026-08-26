@@ -17,17 +17,22 @@ export async function getInitialCategories(userId) {
     .is('deleted_at', null); // Excluir borradas
 
   if (error) {
-    console.error('Error fetching categories:', error);
     return {};
   }
 
-  // Convertir a formato: { pillarId: [categoryId, ...] }
+  // 🆕 Convertir a formato: { pillarId: [{ id, name }, ...] }
   const categories = {};
   (data || []).forEach(cat => {
     if (!categories[cat.pillar]) {
       categories[cat.pillar] = [];
     }
-    categories[cat.pillar].push(cat.id);
+    // Guardar objeto completo con id y name
+    categories[cat.pillar].push({
+      id: cat.id,
+      name: cat.name,
+      spent: cat.spent || 0,
+      budget: cat.budget || null
+    });
   });
 
   return categories;
@@ -44,7 +49,6 @@ export async function getCategoriesByUser(userId) {
     .is('deleted_at', null);
 
   if (error) {
-    console.error('Error fetching user categories:', error);
     return [];
   }
   return data || [];
@@ -52,9 +56,10 @@ export async function getCategoriesByUser(userId) {
 
 // ✅ Crear nueva categoría
 export async function createCategory(userId, pillarId, categoryName) {
-  if (!userId) return null;
+  if (!userId) throw new Error('No userId provided');
 
-  const newId = `cat_${categoryName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+  // 🆕 Generar UUID válido en lugar de string personalizado
+  const newId = crypto.randomUUID();
 
   const { data, error } = await supabase
     .from('categorias_usuario')
@@ -71,8 +76,7 @@ export async function createCategory(userId, pillarId, categoryName) {
     .select();
 
   if (error) {
-    console.error('Error creating category:', error);
-    return null;
+    throw new Error(`Fallo al crear categoría: ${error.message}`);
   }
   return data?.[0]?.id || newId;
 }
@@ -88,7 +92,7 @@ export async function findCategoryByNameAndPillar(userId, pillarId, categoryName
     .eq('pillar', pillarId)
     .eq('name', categoryName)
     .is('deleted_at', null)
-    .single();
+    .maybeSingle(); // 🆕 Usar maybeSingle para evitar 406 cuando no existe
 
   if (error) return null; // No encontrada
   return data;
@@ -96,6 +100,16 @@ export async function findCategoryByNameAndPillar(userId, pillarId, categoryName
 
 // ✅ Editar categoría
 export async function editCategory(categoryId, userId, updates) {
+  // 🆕 FASE 3C - Obtener datos antiguos para registrar historial
+  let oldData = null;
+  const { data: catData } = await supabase
+    .from('categorias_usuario')
+    .select('*')
+    .eq('id', categoryId)
+    .eq('user_id', userId)
+    .maybeSingle(); // 🆕 Usar maybeSingle para evitar 406
+  oldData = catData;
+
   const { data, error } = await supabase
     .from('categorias_usuario')
     .update(updates)
@@ -104,9 +118,19 @@ export async function editCategory(categoryId, userId, updates) {
     .select();
 
   if (error) {
-    console.error('Error editing category:', error);
     return null;
   }
+
+  // 🆕 FASE 3C - Registrar cambios en historial
+  if (oldData && data?.[0]) {
+    for (const [field, newValue] of Object.entries(updates)) {
+      const oldValue = oldData[field];
+      if (oldValue !== newValue) {
+        await addCategoryHistory(userId, categoryId, field, oldValue, newValue);
+      }
+    }
+  }
+
   return data?.[0] || null;
 }
 
@@ -119,32 +143,135 @@ export async function deleteCategory(categoryId, userId) {
     .eq('user_id', userId);
 
   if (error) {
-    console.error('Error deleting category:', error);
     return false;
   }
   return true;
 }
 
 // ✅ Funciones de estado local (para compatibilidad)
-export function addCategory(categories, pillarId, categoryId) {
+export function addCategory(categories, pillarId, categoryObj) {
   return {
     ...categories,
-    [pillarId]: [...(categories[pillarId] || []), categoryId]
+    [pillarId]: [...(categories[pillarId] || []), categoryObj]
   };
 }
 
 export function removeCategory(categories, categoryId, pillarId) {
   return {
     ...categories,
-    [pillarId]: (categories[pillarId] || []).filter(id => id !== categoryId)
+    [pillarId]: (categories[pillarId] || []).filter(cat => {
+      const id = typeof cat === 'string' ? cat : cat.id;
+      return id !== categoryId;
+    })
   };
 }
 
 export function moveCategory(categories, categoryId, newPillarId) {
   const updated = {};
   for (const pillar in categories) {
-    updated[pillar] = categories[pillar].filter(id => id !== categoryId);
+    updated[pillar] = (categories[pillar] || []).filter(cat => {
+      const id = typeof cat === 'string' ? cat : cat.id;
+      return id !== categoryId;
+    });
   }
-  updated[newPillarId] = [...(updated[newPillarId] || []), categoryId];
+  // Encontrar el objeto de categoría para moverlo
+  let categoryObj = categoryId;
+  for (const pillar in categories) {
+    const found = (categories[pillar] || []).find(cat => {
+      const id = typeof cat === 'string' ? cat : cat.id;
+      return id === categoryId;
+    });
+    if (found) {
+      categoryObj = found;
+      break;
+    }
+  }
+  updated[newPillarId] = [...(updated[newPillarId] || []), categoryObj];
   return updated;
+}
+
+// 🆕 FASE 3C - HISTORIAL DE CATEGORÍAS en Supabase
+/**
+ * Agregar entrada al historial de cambios de una categoría
+ */
+export async function addCategoryHistory(userId, categoryId, field, oldValue, newValue) {
+  if (!userId || !categoryId) return false;
+
+  // Solo registrar si realmente cambió
+  if (oldValue === newValue) return true;
+
+
+  const { error } = await supabase
+    .from('category_history')
+    .insert([
+      {
+        user_id: userId,
+        category_id: categoryId,
+        field,
+        old_value: String(oldValue ?? ''),
+        new_value: String(newValue ?? ''),
+        changed_at: new Date().toISOString(),
+      },
+    ]);
+
+  if (error) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Obtener historial de cambios de una categoría
+ */
+export async function getCategoryHistory(userId, categoryId) {
+  if (!userId || !categoryId) return [];
+
+  const { data, error } = await supabase
+    .from('category_history')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('category_id', categoryId)
+    .order('changed_at', { ascending: false });
+
+  if (error) {
+    return [];
+  }
+  return data || [];
+}
+
+/**
+ * Obtener categoría completa CON historial (para getAttributeAtDate)
+ * ✅ NUEVO - Trae la categoría + su historial en formato compatible
+ */
+export async function getCategoryWithHistory(categoryId, userId) {
+  if (!categoryId || !userId) return null;
+
+  try {
+    // Traer categoría completa
+    const { data: category, error: catError } = await supabase
+      .from('categorias_usuario')
+      .select('*')
+      .eq('id', categoryId)
+      .eq('user_id', userId)
+      .single();
+
+    if (catError || !category) {
+      return null;
+    }
+
+    // Traer historial de cambios
+    const historyData = await getCategoryHistory(userId, categoryId);
+
+    // Convertir al formato de attributeHistoryService
+    category.history = (historyData || []).map(h => ({
+      field: h.field,
+      old: h.old_value,
+      new: h.new_value,
+      changedAt: h.changed_at
+    }));
+
+    return category;
+  } catch (err) {
+    return null;
+  }
 }

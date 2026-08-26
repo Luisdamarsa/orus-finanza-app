@@ -28,7 +28,6 @@ export async function downloadReportFromFile(reportId, normalizedFileName) {
 
     return { success: true, filename };
   } catch (error) {
-    console.error('Error descargando PDF:', error);
     return { success: false, error: error.message };
   }
 }

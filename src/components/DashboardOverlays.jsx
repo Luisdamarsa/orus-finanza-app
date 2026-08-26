@@ -17,6 +17,7 @@ import { useDashboard } from "../contexts/DashboardContext";
  * Refactor del Dashboard — HU-2. Extraído tal cual desde App.jsx (idéntico).
  */
 export default function DashboardOverlays() {
+  const dashboard = useDashboard();
   const {
     isDark, setScreen, setPressingFAB, pressingFAB,
     showPeriodPicker, selectedPeriod, setSelectedPeriod, setFilteredPillar,
@@ -28,7 +29,10 @@ export default function DashboardOverlays() {
     setSearchOpen, setSearchQuery, searchOpen, searchQuery,
     setVoicePrefill,
     currentUserId, customBudgets, getBudgetForMonth, // 🆕 FASE 2 - Pasar userId y presupuestos
-  } = useDashboard();
+  } = dashboard;
+
+  // 🆕 FASE 3C - Obtener categoryMap del contexto (acceder directamente porque podría no estar en destructuring)
+  const categoryMap = dashboard?.categoryMap || {};
 
   const [showVoice, setShowVoice] = useState(false);
   // Recuerda si al abrir la lupa ya estábamos en Estado 2 (movimientos abiertos)
@@ -85,6 +89,7 @@ export default function DashboardOverlays() {
           onSelect={p => { setSelectedPeriod(p); setFilteredPillar(null); setActiveId(null); }}
           onClose={() => setShowPeriodPicker(false)}
           monthHasData={monthHasData}
+          transactions={transactions}
         />
       )}
 
@@ -100,22 +105,23 @@ export default function DashboardOverlays() {
             />
           ) : (
             <PillarBarsPopup
-              pillar={selectedPillarDetail}
-              categories={categories}
-              onClose={() => { setShowPillarBars(false); setActiveId(null); }}
-              onViewMovements={() => {
-                setShowPillarBars(false);
-                setActiveId(null); // Resetear la tarjeta seleccionada al abrir movimientos
-                setSelectedPillarForMovements(selectedPillarDetail);
-                setScreen("movimientos");
-              }}
-              isDark={isDark}
-              transactions={transactions}
-              selectedPeriod={selectedPeriod}
-              currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
-              customBudgets={customBudgets} // 🆕 FASE 2 - Pasar presupuestos personalizados
-              getBudgetForMonth={getBudgetForMonth} // 🆕 FASE 2 - Calcular presupuesto del mes
-            />
+                pillar={selectedPillarDetail}
+                categories={categories}
+                onClose={() => { setShowPillarBars(false); setActiveId(null); }}
+                onViewMovements={() => {
+                  setShowPillarBars(false);
+                  setActiveId(null); // Resetear la tarjeta seleccionada al abrir movimientos
+                  setSelectedPillarForMovements(selectedPillarDetail);
+                  setScreen("movimientos");
+                }}
+                isDark={isDark}
+                transactions={transactions}
+                selectedPeriod={selectedPeriod}
+                currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId
+                customBudgets={customBudgets} // 🆕 FASE 2 - Pasar presupuestos personalizados
+                getBudgetForMonth={getBudgetForMonth} // 🆕 FASE 2 - Calcular presupuesto del mes
+                categoryMap={categoryMap} // 🆕 FASE 3C - Pasar categoryMap para mostrar nombres
+              />
           )}
         </>
       )}

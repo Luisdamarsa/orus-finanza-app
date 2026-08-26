@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { getLastMonthWithData } from "../utils/calculations";
-import { DUMMY_TRANSACTIONS } from "../constants";
 
 /**
  * useDashboardFilters.js - Estado de "vista" del dashboard.
@@ -14,8 +12,14 @@ import { DUMMY_TRANSACTIONS } from "../constants";
  * Dashboard, para no tocar los ~50 sitios que los consumen.
  */
 export function useDashboardFilters() {
-  // Inicia en el último mes con datos (sin hardcodear)
-  const [selectedPeriod, setSelectedPeriod] = useState(() => getLastMonthWithData(DUMMY_TRANSACTIONS));
+  // 🆕 FASE 3B - Iniciar con el mes ACTUAL, no con el último mes con datos
+  const [selectedPeriod, setSelectedPeriod] = useState(() => {
+    const today = new Date();
+    return {
+      month: today.getMonth() + 1,
+      year: today.getFullYear()
+    };
+  });
   const [filterType, setFilterType] = useState(null);            // null | "gastado" | "ingresos"
   const [filteredPillar, setFilteredPillar] = useState(null);
   const [activeId, setActiveId] = useState(null);                // pilar activo del donut

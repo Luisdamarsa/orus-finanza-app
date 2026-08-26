@@ -21,10 +21,9 @@ export async function getPillarBudget(userId, pillarId, monthYear) {
     .eq('user_id', userId)
     .eq('pillar_id', pillarId)
     .eq('month_year', monthYear)
-    .single();
+    .maybeSingle(); // 🆕 Usar maybeSingle para evitar 406 cuando no hay presupuesto
 
   if (error) {
-    console.error('Error fetching pillar budget:', error);
     return null;
   }
   return data?.amount || null;
@@ -43,7 +42,6 @@ export async function getPillarBudgetsForMonth(userId, monthYear) {
     .eq('month_year', monthYear);
 
   if (error) {
-    console.error('Error fetching pillar budgets:', error);
     return {};
   }
 
@@ -68,7 +66,7 @@ export async function setPillarBudget(userId, pillarId, monthYear, amount) {
     .eq('user_id', userId)
     .eq('pillar_id', pillarId)
     .eq('month_year', monthYear)
-    .single();
+    .maybeSingle(); // 🆕 Usar maybeSingle para evitar 406 cuando no hay presupuesto anterior
 
   const oldAmount = oldData.data?.amount || null;
 
@@ -88,7 +86,6 @@ export async function setPillarBudget(userId, pillarId, monthYear, amount) {
     .select();
 
   if (error) {
-    console.error('Error setting pillar budget:', error);
     return false;
   }
 
@@ -103,17 +100,18 @@ export async function setPillarBudget(userId, pillarId, monthYear, amount) {
 // ✅ PRESUPUESTOS DE CATEGORÍAS
 
 /**
- * Obtener presupuesto de categoría
+ * Obtener presupuesto de categoría para un mes específico
  */
-export async function getCategoryBudget(userId, categoryId) {
-  if (!userId) return null;
+export async function getCategoryBudget(userId, categoryId, monthYear) {
+  if (!userId || !monthYear) return null;
 
   const { data, error } = await supabase
     .from('category_budgets')
     .select('amount')
     .eq('user_id', userId)
     .eq('category_id', categoryId)
-    .single();
+    .eq('month_year', monthYear) // 🆕 FASE 3D - Filtrar por mes
+    .maybeSingle(); // 🆕 Usar maybeSingle en lugar de single para evitar 406 cuando no hay budget
 
   if (error) {
     // Categoría sin presupuesto es normal
@@ -123,18 +121,18 @@ export async function getCategoryBudget(userId, categoryId) {
 }
 
 /**
- * Obtener todos los presupuestos de categorías de un usuario
+ * Obtener todos los presupuestos de categorías de un usuario para un mes específico
  */
-export async function getCategoryBudgetsForUser(userId) {
-  if (!userId) return {};
+export async function getCategoryBudgetsForUser(userId, monthYear) {
+  if (!userId || !monthYear) return {};
 
   const { data, error } = await supabase
     .from('category_budgets')
     .select('category_id, amount')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .eq('month_year', monthYear); // 🆕 FASE 3D - Filtrar por mes
 
   if (error) {
-    console.error('Error fetching category budgets:', error);
     return {};
   }
 
@@ -147,17 +145,14 @@ export async function getCategoryBudgetsForUser(userId) {
 }
 
 /**
- * Establecer presupuesto de categoría (crea o actualiza)
+ * Establecer presupuesto de categoría (crea o actualiza) para un mes específico
  */
-export async function setCategoryBudget(userId, categoryId, amount) {
-  if (!userId || !categoryId) return false;
+export async function setCategoryBudget(userId, categoryId, monthYear, amount) {
+  if (!userId || !categoryId || !monthYear) return false;
 
   // 🆕 Validar que amount sea un número válido
   const numAmount = parseInt(amount) || 0;
-  if (numAmount < 0) {
-    console.warn(`❌ Presupuesto negativo no permitido: ${numAmount}`);
-    return false;
-  }
+  if (numAmount < 0) return false;
 
   // 1. Obtener valor anterior (para historial)
   const oldData = await supabase
@@ -165,30 +160,42 @@ export async function setCategoryBudget(userId, categoryId, amount) {
     .select('amount')
     .eq('user_id', userId)
     .eq('category_id', categoryId)
-    .single();
+    .eq('month_year', monthYear) // 🆕 FASE 3D - Filtrar por mes
+    .maybeSingle(); // 🆕 Usar maybeSingle para evitar 406 cuando no hay presupuesto anterior
 
   const oldAmount = oldData.data?.amount || null;
 
   // 2. Upsert del nuevo presupuesto
+  // 🆕 FASE 3C - Obtener nombre de la categoría desde categorias_usuario
+  let categoryName = null;
+  if (categoryId) {
+    const { data: catData } = await supabase
+      .from('categorias_usuario')
+      .select('name')
+      .eq('id', categoryId)
+      .eq('user_id', userId)
+      .single();
+    categoryName = catData?.name || null;
+  }
+
   const { data, error } = await supabase
     .from('category_budgets')
     .upsert(
       {
         user_id: userId,
         category_id: categoryId,
+        month_year: monthYear, // 🆕 FASE 3D - Guardar mes
         amount: numAmount,  // 🆕 Asegurar que es un número válido
+        category_name: categoryName, // 🆕 FASE 3C - Guardar nombre de categoría
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'user_id,category_id' }
+      { onConflict: 'user_id,category_id,month_year' } // 🆕 FASE 3D - Agregar month_year al conflicto
     )
     .select();
 
   if (error) {
-    console.error('Error setting category budget:', error);
     return false;
   }
-
-  console.log(`✅ Presupuesto categoría guardado: ${categoryId}=${numAmount}`);
 
   // 3. Agregar al historial (si cambió)
   if (oldAmount !== numAmount) {
@@ -221,7 +228,6 @@ export async function addBudgetHistory(userId, entityType, entityId, field, oldV
     ]);
 
   if (error) {
-    console.error('Error adding budget history:', error);
     return false;
   }
   return true;
@@ -242,7 +248,6 @@ export async function getBudgetHistory(userId, entityType, entityId) {
     .order('changed_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching budget history:', error);
     return [];
   }
   return data || [];
@@ -261,7 +266,6 @@ export async function getAllBudgetHistory(userId) {
     .order('changed_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching all budget history:', error);
     return [];
   }
   return data || [];

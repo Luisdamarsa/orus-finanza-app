@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
 import { useTheme } from "../hooks/useTheme";
+import { usePopup } from "../services/PopupService";
+import { useUserCategories } from "../hooks/useUserCategories";
 import { PILLARS, MANUAL_METHODS, ALL_CATS } from "../constants";
 import { CheckmarkIcon, TrashIcon } from "../icons/Icons";
 import { getCategoryName } from "../utils/categoryUtils";
@@ -43,10 +45,14 @@ export default function TransactionPage({
   isEditing = false,
   editingTransaction = null,
   prefill = null, // 🆕 datos por voz para pre-llenar (modo nuevo)
+  currentUserId, // 🆕 FASE 3C - Para cargar categorías de Supabase
 }) {
   // 🆕 Tema desde ThemeContext
   const { isDark } = useTheme();
   const tokens = isDark ? DARK : LIGHT;
+  const popup = usePopup();
+  // 🆕 FASE 3C - Cargar categorías del usuario desde Supabase
+  const categoryMap = useUserCategories(currentUserId);
   // 🆕 Hook para animación de press en botón de atrás
   const pressBack = usePress();
   // 🆕 Hook para animación de press en botón de guardar
@@ -114,8 +120,11 @@ export default function TransactionPage({
     PILLARS.forEach(pillar => {
       const catIdList = categories[pillar.id] || [];
       if (Array.isArray(catIdList)) {
-        catIdList.forEach(catId => {
-          formatted.push({ id: catId, name: getCategoryName(catId), pillar: pillar.id });
+        catIdList.forEach(cat => {
+          // 🆕 Soportar tanto IDs como objetos {id, name}
+          const catId = typeof cat === 'string' ? cat : cat.id;
+          const catName = typeof cat === 'string' ? getCategoryName(cat, categoryMap) : cat.name;
+          formatted.push({ id: catId, name: catName, pillar: pillar.id });
         });
       }
     });
@@ -123,11 +132,16 @@ export default function TransactionPage({
   };
 
   // 🆕 Obtener nombre de categoría por ID (resuelve cualquier categoría, incl. ingresos)
-  const getCategoryDisplayName = (categoryId) => (categoryId ? getCategoryName(categoryId) : null);
+  const getCategoryDisplayName = (categoryId) => (categoryId ? getCategoryName(categoryId, categoryMap) : null);
 
   // 🆕 Categorías de INGRESO (pillar "ingreso"), lista plana
   const getIncomeCategories = () =>
-    (categories["ingreso"] || []).map((catId) => ({ id: catId, name: getCategoryName(catId), pillar: "ingreso" }));
+    (categories["ingreso"] || []).map((cat) => {
+      // 🆕 Soportar tanto IDs como objetos {id, name}
+      const catId = typeof cat === 'string' ? cat : cat.id;
+      const catName = typeof cat === 'string' ? getCategoryName(cat, categoryMap) : cat.name;
+      return { id: catId, name: catName, pillar: "ingreso" };
+    });
 
   // Cálculos derivados
   const numericAmount = parseInt(rawAmount.replace(/\D/g, "")) || 0;
@@ -194,7 +208,7 @@ export default function TransactionPage({
         isNewCategory // la categoría se crea/reutiliza al guardar (en createTransaction)
       });
     } catch (err) {
-      console.error("❌ Error creating transaction:", err);
+      popup.showErrorPopup("No se pudo guardar la transacción");
     }
   }
 
@@ -215,7 +229,7 @@ export default function TransactionPage({
       };
       await onSave(editingTransaction.id, updatedTransaction);
     } catch (err) {
-      console.error("❌ Error editing transaction:", err);
+      popup.showErrorPopup("No se pudo guardar la transacción");
     }
   }
 
@@ -227,7 +241,6 @@ export default function TransactionPage({
     try {
       await onDelete(editingTransaction.id);
     } catch (err) {
-      console.error("❌ Error deleting transaction:", err);
     }
   }
 

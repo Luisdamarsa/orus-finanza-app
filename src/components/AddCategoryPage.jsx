@@ -135,7 +135,6 @@ export default function AddCategoryPage({
         popup.showCreatePopup('Categoría');
       }
     } catch (err) {
-      console.error("Error al guardar categoría:", err);
       popup.showErrorPopup(`No se pudo ${isEditing ? "actualizar" : "crear"} la categoría`);
     }
   };
@@ -149,7 +148,6 @@ export default function AddCategoryPage({
         // 🆕 Mostrar popup de éxito usando el servicio
         popup.showDeletePopup('Categoría');
       } catch (err) {
-        console.error("Error al eliminar categoría:", err);
         popup.showErrorPopup("No se pudo eliminar la categoría");
       }
     }

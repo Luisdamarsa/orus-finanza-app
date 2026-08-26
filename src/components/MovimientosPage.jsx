@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { usePress } from "../hooks/usePress";
+import { usePopup } from "../services/PopupService";
+import { useUserCategories } from "../hooks/useUserCategories";
+import { useCategoryHistory } from "../context/CategoryHistoryContext"; // 🆕 FASE 3C - Usar context global
 import { groupByDate, fmt } from "../utils/formatters";
-import { METHOD_META, ALL_CATS, PILLARS, DAY_PILLAR_COLOR } from "../constants";
+import { METHOD_META, PILLARS, DAY_PILLAR_COLOR } from "../constants"; // 🆕 Remover ALL_CATS
 import ColorBar from "./ColorBar";
 import TransactionsListService from "./TransactionsListService";
 import CategoryProgressBar from "./CategoryProgressBar";
@@ -33,11 +36,35 @@ export default function MovimientosPage({
   selectedPeriod,
   onEditTransaction, // 🆕 Callback para editar transacción
   showIncomes, // 🆕 FASE 2 - Si debe incluir saldo en el denominador
+  currentUserId, // 🆕 FASE 3C - Para cargar categorías de Supabase
+  categoryMap: categoryMapProp, // 🆕 FASE 3C - Recibir categoryMap como prop
+  categories = {}, // 🆕 FASE 3C - Recibir categorías del usuario
+  getBudgetForMonth, // 🆕 FASE 3B - Recibir función para obtener presupuestos de Supabase
+  customBudgets, // 🆕 FASE 3B - Recibir presupuestos personalizados
+  categoryBudgets = {}, // 🆕 FASE 3B - Recibir presupuestos de categorías (globales, no mensuales)
 }) {
   // 🆕 Hooks para animación de press en botones
   const pressClearFilter = usePress();
+  const popup = usePopup();
   // 🆕 Estado para trackear qué tag de categoría está siendo presionado (mantener por múltiples tags)
   const [pressingCategoryTag, setPressingCategoryTag] = useState(null);
+
+  // 🆕 FASE 3C - Usar categoryMap del prop si viene, si no cargar desde Supabase
+  const categoryMapFromHook = useUserCategories(currentUserId);
+  const categoryMap = categoryMapProp || categoryMapFromHook;
+
+  // ✅ NUEVO - Cargar categorías completas CON historial para transacciones
+  // 🆕 FASE 3C - Usar context global (CategoryHistoryProvider lo maneja)
+  const { categoriesWithHistory } = useCategoryHistory();
+
+  // 🆕 DEBUG - Log único para revisar categoryMap y customBudgets
+
+  // 🆕 Mostrar popup de error cuando hay error
+  useEffect(() => {
+    if (error) {
+      popup.showErrorPopup("No se pudieron cargar las transacciones");
+    }
+  }, [error, popup]);
 
   const t = isDark
     ? { bg: "#000000", card: "#1E1E2E", border: "#2D2D3A", text: "#F0EEFF", sub: "#7B7A99", raised: "linear-gradient(155deg,#262231 0%,#17151f 100%)" }
@@ -60,19 +87,12 @@ export default function MovimientosPage({
     pillarTxns.reduce((sum, tx) => sum + Math.min(tx.amount, 0), 0)
   );
 
-  // 🆕 Categorías del pilar que EXISTÍAN en el período visto (historización: createdAt/deletedAt)
-  const periodKey = selectedPeriod && selectedPeriod.month && selectedPeriod.year
-    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`
-    : null;
-  const pillarCategories = ALL_CATS
-    .filter((cat) => cat.pillar === pilar.id)
-    .filter((cat) => {
-      if (!periodKey) return !cat.deletedAt; // "Todo": excluir borradas
-      const createdOk = !cat.createdAt || cat.createdAt.slice(0, 7) <= periodKey;
-      const notDeleted = !cat.deletedAt || cat.deletedAt.slice(0, 7) > periodKey;
-      return createdOk && notDeleted;
-    })
-    .map((cat) => cat.id);
+  // 🆕 FASE 3C - Usar categorías del usuario desde Supabase, no datos mock
+  // Categorías del pilar del usuario actual
+  const pillarCategories = (categories[pilar.id] || []).map((cat) => {
+    // Soportar tanto objetos {id, name} como IDs string
+    return typeof cat === 'string' ? cat : cat.id;
+  });
 
   // Desglose por categoría - mostrar TODAS las categorías del pilar
   const categorySpent = {};
@@ -88,11 +108,10 @@ export default function MovimientosPage({
     }
   });
 
-  // Porcentaje del presupuesto - usar getAttributeAtDate para períodos históricos
+  // 🆕 FASE 3B - Usar getBudgetForMonth para obtener presupuesto de Supabase
   let budget = null;
-  if (isMonthPeriod) {
-    const budgetQueryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
-    budget = getAttributeAtDate(pilar, "budget", budgetQueryDate) || null;
+  if (isMonthPeriod && getBudgetForMonth) {
+    budget = getBudgetForMonth(pilar.id, selectedPeriod.month, selectedPeriod.year, customBudgets, currentUserId) || null;
   }
   const percentage = budget ? (totalSpent / budget) * 100 : null;
   const isOverBudget = percentage && percentage > 100;
@@ -290,21 +309,6 @@ export default function MovimientosPage({
         <style>{`::-webkit-scrollbar { display: none; }`}</style>
 
         {/* 🆕 FASE 3A - Mostrar error si hay */}
-        {error && (
-          <div style={{
-            marginTop: 16,
-            padding: "12px 14px",
-            borderRadius: 12,
-            background: isDark ? "rgba(239, 68, 68, 0.15)" : "rgba(225, 29, 72, 0.1)",
-            border: `1px solid ${isDark ? "rgba(239, 68, 68, 0.3)" : "rgba(225, 29, 72, 0.2)"}`,
-            color: isDark ? "#FF8A8A" : "#E11D48",
-            fontSize: 12,
-            fontWeight: 600,
-            textAlign: "center"
-          }}>
-            ⚠️ Error cargando transacciones: {error}
-          </div>
-        )}
 
         {/* 🆕 Desglose por categoría (adaptativo, sin presupuesto) */}
         {Object.keys(categorySpent).length > 0 && (
@@ -322,21 +326,20 @@ export default function MovimientosPage({
                 const maxSpent = entries.length > 0 ? entries[0][1] : 1;
 
                 return entries.map(([categoryId, spent]) => {
-                  // 🆕 Nombre y presupuesto históricos (según el período visto)
-                  let categoryName = getCategoryName(categoryId);
-                  const category = ALL_CATS.find(cat => cat.id === categoryId);
-                  const queryDate = selectedPeriod && selectedPeriod.month && selectedPeriod.year
-                    ? `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`
-                    : null;
-                  if (category && queryDate) {
-                    categoryName = getAttributeAtDate(category, "name", queryDate);
-                  }
-                  // 🆕 Presupuesto solo en vista de mes específico (al fin del mes).
-                  // En agregados (año / todo el tiempo) no hay presupuesto → barra proporcional.
+                  // 🆕 Nombre y presupuesto (desde Supabase)
+                  // 🆕 FASE 3C - Usar categoryMap para obtener nombre de Supabase
+                  // 🆕 FASE 3D - 100% Supabase, sin ALL_CATS
+                  let categoryName = getCategoryName(categoryId, categoryMap);
+                  // 🆕 FASE 3D - Presupuesto de categoría (MENSUAL como pilares)
                   let categoryBudget = null;
-                  if (isMonthPeriod && category) {
-                    const budgetQueryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-${String(new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate()).padStart(2, '0')}`;
-                    categoryBudget = getAttributeAtDate(category, "budget", budgetQueryDate) || null;
+                  if (isMonthPeriod && selectedPeriod && currentUserId) {
+                    const month = selectedPeriod.month || new Date().getMonth() + 1;
+                    const year = selectedPeriod.year || new Date().getFullYear();
+                    const monthYear = `${year}-${String(month).padStart(2, '0')}`;
+                    const userMonthBudgets = categoryBudgets[currentUserId]?.[monthYear] || {};
+                    if (userMonthBudgets[categoryId]) {
+                      categoryBudget = userMonthBudgets[categoryId];
+                    }
                   }
 
                   const toggleCat = () => setSelectedCategories(prev =>
@@ -433,13 +436,8 @@ export default function MovimientosPage({
                       {selectedCategories.map((cat, idx) => {
                         const catColor = pilar.darkColor || "#22C55E";
 
-                        // 🆕 Obtener nombre histórico de la categoría filtrada
-                        let displayName = getCategoryName(cat);
-                        const category = ALL_CATS.find(c => c.id === cat);
-                        if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
-                          const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
-                          displayName = getAttributeAtDate(category, "name", queryDate);
-                        }
+                        // 🆕 Obtener nombre de la categoría filtrada (desde Supabase)
+                        let displayName = getCategoryName(cat, categoryMap);
 
                         const isPressingThisTag = pressingCategoryTag === idx;
                         return (
@@ -490,7 +488,6 @@ export default function MovimientosPage({
                     {selectedCategories.length > 1 && (
                       <button
                         onClick={() => {
-                          console.log("✅ Limpiar filtro - onClick");
                           setSelectedCategories([]);
                         }}
                         {...pressClearFilter.handlers}
@@ -538,7 +535,6 @@ export default function MovimientosPage({
                       {selectedCategories.length > 1 && (
                         <button
                           onClick={() => {
-                            console.log("✅ Limpiar filtro (2do) - onClick");
                             setSelectedCategories([]);
                           }}
                           {...pressClearFilter.handlers}
@@ -584,13 +580,8 @@ export default function MovimientosPage({
                         {selectedCategories.map((cat, idx) => {
                           const catColor = pilar.darkColor || "#22C55E";
 
-                          // 🆕 Obtener nombre histórico de la categoría filtrada (caso múltiples filtros)
-                          let displayName = getCategoryName(cat);
-                          const category = ALL_CATS.find(c => c.id === cat);
-                          if (category && selectedPeriod && selectedPeriod.month && selectedPeriod.year) {
-                            const queryDate = `${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}-15`;
-                            displayName = getAttributeAtDate(category, "name", queryDate);
-                          }
+                          // 🆕 Obtener nombre de la categoría filtrada (desde Supabase)
+                          let displayName = getCategoryName(cat, categoryMap);
 
                           return (
                             <button
@@ -642,7 +633,7 @@ export default function MovimientosPage({
               No se pudieron cargar los movimientos
             </div>
           }>
-          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} />
+          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} categoryMap={categoryMap} categoriesWithHistory={categoriesWithHistory} />
           </ErrorBoundary>
           </div>
         ) : (

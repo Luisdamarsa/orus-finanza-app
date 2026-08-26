@@ -1,12 +1,11 @@
 import { useState, useCallback } from "react";
-import { ALL_CATS } from "../constants";
 
 /**
  * useBudgets.js - Hook independiente para gestionar presupuestos de categorías
  *
  * Maneja presupuestos de categorías EN MEMORIA durante la sesión.
  * Usa IDs de categoría, NO nombres.
- * NO PERSISTE - se reinician siempre desde ALL_CATS al recargar.
+ * NO PERSISTE - se reinician siempre vacío al recargar.
  *
  * Retorna:
  *   - categoryBudgets: {categoryId: presupuesto, ...}
@@ -14,15 +13,9 @@ import { ALL_CATS } from "../constants";
  */
 
 export function useBudgets() {
-  // 🔄 Estado de presupuestos de categorías - SIEMPRE iniciar desde ALL_CATS
-  const [categoryBudgets, setCategoryBudgets] = useState(() => {
-    // Inicializar siempre desde ALL_CATS usando IDs
-    const budgets = {};
-    ALL_CATS.forEach(cat => {
-      budgets[cat.id] = cat.budget;
-    });
-    return budgets;
-  });
+  // 🆕 FASE 3B - Inicializar VACÍO, no con ALL_CATS
+  // Solo agregar presupuestos cuando el usuario realmente los edita
+  const [categoryBudgets, setCategoryBudgets] = useState({});
 
   // ⭐ IMPORTANTE: Sin useEffect para guardar en storage
   // Los presupuestos se reinician siempre desde ALL_CATS al recargar
@@ -45,20 +38,9 @@ export function useBudgets() {
     }));
   }, []);
 
-  // Agregar múltiples categorías (ej: cuando vienen del hook useCategories)
+  // 🆕 FASE 3B - No agregar categorías de test - solo mantener lo que el usuario editó
   const updateWithNewCategories = useCallback(() => {
-    setCategoryBudgets(prev => {
-      const updated = { ...prev };
-
-      // Agregar categorías de ALL_CATS que no estén (por ID)
-      ALL_CATS.forEach(cat => {
-        if (!updated.hasOwnProperty(cat.id)) {
-          updated[cat.id] = cat.budget;
-        }
-      });
-
-      return updated;
-    });
+    // No hacer nada - solo mantener los presupuestos que el usuario realmente editó
   }, []);
 
   return {

@@ -8,6 +8,7 @@ import PillarBarsPopup from "./PillarBarsPopup";
 import SaldoCard from "./SaldoCard";
 import { PILLARS, SALDO_COLOR } from "../constants";
 import { useDashboard } from "../contexts/DashboardContext";
+import { useCategoryHistory } from "../context/CategoryHistoryContext"; // 🆕 FASE 3C - Acceder al historial global
 
 /**
  * DashboardExpandedState.jsx
@@ -17,6 +18,7 @@ import { useDashboard } from "../contexts/DashboardContext";
  * Extraído tal cual desde App.jsx (comportamiento idéntico).
  */
 export default function DashboardExpandedState() {
+  const dashboard = useDashboard();
   const {
     isDark, t, isLoading, isMovementOpen, filterType,
     segments, activeId, setActiveId, handleSelectPillar,
@@ -28,7 +30,14 @@ export default function DashboardExpandedState() {
     donutRef, donutContainerRef, pillarsGridRef,
     transactions, setScreen,
     currentUserId, // 🆕 FASE 2 - Pasar userId para filtrar categorías
-  } = useDashboard();
+  } = dashboard;
+
+  // 🆕 FASE 3C - Obtener categories y categoryMap del contexto
+  const categories = dashboard?.categories || {};
+  const categoryMap = dashboard?.categoryMap || {};
+
+  // 🆕 FASE 3C - Obtener categorias con historial del contexto global
+  const { categoriesWithHistory } = useCategoryHistory();
 
   return (
     <div style={{ overflow: "visible" }}>
@@ -95,6 +104,7 @@ export default function DashboardExpandedState() {
                 isDark={isDark}
                 t={t}
                 currentUserId={currentUserId} // 🆕 FASE 2 - Pasar userId para presupuestos
+                categoriesWithHistory={categoriesWithHistory} // 🆕 FASE 3C - Pasar historiales
               />
             </LoadingWrapper>
           ) : (
@@ -109,6 +119,9 @@ export default function DashboardExpandedState() {
             ) : (
               <PillarBarsPopup
                 pillar={PILLARS.find(p => p.id === activeId)}
+                categories={categories} // 🆕 FASE 3C - Pasar categorías
+                categoryMap={categoryMap} // 🆕 FASE 3C - Pasar categoryMap
+                categoriesWithHistory={categoriesWithHistory} // 🆕 FASE 3C - Pasar historiales
                 onClose={() => setActiveId(null)}
                 onViewMovements={() => {
                   setSelectedPillarForMovements(PILLARS.find(p => p.id === activeId));

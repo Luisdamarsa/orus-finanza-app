@@ -4,6 +4,8 @@ import Periodo from "./Periodo";
 import ErrorBoundary from "./ErrorBoundary";
 import Movimientos from "./MovimientosBar";
 import TransactionsListService from "./TransactionsListService";
+import { useUserCategories } from "../hooks/useUserCategories";
+import { useCategoryHistory } from "../context/CategoryHistoryContext"; // 🆕 FASE 3C - Usar context global
 import DashboardExpandedState from "./DashboardExpandedState";
 import DashboardCollapsedState from "./DashboardCollapsedState";
 import DashboardOverlays from "./DashboardOverlays";
@@ -31,6 +33,13 @@ export default function DashboardScreen() {
     searchOpen, searchQuery, setSearchOpen, showPillarBars,
     currentUser, // 🆕 FASE 2 - Usuario actual
   } = useDashboard();
+
+  // 🆕 FASE 3C - Cargar categorías del usuario desde Supabase
+  const categoryMap = useUserCategories(currentUser?.id);
+
+  // ✅ NUEVO - Cargar categorías completas CON historial para transacciones
+  // 🆕 FASE 3C - Usar context global (CategoryHistoryProvider lo maneja)
+  const { categoriesWithHistory } = useCategoryHistory();
 
   // 🆕 key que reinicia scroll + paginación al cambiar de periodo/filtro/búsqueda
   const listKey = `${selectedPeriod?.year ?? "all"}-${selectedPeriod?.month ?? "all"}-${filterType ?? "none"}-${filteredPillar ?? "none"}-${searchOpen ? searchQuery : ""}`;
@@ -116,6 +125,7 @@ export default function DashboardScreen() {
                   setShowUpdateBalance={setShowUpdateBalance}
                   setShowPeriodPicker={setShowPeriodPicker}
                   newTxnToast={newTxnToast}
+                  categoryMap={categoryMap}
                 />
               </ErrorBoundary>
 
@@ -161,6 +171,8 @@ export default function DashboardScreen() {
                 onEditTransaction={(tx) => {
                   startTransactionEditing(tx);
                 }}
+                categoryMap={categoryMap}
+                categoriesWithHistory={categoriesWithHistory}
               />
               </ErrorBoundary>
               </div>

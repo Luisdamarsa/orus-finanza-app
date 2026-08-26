@@ -18,7 +18,26 @@ export function useTransactionActions({
   screen,
   ensureVariosCategory,
   getOrCreateCategory,
+  categories = {}, // 🆕 FASE 3C - Para obtener nombres de categorías
 }) {
+  // 🆕 FASE 3C - Obtener nombre de categoría desde el objeto categories
+  const getCategoryNameFromCategories = (categoryId) => {
+    if (!categoryId || !categories) return null;
+
+    // Iterar sobre todos los pilares
+    for (const pillarId in categories) {
+      const catList = categories[pillarId];
+      if (Array.isArray(catList)) {
+        // Buscar en la lista de categorías
+        const found = catList.find(cat => cat.id === categoryId);
+        if (found) {
+          return found.name;
+        }
+      }
+    }
+    return null;
+  };
+
   // Al guardar/eliminar en modo edición: volver a la pantalla de origen.
   const backToOrigin = () =>
     setScreen(screen === "movimientos" ? "movimientos" : "dashboard");
@@ -56,6 +75,9 @@ export function useTransactionActions({
         pillar = "varios";
       }
 
+      // 🆕 FASE 3C - Obtener nombre de la categoría
+      const categoryName = getCategoryNameFromCategories(categoryId);
+
       const newTx = {
         date: now.toISOString().slice(0, 10),
         time: now.toTimeString().slice(0, 5),
@@ -64,6 +86,7 @@ export function useTransactionActions({
         amount: isIncome ? absAmount : -absAmount,
         pillar,
         category: categoryId,
+        category_name: categoryName, // 🆕 FASE 3C - Guardar nombre
       };
 
       await addTx(newTx); // el servicio asigna el id; el hook persiste
@@ -76,7 +99,6 @@ export function useTransactionActions({
       setMovementOpenedFrom(null);
       setScreen("dashboard");
     } catch (err) {
-      console.error("❌ Error creating transaction:", err);
     }
   };
 
@@ -86,7 +108,6 @@ export function useTransactionActions({
       await editTransaction(transactionId, updatedData);
       backToOrigin();
     } catch (err) {
-      console.error("❌ Error saving transaction:", err);
     }
   };
 
@@ -96,7 +117,6 @@ export function useTransactionActions({
       await deleteTransaction(transactionId);
       backToOrigin();
     } catch (err) {
-      console.error("❌ Error removing transaction:", err);
     }
   };
 

@@ -10,7 +10,7 @@ import NewTransactionToast from "./NewTransactionToast";
  * Aloja también el tag transitorio de nueva transacción (centrado en el hueco).
  * Se llama "Periodo" porque el saldo está inactivo. Falla como unidad (?fail=period).
  */
-export default function Periodo({ isDark, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, newTxnToast }) {
+export default function Periodo({ isDark, selectedPeriod, setShowUpdateBalance, setShowPeriodPicker, newTxnToast, categoryMap = {} }) {
   const tokens = isDark ? DARK : LIGHT; // Seleccionar tokens según el tema
   return (
     <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 0, gap: 8 }}>
@@ -58,7 +58,7 @@ export default function Periodo({ isDark, selectedPeriod, setShowUpdateBalance, 
         <Calendar size={12} strokeWidth={1.6} />
         <span>{getPeriodLabel(selectedPeriod)}</span>
       </button>
-      <NewTransactionToast toast={newTxnToast} isDark={isDark} />
+      <NewTransactionToast toast={newTxnToast} isDark={isDark} categoryMap={categoryMap} />
     </div>
   );
 }

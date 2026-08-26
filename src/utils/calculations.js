@@ -197,7 +197,6 @@ export const calculateAccumulativeBalances = (transactions) => {
   const balances = [];
   let previousSaldo = 0; // Enero 2025 comienza en 0
 
-  console.log("🔍 Calculando saldos acumulativos mes a mes:");
   sortedMonths.forEach(({ year, month }) => {
     const key = `${year}-${month}`;
     const { ingresos, gastos } = monthData[key];
@@ -205,20 +204,16 @@ export const calculateAccumulativeBalances = (transactions) => {
     // Nuevo saldo = saldo anterior + ingresos - gastos
     const nuevoSaldo = previousSaldo + ingresos - gastos;
 
-    console.log(`  ${year}-${String(month).padStart(2, '0')}: Saldo anterior=${previousSaldo} + Ingresos=${ingresos} - Gastos=${gastos} = ${nuevoSaldo}`);
 
     // Solo agregar al array si saldo > 0
     if (nuevoSaldo > 0) {
       balances.push({ year, month, value: nuevoSaldo });
       previousSaldo = nuevoSaldo;
-      console.log(`    ✅ Agregado al array`);
     } else {
       // Si saldo <= 0, no agregamos pero mantenemos previousSaldo en 0 para próximos meses
       previousSaldo = 0;
-      console.log(`    ❌ NO agregado (saldo <= 0), reset a 0`);
     }
   });
 
-  console.log("📊 Balances finales:", balances);
   return balances;
 };

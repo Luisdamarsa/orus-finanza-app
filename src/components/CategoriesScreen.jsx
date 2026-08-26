@@ -22,8 +22,8 @@ export default function CategoriesScreen({ isDark, t, categories, catLoading, ca
           else resetCategoryEditing();
           setScreen("add-category");
         }}
-        onEditCategory={(categoryId, pillarId) => {
-          startCategoryEditing(categoryId, getCategoryName(categoryId), pillarId);
+        onEditCategory={(categoryId, categoryName, pillarId) => {
+          startCategoryEditing(categoryId, categoryName, pillarId);
           setScreen("add-category");
         }}
         categories={categories}

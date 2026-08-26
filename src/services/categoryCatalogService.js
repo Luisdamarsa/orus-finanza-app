@@ -96,22 +96,23 @@ export function softDeleteCategory(categoryId) {
 /**
  * Actualiza el presupuesto de una categoría (con historial).
  * 🆕 FASE 3B: Ahora async, persiste en Supabase
+ * 🆕 FASE 3D: Ahora recibe monthYear para presupuestos mensuales
  */
-export async function setCategoryBudget(categoryId, newBudget, userId) {
-  // Versión en memoria (para compatibilidad)
-  const category = ALL_CATS.find((cat) => cat.id === categoryId);
-  if (!category) return false;
+export async function setCategoryBudget(categoryId, newBudget, userId, monthYear) {
+  // 🆕 FASE 3B - NO buscar en ALL_CATS, solo guardar en Supabase
+  if (!userId || !monthYear) {
+    throw new Error("userId y monthYear requeridos para guardar presupuesto");
+  }
 
-  // Actualizar en Supabase si userId está disponible
-  if (userId) {
-    try {
-      const success = await budgetService.setCategoryBudget(userId, categoryId, newBudget);
-      console.log(`✅ Presupuesto categoría guardado en Supabase: ${categoryId}=${newBudget}`);
-      return success;
-    } catch (err) {
-      console.error("Error updating budget in Supabase:", err);
-      // Fallback: actualizar en memoria si falla Supabase
+  // Actualizar en Supabase
+  try {
+    const success = await budgetService.setCategoryBudget(userId, categoryId, monthYear, newBudget);
+    if (!success) {
+      throw new Error(`No se pudo guardar presupuesto para categoría ${categoryId}`);
     }
+    return success;
+  } catch (err) {
+    throw err; // 🆕 Relanzar el error para que BudgetsPage lo capture
   }
 
   // Fallback: actualizar en memoria (si no hay userId o falla Supabase)

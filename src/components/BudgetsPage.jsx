@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { PILLARS, ALL_CATS } from "../constants";
+import { PILLARS } from "../constants"; // 🆕 Remover ALL_CATS
 import { useTheme } from "../hooks/useTheme";
 import { usePopup } from "../services/PopupService";
 import { useCategories } from "../hooks/useCategories";
@@ -19,12 +19,21 @@ export default function BudgetsPage({
   editCategoryBudget,
   // 🆕 FASE 3B - Necesario para pasar a setCategoryBudget
   currentUserId,
+  // 🆕 FASE 3B - Presupuestos de categorías desde Supabase
+  initialCategoryBudgets = {},
 }) {
   const { isDark } = useTheme();
   const popup = usePopup();
   const { categories: categoriesFromHook } = useCategories();
   const categories = categoriesFromProps || categoriesFromHook;
-  const { categoryBudgets, handleCategoryBudgetChange, updateWithNewCategories } = useBudgets();
+  const { categoryBudgets, handleCategoryBudgetChange, updateWithNewCategories, setCategoryBudgets } = useBudgets();
+
+  // 🆕 FASE 3B - Cargar presupuestos de Supabase al inicializar
+  useEffect(() => {
+    if (Object.keys(initialCategoryBudgets).length > 0) {
+      setCategoryBudgets(initialCategoryBudgets);
+    }
+  }, [initialCategoryBudgets, setCategoryBudgets]);
 
   const t = isDark
     ? {
@@ -68,7 +77,6 @@ export default function BudgetsPage({
 
   // 🆕 FASE 2 - Actualizar editedBudgets cuando initialBudgets cambia (ej: cambio de usuario)
   useEffect(() => {
-    console.log(`\n📊 BudgetsPage.useEffect - initialBudgets cambió:`, initialBudgets);
     setEditedBudgets(initialBudgets || {});
     setHasChanged(false);
   }, [JSON.stringify(initialBudgets)]);
@@ -79,7 +87,12 @@ export default function BudgetsPage({
       key => (editedBudgets[key] || 0) !== (initialBudgets[key] || 0)
     );
     const categoryChanged = Object.keys(categoryBudgets || {}).some(
-      key => categoryBudgets[key] !== null && categoryBudgets[key] !== (ALL_CATS.find(c => c.id === key)?.budget || 0)
+      key => {
+        // 🆕 No usar ALL_CATS - solo detectar si el valor cambió de null a algo, o viceversa
+        const newBudget = categoryBudgets[key];
+        const hadInitialBudget = initialBudgets?.[`cat_${key}`] !== undefined;
+        return newBudget !== null && !hadInitialBudget;
+      }
     );
     const alertChanged = budgetAlertEnabled !== initialBudgetAlertEnabled;
     setHasChanged(pillarChanged || categoryChanged || alertChanged);
@@ -133,45 +146,48 @@ export default function BudgetsPage({
 
   // 🆕 FASE 3B: handleSave ahora es async (setCategoryBudget es async)
   const handleSave = async () => {
-    console.log(`\n🔴 BudgetsPage.handleSave() INICIO`);
-    console.log(`  editPillarBudget: ${typeof editPillarBudget}`);
-    console.log(`  editedBudgets:`, editedBudgets);
-    console.log(`  initialBudgets:`, initialBudgets);
+
+    // 🆕 Guardar estado previo para revertir en caso de error
+    const previousCategoryBudgets = { ...categoryBudgets };
 
     try {
       // Guardar cambios de pilares
       if (editPillarBudget) {
-        console.log(`  ✅ Iterando editedBudgets...`);
         Object.entries(editedBudgets).forEach(([pillarId, budget]) => {
           const initialBudget = initialBudgets[pillarId] || 0;
           const changed = initialBudget !== budget;
-          console.log(`    ${pillarId}: ${initialBudget} → ${budget} (changed: ${changed})`);
           if (changed) {
-            console.log(`    🔧 Llamando editPillarBudget(${pillarId}, ${budget})`);
             editPillarBudget(pillarId, budget);
           }
         });
       } else {
-        console.log(`  ❌ NO editPillarBudget`);
       }
 
       // Guardar cambios de categorías (FASE 3B: ahora async)
+      // 🆕 FASE 3D - Usar Promise.all() para guardar en paralelo (más rápido)
       if (editCategoryBudget) {
-        for (const [catId, newBudget] of Object.entries(categoryBudgets)) {
-          // 🆕 Validar que newBudget sea un número válido (no null, no undefined)
-          if (newBudget === null || newBudget === undefined || newBudget === '') {
-            continue;  // Saltar categorías sin cambios
-          }
+        const categoryPromises = Object.entries(categoryBudgets)
+          .filter(([catId, newBudget]) => {
+            // Validar que newBudget sea un número válido
+            if (newBudget === null || newBudget === undefined || newBudget === '') {
+              return false;
+            }
+            const numNewBudget = parseInt(newBudget) || 0;
+            return numNewBudget > 0; // Solo guardar si presupuesto > 0
+          })
+          .map(([catId, newBudget]) =>
+            editCategoryBudget(catId, parseInt(newBudget) || 0).catch(err => {
+              throw err;
+            })
+          );
 
-          const currentCategory = ALL_CATS.find(c => c.id === catId);
-          const oldBudget = currentCategory?.budget || 0;
-          const numNewBudget = parseInt(newBudget) || 0;
-
-          if (oldBudget !== numNewBudget) {
-            // 🆕 Ahora editCategoryBudget es async y recibe currentUserId
-            console.log(`  🔧 Guardando presupuesto: ${catId} ${oldBudget} → ${numNewBudget}`);
-            await editCategoryBudget(catId, numNewBudget);
-          }
+        try {
+          await Promise.all(categoryPromises);
+        } catch (err) {
+          // Si falla, revertir y mostrar error
+          setCategoryBudgets(previousCategoryBudgets);
+          setEditingInputs({}); // Limpiar inputs
+          throw err;
         }
       }
 
@@ -180,10 +196,11 @@ export default function BudgetsPage({
         userStorage.set("budgetAlertEnabled", budgetAlertEnabled);
       }
 
+      // 🆕 Limpiar inputs si fue exitoso
+      setEditingInputs({});
       popup.showEditPopup("Presupuestos");
       setHasChanged(false);
     } catch (err) {
-      console.error("Error al guardar presupuestos:", err);
       popup.showErrorPopup("No se pudo guardar los presupuestos");
     }
   };
@@ -312,9 +329,14 @@ export default function BudgetsPage({
                   {isExpanded && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "2px 6px 8px" }}>
                       {pillarCategories.length > 0 ? (
-                        pillarCategories.map((categoryId) => (
+                        pillarCategories.map((category) => {
+                          // 🆕 FASE 3B - Manejar tanto strings (IDs) como objetos {id, name}
+                          const catId = typeof category === 'string' ? category : category.id;
+                          const catName = typeof category === 'string' ? getCategoryName(category) : category.name;
+
+                          return (
                           <div
-                            key={categoryId}
+                            key={catId}
                             style={{
                               display: "flex",
                               alignItems: "center",
@@ -325,31 +347,31 @@ export default function BudgetsPage({
                             }}
                           >
                             <span style={{ fontSize: "12.5px", fontWeight: 700, color: t.text }}>
-                              {getCategoryName(categoryId)}
+                              {catName}
                             </span>
                             <input
                               type="text"
                               onClick={(e) => e.stopPropagation()}
                               value={
-                                editingInputs[`cat_${categoryId}`] !== undefined
-                                  ? formatNumber(parseFloat(editingInputs[`cat_${categoryId}`].replace(",", ".")) || 0)
-                                  : (categoryBudgets[categoryId] || 0) === 0 ? "Presupuesto" : formatNumber(categoryBudgets[categoryId] || 0)
+                                editingInputs[`cat_${catId}`] !== undefined
+                                  ? formatNumber(parseFloat(editingInputs[`cat_${catId}`].replace(",", ".")) || 0)
+                                  : (categoryBudgets[catId] || 0) === 0 ? "Presupuesto" : formatNumber(categoryBudgets[catId] || 0)
                               }
                               onChange={(e) => {
                                 const validatedValue = validateBudgetInput(e.target.value);
                                 setEditingInputs(prev => ({
                                   ...prev,
-                                  [`cat_${categoryId}`]: validatedValue
+                                  [`cat_${catId}`]: validatedValue
                                 }));
-                                handleCategoryBudgetChange(categoryId, validatedValue);
+                                handleCategoryBudgetChange(catId, validatedValue);
                               }}
                               onBlur={() => {
-                                const rawValue = editingInputs[`cat_${categoryId}`];
+                                const rawValue = editingInputs[`cat_${catId}`];
                                 if (rawValue !== undefined) {
-                                  handleCategoryBudgetChange(categoryId, rawValue);
+                                  handleCategoryBudgetChange(catId, rawValue);
                                   setEditingInputs(prev => {
                                     const newState = { ...prev };
-                                    delete newState[`cat_${categoryId}`];
+                                    delete newState[`cat_${catId}`];
                                     return newState;
                                   });
                                 }
@@ -363,16 +385,17 @@ export default function BudgetsPage({
                                 border: "none",
                                 fontSize: "12.5px",
                                 fontWeight: 800,
-                                color: (categoryBudgets[categoryId] || 0) === 0 ? t.sub : t.text,
+                                color: (categoryBudgets[catId] || 0) === 0 ? t.sub : t.text,
                                 textAlign: "right",
                                 fontFamily: "Manrope",
                                 outline: "none",
                                 cursor: "text",
-                                opacity: (categoryBudgets[categoryId] || 0) === 0 ? 0.6 : 1,
+                                opacity: (categoryBudgets[catId] || 0) === 0 ? 0.6 : 1,
                               }}
                             />
                           </div>
-                        ))
+                        );
+                        })
                       ) : (
                         <div style={{ padding: "12px 14px", fontSize: "12px", color: t.sub, textAlign: "center" }}>
                           Sin categorías

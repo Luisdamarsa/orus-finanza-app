@@ -16,6 +16,7 @@ import { ALL_CATS } from "../constants/index.js";
  * - selectedPeriod: Período seleccionado
  * - isDark: Tema oscuro
  * - onViewMovements: Callback para abrir los movimientos
+ * - categories: Categorías del usuario (desde Supabase)
  */
 export default function PillarDetailCard({
   pillarId,
@@ -23,6 +24,7 @@ export default function PillarDetailCard({
   selectedPeriod,
   isDark,
   onViewMovements,
+  categories = {},
 }) {
   const tokens = isDark ? DARK : LIGHT;
   const pressViewMovements = usePress();
@@ -34,10 +36,11 @@ export default function PillarDetailCard({
   // Obtener color del pilar
   const pillarColor = pillar.color;
 
-  // Categorías del pilar
-  const pillarCategoryIds = ALL_CATS
-    .filter(cat => cat.pillar === pillarId)
-    .map(cat => cat.id);
+  // 🆕 FASE 3B: Usar categorías del usuario (desde prop) en lugar de ALL_CATS
+  const pillarCategoryIds = (categories[pillarId] || []).map((cat) => {
+    // Soportar tanto objetos {id, name} como IDs string
+    return typeof cat === 'string' ? cat : cat.id;
+  });
 
   // Calcular gastos por categoría
   const categorySpent = {};

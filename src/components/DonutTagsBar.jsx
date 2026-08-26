@@ -41,7 +41,6 @@ export default function DonutTagsBar({
         const isClickable = !isSaldo || !isMovementOpen;
 
         const isPressing = pressingSegmentId === seg.id; // Verificar si este tag está siendo presionado
-        if (isPressing) console.log("🎯 RENDERING DONUT TAG PRESSED:", seg.id, "pressingSegmentId:", pressingSegmentId);
 
         // 🆕 Color dinámico del pilar
         const pillarColor = getPillarColor(seg.id, isDarkTheme);
@@ -52,27 +51,21 @@ export default function DonutTagsBar({
           <button
             key={seg.id}
             onMouseDown={() => {
-              console.log("🔻 DONUT TAG MOUSE DOWN:", seg.id);
               isClickable && setPressingSegmentId(seg.id);
             }} // Al presionar (desktop)
             onMouseUp={() => {
-              console.log("🔺 DONUT TAG MOUSE UP:", seg.id);
               setPressingSegmentId(null);
             }} // Al soltar (desktop)
             onMouseLeave={() => {
-              console.log("🚫 DONUT TAG MOUSE LEAVE:", seg.id);
               setPressingSegmentId(null);
             }} // Si el mouse deja el elemento (desktop)
             onTouchStart={() => {
-              console.log("👆 DONUT TAG TOUCH START:", seg.id);
               isClickable && setPressingSegmentId(seg.id);
             }} // Al presionar (móvil)
             onTouchEnd={() => {
-              console.log("👆 DONUT TAG TOUCH END:", seg.id);
               setPressingSegmentId(null);
             }} // Al soltar (móvil)
             onTouchCancel={() => {
-              console.log("👆 DONUT TAG TOUCH CANCEL:", seg.id);
               setPressingSegmentId(null);
             }} // Si se cancela el touch (móvil)
             onClick={() => isClickable && setActiveId(activeId === seg.id ? null : seg.id)}

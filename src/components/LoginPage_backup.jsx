@@ -55,7 +55,6 @@ export default function LoginPage({ setScreen }) {
   };
 
   const handleOAuth = (provider) => {
-    console.log(`OAuth: ${provider}`);
   };
 
   const handleForgotPassword = () => {

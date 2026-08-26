@@ -53,8 +53,25 @@ export default function SignupPage({ setScreen }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [registerError, setRegisterError] = useState(""); // 🆕 FASE 3D - Error de registro
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const countryDropdownRef = useRef(null);
+
+  // 🆕 FASE 3D - Limpiar formulario al montar el componente
+  useEffect(() => {
+    setNombre("");
+    setApellido("");
+    setEmail("");
+    setPhone("");
+    setPassword("");
+    setErrors({});
+    setRegisterError("");
+    setShowPassword(false);
+  }, []);
+
+  // 🆕 Debug: Verificar valor de password
+  useEffect(() => {
+  }, [password]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -98,17 +115,27 @@ export default function SignupPage({ setScreen }) {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setRegisterError(""); // Limpiar error anterior
+
     const result = await register({
       nombre,
       apellido,
       email,
       phone: phone ? `${selectedCountry.phone} ${phone}` : "",
       password,
-      username: email,
+      username: nombre, // 🆕 Username = solo nombre (no email)
     });
 
     if (result.success) {
-      setScreen("dashboard");
+      // 🆕 FASE 3D - Guardar userId en localStorage ANTES de cambiar screen
+      localStorage.setItem("currentUserId", result.user.id);
+      // Pequeño delay para asegurar que localStorage se actualiza
+      setTimeout(() => {
+        setScreen("dashboard");
+      }, 100);
+    } else {
+      // 🆕 FASE 3D - Mostrar error de registro
+      setRegisterError(result.error || "Error al crear cuenta");
     }
   };
 
@@ -307,6 +334,10 @@ export default function SignupPage({ setScreen }) {
             onChange={(e) => {
               setEmail(e.target.value);
               if (errors.email) setErrors({ ...errors, email: "" });
+              // Limpiar error global de duplicado si el usuario lo cambia
+              if (authError && authError.includes("registrado")) {
+                // No limpiamos aquí, se limpia al hacer submit de nuevo
+              }
             }}
             style={{
               width: "100%",
@@ -314,7 +345,7 @@ export default function SignupPage({ setScreen }) {
               padding: "15px 16px",
               fontSize: 13.5,
               fontFamily: "inherit",
-              border: `1px solid ${errors.email ? "#FF8A8A" : "rgba(255,255,255,0.07)"}`,
+              border: `1px solid ${(errors.email || (authError && authError.includes("registrado"))) ? "#FF8A8A" : "rgba(255,255,255,0.07)"}`,
               borderRadius: 14,
               background: "#1e1b28",
               color: "#F5F3FF",
@@ -324,9 +355,9 @@ export default function SignupPage({ setScreen }) {
           />
         </div>
 
-        {errors.email && (
+        {(errors.email || (authError && authError.includes("registrado"))) && (
           <span style={{ color: "#FF8A8A", fontSize: 11.5, fontWeight: 700, marginTop: -12 }}>
-            {errors.email}
+            {errors.email || authError}
           </span>
         )}
 
@@ -497,6 +528,7 @@ export default function SignupPage({ setScreen }) {
               type={showPassword ? "text" : "password"}
               placeholder="Mínimo 8 caracteres"
               value={password}
+              autoComplete="new-password" // 🆕 Deshabilitar autofill del navegador
               onChange={(e) => {
                 setPassword(e.target.value);
                 if (errors.password) setErrors({ ...errors, password: "" });
@@ -567,6 +599,24 @@ export default function SignupPage({ setScreen }) {
         >
           {isLoading ? "Creando cuenta..." : "Crear cuenta"}
         </button>
+
+        {/* 🆕 FASE 3D - Mensaje de error de registro */}
+        {registerError && (
+          <div style={{
+            marginTop: 12,
+            padding: "12px 14px",
+            borderRadius: 12,
+            background: "rgba(255, 138, 138, 0.16)",
+            border: "1px solid rgba(255, 138, 138, 0.3)",
+            color: "#FF8A8A",
+            fontSize: 12.5,
+            fontWeight: 600,
+            textAlign: "center",
+            lineHeight: 1.4
+          }}>
+            {registerError}
+          </div>
+        )}
         </form>
       </div>
 

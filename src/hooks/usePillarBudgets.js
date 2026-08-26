@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as budgetService from "../services/budgetService";
+import { supabase } from "../services/supabaseService";
 
 /**
  * usePillarBudgets.js - REFACTORIZADO para Supabase (FASE 3B)
@@ -18,20 +19,45 @@ export function usePillarBudgets(userId) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 🆕 Cargar presupuestos del usuario desde Supabase cuando userId o month cambia
+  // 🆕 FASE 3B - Cargar TODOS los presupuestos de pilares del usuario desde Supabase
   useEffect(() => {
     if (!userId) {
       setCustomBudgets({});
       return;
     }
 
-    // Nota: Aquí podríamos cargar un mes específico si fuera necesario
-    // Por ahora, inicializamos vacío y cargamos bajo demanda
-    setCustomBudgets(prev => ({
-      ...prev,
-      [userId]: prev[userId] || {}
-    }));
-    console.log(`🎯 usePillarBudgets - userId cambió a: ${userId}`);
+    const loadAllPillarBudgets = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const { data, error: supabaseError } = await supabase
+          .from('pillar_budgets')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (supabaseError) throw supabaseError;
+
+        // Agrupar presupuestos por monthYear y pillarId
+        const budgetsByMonth = {};
+        (data || []).forEach(record => {
+          const { month_year, pillar_id, amount } = record;
+          if (!budgetsByMonth[month_year]) {
+            budgetsByMonth[month_year] = {};
+          }
+          budgetsByMonth[month_year][pillar_id] = amount;
+        });
+
+        setCustomBudgets({
+          [userId]: budgetsByMonth
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAllPillarBudgets();
   }, [userId]);
 
   // 🆕 Obtener presupuesto para un mes específico (con fallback a BD)
@@ -43,7 +69,6 @@ export function usePillarBudgets(userId) {
         const budget = await budgetService.getPillarBudget(userId, pillarId, monthYear);
         return budget;
       } catch (err) {
-        console.error("Error getting pillar budget:", err);
         return null;
       }
     },
@@ -73,11 +98,9 @@ export function usePillarBudgets(userId) {
               }
             }
           }));
-          console.log(`✅ Presupuesto pillar guardado: ${userId}/${pillarId}/${monthYear}=${amount}`);
         }
         return success;
       } catch (err) {
-        console.error("Error setting pillar budget:", err);
         setError(err.message);
         return false;
       } finally {

@@ -309,7 +309,6 @@ export default function ReportsPage({ onBack, onNavigate }) {
         <button
           onClick={() => {
             onNavigate?.("reports-history");
-            console.log("📊 ReportsPage: Botón 'Mis Informes' ABIERTO");
           }}
           {...pressViewReports.handlers}
           style={{
