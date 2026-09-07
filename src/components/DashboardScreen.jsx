@@ -56,6 +56,13 @@ export default function DashboardScreen() {
     if (searchOpen && listScrollRef.current) listScrollRef.current.scrollTop = 0;
   }, [searchQuery, searchOpen]);
 
+  // 🆕 FASE 3E - Al cambiar filtro por pilar, resetea scroll al top
+  useEffect(() => {
+    if (isMovementOpen && listScrollRef.current) {
+      listScrollRef.current.scrollTop = 0;
+    }
+  }, [filteredPillar, isMovementOpen]);
+
   // 🆕 Medir altura dinámica del header para calcular el top del scroll container
   const [headerHeight, setHeaderHeight] = useState(showIncomes ? 149 : 115);
   useEffect(() => {
@@ -173,6 +180,7 @@ export default function DashboardScreen() {
                 }}
                 categoryMap={categoryMap}
                 categoriesWithHistory={categoriesWithHistory}
+                selectedPeriod={selectedPeriod}
               />
               </ErrorBoundary>
               </div>

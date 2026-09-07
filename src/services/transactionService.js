@@ -6,7 +6,7 @@ import { supabase } from './supabaseService';
  * Ahora TODAS las funciones usan Supabase en lugar de localStorage
  */
 
-// ✅ Obtener TODAS las transacciones del usuario
+// ✅ Obtener transacciones ACTIVAS del usuario (FASE 3E - soft delete)
 export async function getTransactionsByUser(userId) {
   if (!userId) return [];
 
@@ -14,6 +14,7 @@ export async function getTransactionsByUser(userId) {
     .from('transacciones')
     .select('*')
     .eq('user_id', userId)
+    .eq('is_active', true)  // 🆕 FASE 3E - Filtrar solo transacciones activas
     .order('date', { ascending: false });
 
   if (error) {
@@ -91,11 +92,24 @@ export async function editTransaction(transactionId, updates, categoryName = nul
   return data?.[0] || null;
 }
 
-// ✅ Eliminar transacción
+// ✅ FASE 3E - Soft Delete: marcar transacción como inactiva (no elimina permanentemente)
 export async function deleteTransaction(transactionId) {
   const { error } = await supabase
     .from('transacciones')
-    .delete()
+    .update({ is_active: false })
+    .eq('id', transactionId);
+
+  if (error) {
+    return false;
+  }
+  return true;
+}
+
+// 🆕 FASE 3E - Restaurar transacción eliminada (soft delete)
+export async function restoreTransaction(transactionId) {
+  const { error } = await supabase
+    .from('transacciones')
+    .update({ is_active: true })
     .eq('id', transactionId);
 
   if (error) {
@@ -155,6 +169,23 @@ export async function getTransactionHistory(userId, transactionId) {
     .eq('user_id', userId)
     .eq('transaction_id', transactionId)
     .order('changed_at', { ascending: false });
+
+  if (error) {
+    return [];
+  }
+  return data || [];
+}
+
+// 🆕 FASE 3E - Obtener transacciones ELIMINADAS del usuario (para recuperar si es necesario)
+export async function getDeletedTransactionsByUser(userId) {
+  if (!userId) return [];
+
+  const { data, error } = await supabase
+    .from('transacciones')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', false)  // 🆕 FASE 3E - Solo las inactivas
+    .order('date', { ascending: false });
 
   if (error) {
     return [];

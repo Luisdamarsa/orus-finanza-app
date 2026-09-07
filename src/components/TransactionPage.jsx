@@ -12,6 +12,7 @@ import { DARK, LIGHT, RADIUS } from "../constants/tokens";
 import { inputStyles, buttonStyles, getClayShadow } from "../utils/clayStyles";
 import { getPaymentMethodColor } from "../utils/colorUtils";
 import SaveDeleteButtons from "./SaveDeleteButtons";
+import DeleteConfirmationPopup from "./DeleteConfirmationPopup"; // 🆕 FASE 3E - Popup genérico
 
 /**
  * TransactionPage.jsx - REFORMULADA (Crear + Editar)
@@ -70,6 +71,9 @@ export default function TransactionPage({
 
   // 🆕 Estado de loading para skeleton
   const [isLoading] = useState(false);
+
+  // 🆕 FASE 3E - Estado para controlar modal de confirmación de eliminación
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Estado del formulario (pre-llenado por voz si viene `prefill`)
   const [desc, setDesc] = useState(prefill?.desc || "");
@@ -234,13 +238,23 @@ export default function TransactionPage({
   }
 
   /**
-   * Eliminar transacción
-   * 🆕 FASE 3A: Ahora es async (onDelete es async)
+   * Mostrar modal de confirmación antes de eliminar
+   * 🆕 FASE 3E: Soft delete con confirmación
    */
-  async function handleDelete() {
+  function handleDelete() {
+    setShowDeleteConfirm(true);
+  }
+
+  /**
+   * Eliminar transacción confirmado
+   * 🆕 FASE 3E: Ahora es async (onDelete es async)
+   */
+  async function handleConfirmDelete() {
     try {
+      setShowDeleteConfirm(false);
       await onDelete(editingTransaction.id);
     } catch (err) {
+      popup.showErrorPopup("No se pudo eliminar la transacción");
     }
   }
 
@@ -831,6 +845,15 @@ export default function TransactionPage({
           />
         </>
       )}
+
+      {/* 🆕 FASE 3E - Popup de confirmación para eliminar transacción */}
+      <DeleteConfirmationPopup
+        isOpen={showDeleteConfirm}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        title="¿Eliminar transacción?"
+        isDark={isDark}
+      />
     </div>
   );
 }

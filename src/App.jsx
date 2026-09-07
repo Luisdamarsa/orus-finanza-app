@@ -610,10 +610,15 @@ function Dashboard() {
   const filteredByPeriod = selectedPeriod
     ? transactions.filter(tx => {
         const [txYear, txMonth] = tx.date.split("-").map(Number);
-        // ✅ Si month es null, mostrar todo el año. Si no, mostrar solo ese mes
+        // 🆕 FASE 3E - Si year === null, es "TODO EL TIEMPO" (todos los años)
+        if (selectedPeriod.year === null && selectedPeriod.month === null) {
+          return true; // Mostrar todas las transacciones
+        }
+        // ✅ Si month es null (pero year existe), mostrar todo el año
         if (selectedPeriod.month === null) {
           return txYear === selectedPeriod.year;
         }
+        // Si month existe, mostrar solo ese mes
         return txYear === selectedPeriod.year && txMonth === selectedPeriod.month;
       })
     : transactions;
@@ -707,7 +712,7 @@ function Dashboard() {
 
   const routerProps = {
     screen, isDark, t, setTheme: handleSetIsDark, // 🆕 FASE 3D - Guardar en BD
-    selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions,
+    selectedPillarDetail, setSelectedPillarDetail, setShowPillarBars, transactions: filteredByPeriod, // 🆕 FASE 3E - Pasar transacciones filtradas por período
     categories, customConcepts, txnActions, voicePrefill,
     // 🆕 FASE 3A - Loading states de Supabase
     txLoading, txError, catLoading, catError,

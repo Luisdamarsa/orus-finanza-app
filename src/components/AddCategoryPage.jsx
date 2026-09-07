@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PILLARS } from "../constants";
 import { usePopup } from "../services/PopupService";
 import SaveDeleteButtons from "./SaveDeleteButtons";
+import DeleteConfirmationPopup from "./DeleteConfirmationPopup"; // 🆕 FASE 3E - Popup genérico
 
 /**
  * AddCategoryPage.jsx - Clay Design (Crear + Editar)
@@ -32,6 +33,7 @@ export default function AddCategoryPage({
   const [description, setDescription] = useState("");
   const [selectedPillar, setSelectedPillar] = useState(null);
   const [hasChanged, setHasChanged] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // 🆕 FASE 3E - Popup confirmación
   const isIncome = editingPillarId === "ingreso";
 
   // Pre-llenar datos en modo edición
@@ -139,11 +141,17 @@ export default function AddCategoryPage({
     }
   };
 
-  // 🆕 FASE 3A: handleDelete ahora es async (onDelete es async)
-  const handleDelete = async () => {
+  // 🆕 FASE 3E: handleDelete muestra popup de confirmación
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  // 🆕 FASE 3E: handleConfirmDelete elimina realmente
+  const handleConfirmDelete = async () => {
     if (isEditing && onDelete) {
       try {
-        // Eliminar directamente sin confirmación
+        setShowDeleteConfirm(false);
+        // Eliminar después de cerrar popup
         await onDelete();
         // 🆕 Mostrar popup de éxito usando el servicio
         popup.showDeletePopup('Categoría');
@@ -326,6 +334,15 @@ export default function AddCategoryPage({
         onDelete={isEditing ? handleDelete : undefined}
         disabledSave={!canSave}
         showDelete={isEditing}
+      />
+
+      {/* 🆕 FASE 3E - Popup de confirmación para eliminar categoría */}
+      <DeleteConfirmationPopup
+        isOpen={showDeleteConfirm}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        title="¿Eliminar categoría?"
+        isDark={isDark}
       />
     </div>
   );

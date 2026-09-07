@@ -78,8 +78,12 @@ export default function MovimientosPage({
     const matchesPillar = tx.pillar === pilar.id;
     if (!selectedPeriod) return matchesPillar; // "Todo el tiempo"
     const [y, m] = tx.date.split("-").map(Number);
-    if (selectedPeriod.month === null) return matchesPillar && y === selectedPeriod.year; // año
-    return matchesPillar && y === selectedPeriod.year && m === selectedPeriod.month; // mes
+    // 🆕 FASE 3E - Si year === null, es "TODO EL TIEMPO" (todos los años)
+    if (selectedPeriod.year === null && selectedPeriod.month === null) return matchesPillar;
+    // Si month === null (pero year existe), es "Todo el año"
+    if (selectedPeriod.month === null) return matchesPillar && y === selectedPeriod.year;
+    // Si month existe, es mes específico
+    return matchesPillar && y === selectedPeriod.year && m === selectedPeriod.month;
   });
 
   // Calcular total gastado (sum de amounts negativos)
@@ -207,6 +211,13 @@ export default function MovimientosPage({
       }
     });
   }, [groups]);
+
+  // 🆕 FASE 3E - Scroll al top cuando cambia el filtro de pilar o período
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [pilar, selectedPeriod]);
 
   return (
     <div style={{ width: "100%", height: "100%", background: t.bg, display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -633,7 +644,7 @@ export default function MovimientosPage({
               No se pudieron cargar los movimientos
             </div>
           }>
-          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} categoryMap={categoryMap} categoriesWithHistory={categoriesWithHistory} />
+          <TransactionsListService isDark={isDark} transactions={filteredTxns} stickyTop={movimientosHeight} onEditTransaction={onEditTransaction} categoryMap={categoryMap} categoriesWithHistory={categoriesWithHistory} selectedPeriod={selectedPeriod} />
           </ErrorBoundary>
           </div>
         ) : (

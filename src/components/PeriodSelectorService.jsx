@@ -119,26 +119,33 @@ export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClo
           {/* Título "Período" */}
           <span style={{ fontSize: 13, fontWeight: 800, color: tokens.text }}>Período</span>
 
-          {/* Grupo derecha: Botón "Todo el tiempo" + Botón cerrar */}
+          {/* Grupo derecha: Botón "TODO EL TIEMPO" (solo si 2+ años) + Botón cerrar */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* Botón "Todo el tiempo" */}
-            <button
-              onClick={() => { onSelect(null); onClose(); }}
-              {...pressAllTime.handlers}
-              style={{
-                padding: "7px 12px",
-                borderRadius: 20,
-                border: "none",
-                cursor: "pointer",
-                background: !selectedPeriod ? "rgba(155,109,255,0.2)" : tokens.raised,
-                color: !selectedPeriod ? "#9B6DFF" : tokens.text,
-                fontSize: 11,
-                fontWeight: 700,
-                transition: "all 0.15s",
-                ...pressAllTime.getPressStyle(),
-              }}>
-              Todo el tiempo
-            </button>
+            {/* 🆕 FASE 3E - Botón "TODO EL TIEMPO" - solo si 2+ años */}
+            {availableYears.length > 1 && (
+              <button
+                onClick={() => { onSelect({ year: null, month: null }); onClose(); }}
+                {...pressAllTime.handlers}
+                style={{
+                  padding: "7px 12px",
+                  borderRadius: 20,
+                  border: "none",
+                  cursor: "pointer",
+                  background: selectedPeriod?.year === null && selectedPeriod?.month === null
+                    ? "linear-gradient(155deg,#B18CFF,#8B5CF6)"
+                    : tokens.raised,
+                  color: selectedPeriod?.year === null && selectedPeriod?.month === null ? "#ffffff" : tokens.text,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  transition: "all 0.15s",
+                  boxShadow: selectedPeriod?.year === null && selectedPeriod?.month === null
+                    ? "0 8px 16px rgba(177,140,255,0.3)"
+                    : "none",
+                  ...pressAllTime.getPressStyle(),
+                }}>
+                TODO EL TIEMPO
+              </button>
+            )}
 
             {/* Botón cerrar X */}
             <button
@@ -196,10 +203,11 @@ export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClo
           </div>
         )}
 
-        {/* TEXTO AÑO SELECCIONADO + BOTÓN TODO EL AÑO (solo si 2+ años) */}
-        {availableYears.length > 1 && (
+        {/* TEXTO AÑO SELECCIONADO + BOTÓN TODO EL AÑO (solo si hay datos) */}
+        {availableYears.length >= 1 && (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
             <span style={{ fontSize: 10, fontWeight: 800, color: tokens.sub }}>{pickerYear}</span>
+            {/* Botón "Todo el año" - siempre aparece */}
             <button
               onClick={() => { onSelect({ year: pickerYear, month: null }); onClose(); }}
               style={{
@@ -212,16 +220,10 @@ export default function PeriodSelector({ isDark, selectedPeriod, onSelect, onClo
                 fontWeight: 600,
                 cursor: "pointer",
                 transition: "all 0.15s",
+                whiteSpace: "nowrap",
               }}>
               Todo el año
             </button>
-          </div>
-        )}
-
-        {/* 🆕 Solo mostrar año si hay 1 año */}
-        {availableYears.length === 1 && (
-          <div style={{ marginBottom: 12 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, color: tokens.sub }}>{pickerYear}</span>
           </div>
         )}
 

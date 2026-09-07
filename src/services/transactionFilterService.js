@@ -21,12 +21,16 @@ export function isIngreso(tx) {
  * ¿La transacción cae dentro del período seleccionado?
  * Si selectedPeriod es null/undefined → true (mostrar todo).
  * Si selectedPeriod.month es null → todo el año.
+ * Si selectedPeriod.year es null → TODO EL TIEMPO (todos los años).
  * @param {{ date: string }} tx  fecha en formato "YYYY-MM-..."
- * @param {{ year: number, month: number|null }|null} selectedPeriod
+ * @param {{ year: number|null, month: number|null }|null} selectedPeriod
  * @returns {boolean}
  */
 export function matchesPeriod(tx, selectedPeriod) {
   if (!selectedPeriod) return true;
+  // 🆕 FASE 3E - Si year === null y month === null, es "TODO EL TIEMPO" (mostrar todas)
+  if (selectedPeriod.year === null && selectedPeriod.month === null) return true;
+
   const [txYear, txMonth] = tx.date.split("-").map(Number);
   if (selectedPeriod.month === null) {
     return txYear === selectedPeriod.year;

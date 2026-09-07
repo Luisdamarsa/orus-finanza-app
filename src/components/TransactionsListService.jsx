@@ -16,8 +16,9 @@ import { getAttributeAtDate } from "../services/attributeHistoryService";
  * - onEditTransaction: function(transaction) - callback al hacer click en una transacción
  * - categoriesWithHistory: object (opcional) - {categoryId: categoryObj} con historial (NUEVO)
  * - categoryMap: object (opcional) - LEGACY - mapping {categoryId: categoryName}
+ * - selectedPeriod: object (opcional) - { year, month } para detectar si mostrar año en fechas
  */
-export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction, categoriesWithHistory = {}, categoryMap = {} }) {
+export default function TransactionsListService({ isDark, transactions, stickyTop = 0, onEditTransaction, categoriesWithHistory = {}, categoryMap = {}, selectedPeriod = null }) {
   // 🆕 DEBUG - Ver qué recibe categoriesWithHistory
 
   // 🆕 Estado para trackear qué transacción está siendo presionada
@@ -49,8 +50,11 @@ export default function TransactionsListService({ isDark, transactions, stickyTo
     return () => obs.disconnect();
   }, [hasMore, loadMore]);
 
+  // 🆕 FASE 3E - Mostrar año si período es "Todo el año" (month === null) o "TODO EL TIEMPO" (year === null)
+  const showYear = selectedPeriod && (selectedPeriod.month === null || selectedPeriod.year === null);
+
   // Agrupar SOLO las visibles por fecha
-  const groups = groupByDate(visibleItems);
+  const groups = groupByDate(visibleItems, showYear);
 
   return (
     <>

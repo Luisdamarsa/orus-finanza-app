@@ -13,15 +13,17 @@ export const fmt = (n) => {
 };
 
 /**
- * Formatea una fecha ISO a formato "Mié 15 Mar"
+ * Formatea una fecha ISO a formato "Mié 15 Mar" o "Mié 15 Mar 2026"
  * @param {string} dateStr - Fecha en formato "YYYY-MM-DD"
+ * @param {boolean} showYear - Si mostrar el año (default: false)
  * @returns {string} Fecha formateada
  */
-export const fmtDate = (dateStr) => {
+export const fmtDate = (dateStr, showYear = false) => {
   const [y, m, d] = dateStr.split("-").map(Number);
   const dayNames = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   const date = new Date(y, m - 1, d);
-  return `${dayNames[date.getDay()]} ${d} ${MONTHS_SHORT[m - 1]}`;
+  const base = `${dayNames[date.getDay()]} ${d} ${MONTHS_SHORT[m - 1]}`;
+  return showYear ? `${base} ${y}` : base;
 };
 
 /**
@@ -31,7 +33,9 @@ export const fmtDate = (dateStr) => {
  */
 export const getPeriodLabel = (period) => {
   if (!period) return "Todo";
-  // ✅ Si month es null, mostrar el año
+  // 🆕 FASE 3E - Si year es null, es "TODO EL TIEMPO"
+  if (period.year === null && period.month === null) return "TODO EL TIEMPO";
+  // ✅ Si month es null (pero year existe), mostrar el año
   if (period.month === null) return period.year.toString();
   // Si month existe, mostrar el mes
   return MONTHS_SHORT[period.month - 1];
@@ -40,9 +44,10 @@ export const getPeriodLabel = (period) => {
 /**
  * Agrupa transacciones por fecha
  * @param {array} txns - Array de transacciones
+ * @param {boolean} showYear - Si mostrar año en las fechas (default: false)
  * @returns {array} Transacciones agrupadas por fecha
  */
-export const groupByDate = (txns) => {
+export const groupByDate = (txns, showYear = false) => {
   const map = {};
   txns.forEach(tx => {
     (map[tx.date] = map[tx.date] || []).push(tx);
@@ -51,7 +56,7 @@ export const groupByDate = (txns) => {
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([date, items]) => ({
       date,
-      label: fmtDate(date),
+      label: fmtDate(date, showYear), // 🆕 FASE 3E - Pasar showYear
       items: items.sort((a, b) => b.time.localeCompare(a.time)),
       // 🆕 Calcular suma total del día
       dayTotal: items.reduce((sum, tx) => sum + tx.amount, 0),
