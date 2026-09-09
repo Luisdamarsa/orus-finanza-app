@@ -32,7 +32,7 @@ const AlertIconSvg = () => (
 
 export default function ForgotPasswordPage({ setScreen }) {
   const { isDark } = useTheme();
-  const { resetPassword } = useAuth();
+  const { resetPasswordForEmail, verifyOtpAndReset } = useAuth(); // 🆕 FASE 3F
   const tokens = isDark ? DARK : LIGHT;
 
   const [step, setStep] = useState(1); // 1: email, 2: code, 3: password
@@ -74,13 +74,16 @@ export default function ForgotPasswordPage({ setScreen }) {
       return;
     }
 
-    setIsLoading(true);
-    setTimeout(() => {
-      // Simulación: aceptar cualquier correo
+    // 🆕 FASE 3F - Enviar email de reset con Supabase
+    const result = await resetPasswordForEmail(email);
+
+    if (result.success) {
       setStep(2);
       setResendCountdown(60);
-      setIsLoading(false);
-    }, 800);
+      setAttempts(0);
+    } else {
+      setError(result.error || "Error al enviar email");
+    }
   };
 
   // ===== STEP 2: CODE =====
@@ -102,7 +105,7 @@ export default function ForgotPasswordPage({ setScreen }) {
     }
   };
 
-  const handleCodeSubmit = (e) => {
+  const handleCodeSubmit = async (e) => {
     e.preventDefault();
     if (code.some((c) => !c)) return;
 
@@ -113,33 +116,25 @@ export default function ForgotPasswordPage({ setScreen }) {
     }
 
     setError("");
-    setIsLoading(true);
 
-    setTimeout(() => {
-      const fullCode = code.join("");
-      if (fullCode === "123456") {
-        setStep(3);
-      } else {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        setCode(["", "", "", "", "", ""]);
-
-        if (newAttempts >= 5) {
-          setError(`Código incorrecto. (Intento 5 de 5)`);
-        } else {
-          setError(`Código incorrecto. (Intento ${newAttempts} de 5)`);
-        }
-      }
-      setIsLoading(false);
-    }, 600);
+    // 🆕 FASE 3F - En Step 2 solo validamos que el código esté completo
+    // La verificación real ocurre en Step 3 cuando se cambia la contraseña
+    setStep(3);
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setError("");
-    setCode(["", "", "", "", "", ""]);
-    setAttempts(0);
-    setResendCountdown(60);
-    // TODO: Simular reenvío de código
+
+    // 🆕 FASE 3F - Reenviar código con Supabase
+    const result = await resetPasswordForEmail(email);
+
+    if (result.success) {
+      setCode(["", "", "", "", "", ""]);
+      setAttempts(0);
+      setResendCountdown(60);
+    } else {
+      setError(result.error || "Error al reenviar código");
+    }
   };
 
   // Resend countdown
@@ -161,13 +156,24 @@ export default function ForgotPasswordPage({ setScreen }) {
       return;
     }
 
+    if (!/[A-Z]/.test(password)) {
+      setError("La contraseña debe contener al menos 1 mayúscula");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("La contraseña debe contener al menos 1 número");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
       return;
     }
 
-    setIsLoading(true);
-    const result = await resetPassword(email, password);
+    // 🆕 FASE 3F - Cambiar contraseña con código verificado
+    const fullCode = code.join("");
+    const result = await verifyOtpAndReset(email, fullCode, password);
 
     if (result.success) {
       // Contraseña cambiada exitosamente - ir a login
@@ -177,7 +183,6 @@ export default function ForgotPasswordPage({ setScreen }) {
     } else {
       // Error - mostrar mensaje
       setError(result.error);
-      setIsLoading(false);
     }
   };
 

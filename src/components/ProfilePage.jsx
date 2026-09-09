@@ -6,6 +6,7 @@ import { useTheme } from "../hooks/useTheme";
 import * as userService from "../services/userService"; // 🆕 FASE 3C
 import HeaderBar from "./HeaderBar";
 import DeleteAccountModal from "./DeleteAccountModal";
+import ChangePasswordModal from "./ChangePasswordModal"; // 🆕 FASE 3F
 
 // 🆕 FASE 3D - Importar soft delete
 import { softDeleteUser } from "../services/userService";
@@ -42,6 +43,7 @@ export default function ProfilePage({
   const pressBack = usePress();
   const pressLogout = usePress();
   const pressDelete = usePress();
+  const pressChangePassword = usePress(); // 🆕 FASE 3F
   const pressSave = usePress();
 
   const [user, setUser] = useState(null);
@@ -49,6 +51,7 @@ export default function ProfilePage({
   const [hasChanged, setHasChanged] = useState(false);
   const [copiedUserId, setCopiedUserId] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false); // 🆕 FASE 3F
 
   // 🆕 FASE 2 - Cargar datos del usuario desde currentUser o userStorage
   useEffect(() => {
@@ -354,6 +357,33 @@ export default function ProfilePage({
           </div>
         </div>
 
+        {/* BOTÓN Cambiar Contraseña */}
+        <button
+          onClick={() => setChangePasswordModalOpen(true)}
+          {...pressChangePassword.handlers}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 16,
+            border: "none",
+            background: tokens.raised,
+            color: tokens.text,
+            fontWeight: 800,
+            fontSize: "13.5px",
+            marginTop: 26,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            boxShadow: tokens.shadowSm,
+            fontFamily: "Manrope",
+            ...pressChangePassword.getPressStyle({ scale: 0.97 }),
+          }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Cambiar Contraseña
+        </button>
+
         {/* BOTÓN Eliminar Cuenta */}
         <button
           onClick={() => setDeleteAccountModalOpen(true)}
@@ -367,7 +397,7 @@ export default function ProfilePage({
             color: "#fff",
             fontWeight: 800,
             fontSize: "13.5px",
-            marginTop: 26,
+            marginTop: 12,
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -381,6 +411,14 @@ export default function ProfilePage({
           Eliminar Cuenta
         </button>
       </div>
+
+      {/* Modal Cambiar Contraseña */}
+      {changePasswordModalOpen && (
+        <ChangePasswordModal
+          isDark={isDark}
+          onClose={() => setChangePasswordModalOpen(false)}
+        />
+      )}
 
       {/* Modal de Eliminación de Cuenta */}
       <DeleteAccountModal

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import * as userService from "../services/userService"; // 🆕 FASE 3D - Para crear usuarios en Supabase
+import { supabase } from "../services/supabaseService"; // 🆕 FASE 3F - Para reset password
 
 /**
  * useAuth.js — Hook de autenticación
@@ -211,30 +212,57 @@ export function useAuth() {
   }, []);
 
   /**
-   * RESET PASSWORD — Cambia la contraseña (simulado)
+   * RESET PASSWORD FOR EMAIL — Envía email de reset (Step 1)
    * @param {string} email - Email del usuario
-   * @param {string} newPassword - Nueva contraseña
    */
-  const resetPassword = useCallback(async (email, newPassword) => {
+  const resetPasswordForEmail = useCallback(async (email) => {
     setIsLoading(true);
     setError("");
 
     try {
-      // TODO: Remplazar con Supabase Auth
-      // const { error } = await supabase.auth.updateUser({
-      //   password: newPassword
-      // });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "http://localhost:5173/reset-password",
+      });
 
-      // Simulación local
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (error) throw error;
 
-      const userIndex = MOCK_USERS.findIndex((u) => u.email === email);
-      if (userIndex === -1) {
-        throw new Error("Usuario no encontrado");
-      }
+      return { success: true };
+    } catch (err) {
+      const errorMsg = err.message || "Error al enviar email de reset";
+      setError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-      // Actualizar contraseña en mock
-      MOCK_USERS[userIndex].password = newPassword;
+  /**
+   * VERIFY OTP AND RESET PASSWORD — Verifica código + cambia contraseña (Step 2-3)
+   * @param {string} email - Email del usuario
+   * @param {string} token - Token OTP (6 dígitos)
+   * @param {string} newPassword - Nueva contraseña
+   */
+  const verifyOtpAndReset = useCallback(async (email, token, newPassword) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // 🆕 FASE 3F - Verificar OTP con Supabase
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "recovery",
+      });
+
+      if (verifyError) throw verifyError;
+      if (!data.session) throw new Error("Sesión no establecida");
+
+      // 🆕 Cambiar contraseña usando la sesión verificada
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
 
       return { success: true };
     } catch (err) {
@@ -245,6 +273,16 @@ export function useAuth() {
       setIsLoading(false);
     }
   }, []);
+
+  /**
+   * RESET PASSWORD (DEPRECATED - kept for backwards compat)
+   * @param {string} email - Email del usuario
+   * @param {string} newPassword - Nueva contraseña
+   */
+  const resetPassword = useCallback(async (email, newPassword) => {
+    // Redirigir a verifyOtpAndReset
+    return verifyOtpAndReset(email, "", newPassword);
+  }, [verifyOtpAndReset]);
 
   /**
    * GET ALL USERS — Retorna lista de todos los usuarios (solo para testing/admin)
@@ -262,6 +300,8 @@ export function useAuth() {
     register,
     logout,
     resetPassword,
+    resetPasswordForEmail, // 🆕 FASE 3F
+    verifyOtpAndReset, // 🆕 FASE 3F
     getAllUsers, // Solo para testing
   };
 }
