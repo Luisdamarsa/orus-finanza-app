@@ -67,13 +67,28 @@ export function useAuth() {
 
     try {
       // 🆕 FASE 3F - Usar Supabase Auth en lugar de simulación
+      console.log("🔐 Intentando login con:", username);
+
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: username,
         password: password,
       });
 
-      if (authError) throw authError;
-      if (!data.user) throw new Error("No se pudo autenticar");
+      if (authError) {
+        console.error("❌ Error Supabase Auth:", authError);
+        throw authError;
+      }
+
+      if (!data.user) {
+        console.error("❌ No se retornó user en data");
+        throw new Error("No se pudo autenticar");
+      }
+
+      console.log("✅ Auth exitoso. User:", data.user.email);
+
+      // 🆕 Verificar que la sesión fue creada
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log("✅ Sesión creada:", sessionData?.session ? "SÍ" : "NO");
 
       // Obtener datos completos del usuario desde tabla usuarios
       const { data: userData, error: userError } = await supabase
@@ -82,8 +97,17 @@ export function useAuth() {
         .eq("email", username)
         .single();
 
-      if (userError) throw userError;
-      if (!userData) throw new Error("Usuario no encontrado en BD");
+      if (userError) {
+        console.error("❌ Error obteniendo usuario de BD:", userError);
+        throw userError;
+      }
+
+      if (!userData) {
+        console.error("❌ Usuario no encontrado en BD");
+        throw new Error("Usuario no encontrado en BD");
+      }
+
+      console.log("✅ Datos del usuario cargados:", userData.email);
 
       const { password: _, ...userWithoutPassword } = userData;
       setUser(userWithoutPassword);
@@ -92,8 +116,10 @@ export function useAuth() {
       localStorage.setItem("currentUserId", userData.id);
       localStorage.setItem("currentUserEmail", userData.email);
 
+      console.log("✅ LOGIN EXITOSO:", userData.email);
       return { success: true, user: userWithoutPassword };
     } catch (err) {
+      console.error("❌ Error en login:", err);
       const errorMsg = err.message || "Error al iniciar sesión";
       setError(errorMsg);
       return { success: false, error: errorMsg };
