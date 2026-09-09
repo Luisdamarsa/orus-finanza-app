@@ -56,8 +56,9 @@ export function useAuth() {
   const [error, setError] = useState("");
 
   /**
-   * LOGIN — Autentica usuario con username/email y password
-   * @param {string} username - Usuario o correo
+   * LOGIN — Autentica usuario con email y password
+   * 🆕 FASE 3F - Integración completa con Supabase Auth
+   * @param {string} username - Email del usuario
    * @param {string} password - Contraseña
    */
   const login = useCallback(async (username, password) => {
@@ -65,29 +66,33 @@ export function useAuth() {
     setError("");
 
     try {
-      // TODO: Remplazar con Supabase Auth
-      // const { data, error } = await supabase.auth.signInWithPassword({
-      //   email: username,
-      //   password: password
-      // });
+      // 🆕 FASE 3F - Usar Supabase Auth en lugar de simulación
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password,
+      });
 
-      // Simulación local (remove cuando conectes Supabase)
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (authError) throw authError;
+      if (!data.user) throw new Error("No se pudo autenticar");
 
-      const foundUser = MOCK_USERS.find(
-        (u) => u.email === username && u.password === password
-      );
+      // Obtener datos completos del usuario desde tabla usuarios
+      const { data: userData, error: userError } = await supabase
+        .from("usuarios")
+        .select("*")
+        .eq("email", username)
+        .single();
 
-      if (foundUser) {
-        // No guardar password en el estado
-        const { password: _, ...userWithoutPassword } = foundUser;
-        setUser(userWithoutPassword);
-        setError("");
-        return { success: true, user: userWithoutPassword };
-      } else {
-        setError("Usuario o contraseña incorrectos");
-        return { success: false, error: "Usuario o contraseña incorrectos" };
-      }
+      if (userError) throw userError;
+      if (!userData) throw new Error("Usuario no encontrado en BD");
+
+      const { password: _, ...userWithoutPassword } = userData;
+      setUser(userWithoutPassword);
+
+      // Guardar en localStorage
+      localStorage.setItem("currentUserId", userData.id);
+      localStorage.setItem("currentUserEmail", userData.email);
+
+      return { success: true, user: userWithoutPassword };
     } catch (err) {
       const errorMsg = err.message || "Error al iniciar sesión";
       setError(errorMsg);
@@ -192,15 +197,20 @@ export function useAuth() {
 
   /**
    * LOGOUT — Cierra sesión
+   * 🆕 FASE 3F - Integración con Supabase Auth
    */
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      // TODO: Remplazar con Supabase Auth
-      // await supabase.auth.signOut();
+      // 🆕 FASE 3F - Usar Supabase Auth signOut
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
 
       setUser(null);
       setError("");
+      localStorage.removeItem("currentUserId");
+      localStorage.removeItem("currentUserEmail");
+
       return { success: true };
     } catch (err) {
       const errorMsg = err.message || "Error al cerrar sesión";

@@ -116,11 +116,11 @@ export default function ChangePasswordModal({ isDark, onClose }) {
       <div
         style={{
           background: t.bg,
-          borderRadius: 20,
-          padding: "22px",
-          maxWidth: 380,
-          width: "90%",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
+          borderRadius: 16,
+          padding: "18px 16px",
+          maxWidth: 320,
+          width: "88%",
+          boxShadow: "0 10px 22px -10px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04)",
           animation: "scaleUp 0.25s cubic-bezier(0.32, 0.72, 0.12, 1)",
         }}
         onPointerDown={(e) => e.stopPropagation()}
@@ -133,12 +133,12 @@ export default function ChangePasswordModal({ isDark, onClose }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 16,
+            marginBottom: 12,
           }}
         >
           <h2
             style={{
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: 700,
               color: t.text,
               margin: 0,
@@ -152,9 +152,14 @@ export default function ChangePasswordModal({ isDark, onClose }) {
               background: "none",
               border: "none",
               color: t.sub,
-              fontSize: 24,
+              fontSize: 20,
               cursor: "pointer",
               padding: 0,
+              width: 24,
+              height: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             ✕
@@ -167,15 +172,15 @@ export default function ChangePasswordModal({ isDark, onClose }) {
             style={{
               background: "rgba(134,239,172,0.1)",
               color: t.success,
-              padding: "12px 14px",
-              borderRadius: 12,
-              fontSize: 12,
+              padding: "10px 12px",
+              borderRadius: 10,
+              fontSize: 11,
               fontWeight: 600,
-              marginBottom: 12,
+              marginBottom: 10,
               textAlign: "center",
             }}
           >
-            ✓ Contraseña cambiada exitosamente
+            ✓ Contraseña cambiada
           </div>
         )}
 
@@ -185,11 +190,11 @@ export default function ChangePasswordModal({ isDark, onClose }) {
             style={{
               background: "rgba(255,138,138,0.1)",
               color: t.danger,
-              padding: "12px 14px",
-              borderRadius: 12,
-              fontSize: 12,
+              padding: "10px 12px",
+              borderRadius: 10,
+              fontSize: 11,
               fontWeight: 600,
-              marginBottom: 12,
+              marginBottom: 10,
               textAlign: "center",
             }}
           >
@@ -198,19 +203,19 @@ export default function ChangePasswordModal({ isDark, onClose }) {
         )}
 
         {/* Formulario */}
-        <form onSubmit={handleChangePassword} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <form onSubmit={handleChangePassword} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {/* Contraseña Actual */}
           <div>
             <label
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
+                marginBottom: 5,
                 display: "block",
               }}
             >
-              CONTRASEÑA ACTUAL
+              ACTUAL
             </label>
             <div style={{ position: "relative" }}>
               <input
@@ -225,10 +230,10 @@ export default function ChangePasswordModal({ isDark, onClose }) {
                 style={{
                   width: "100%",
                   boxSizing: "border-box",
-                  padding: "10px 18px 10px 40px",
-                  fontSize: 14,
+                  padding: "8px 14px 8px 36px",
+                  fontSize: 13,
                   border: `1px solid ${error ? t.danger : "rgba(255,255,255,0.07)"}`,
-                  borderRadius: 12,
+                  borderRadius: 10,
                   background: t.surface,
                   color: t.text,
                   outline: "none",
@@ -260,14 +265,14 @@ export default function ChangePasswordModal({ isDark, onClose }) {
           <div>
             <label
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
+                marginBottom: 5,
                 display: "block",
               }}
             >
-              NUEVA CONTRASEÑA
+              NUEVA
             </label>
             <div style={{ position: "relative" }}>
               <input
@@ -317,14 +322,14 @@ export default function ChangePasswordModal({ isDark, onClose }) {
           <div>
             <label
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: 700,
                 color: t.sub,
-                marginBottom: 6,
+                marginBottom: 5,
                 display: "block",
               }}
             >
-              CONFIRMAR CONTRASEÑA
+              CONFIRMAR
             </label>
             <div style={{ position: "relative" }}>
               <input
@@ -371,21 +376,21 @@ export default function ChangePasswordModal({ isDark, onClose }) {
           </div>
 
           {/* Botones */}
-          <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading || success}
               style={{
                 flex: 1,
-                padding: "10px 16px",
-                borderRadius: 12,
+                padding: "9px 14px",
+                borderRadius: 10,
                 border: "none",
                 background: t.surface,
                 color: t.text,
                 fontWeight: 600,
                 cursor: isLoading || success ? "not-allowed" : "pointer",
-                fontSize: 12,
+                fontSize: 11,
                 transition: "all 0.3s",
               }}
             >
