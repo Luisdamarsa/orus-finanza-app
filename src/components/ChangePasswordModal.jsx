@@ -73,6 +73,13 @@ export default function ChangePasswordModal({ isDark, onClose }) {
     setIsLoading(true);
 
     try {
+      // 🆕 FASE 3F - Verificar que hay sesión activa
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !sessionData?.session) {
+        throw new Error("No hay sesión activa. Por favor, cierra sesión y vuelve a ingresar.");
+      }
+
       // 🆕 FASE 3F - Cambiar contraseña con Supabase Auth
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,

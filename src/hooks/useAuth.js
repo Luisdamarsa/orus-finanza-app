@@ -295,6 +295,20 @@ export function useAuth() {
   }, [verifyOtpAndReset]);
 
   /**
+   * GET SESSION — Obtiene la sesión actual de Supabase Auth
+   * 🆕 FASE 3F - Para debuggear y verificar sesión activa
+   */
+  const getSession = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return { success: true, session: data.session };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }, []);
+
+  /**
    * GET ALL USERS — Retorna lista de todos los usuarios (solo para testing/admin)
    * TODO: remover cuando conectes Supabase
    */
@@ -312,6 +326,7 @@ export function useAuth() {
     resetPassword,
     resetPasswordForEmail, // 🆕 FASE 3F
     verifyOtpAndReset, // 🆕 FASE 3F
+    getSession, // 🆕 FASE 3F - Para debuggear sesión
     getAllUsers, // Solo para testing
   };
 }

@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
+// 🆕 FASE 3F - Importar supabase para recuperar sesión
+import { supabase } from "./services/supabaseService";
+
 // 🆕 Importar PopupProvider
 import { PopupProvider } from "./services/PopupService";
 
@@ -142,6 +145,23 @@ function Dashboard() {
     }, 100);
     return () => clearInterval(interval);
   }, [currentUserId]);
+
+  // 🆕 FASE 3F - Recuperar sesión de Supabase Auth al cargar la app
+  // Esto asegura que supabase.auth.updateUser() funcione para cambiar contraseña
+  useEffect(() => {
+    const recoverSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) console.error("Error recuperando sesión:", error);
+        if (data?.session) {
+          console.log("✅ Sesión de Supabase recuperada:", data.session.user.email);
+        }
+      } catch (err) {
+        console.error("Error en recoverSession:", err);
+      }
+    };
+    recoverSession();
+  }, []);
 
   // ✅ FASE LOGIN - Validar si hay usuario logueado
   // Si no hay userId en localStorage, forzar pantalla de login
