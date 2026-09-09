@@ -42,25 +42,6 @@ export async function loginUser(email, password) {
       throw new Error('Usuario o contraseña incorrectos');
     }
 
-    // 🆕 FASE 3F - Crear sesión en Supabase Auth
-    // Esto permite que luego se pueda cambiar contraseña con updateUser()
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (authError) {
-        console.error("⚠️ Auth en Supabase falló, pero login local OK:", authError);
-        // Continuamos aunque falle Supabase Auth, porque el usuario existe en tabla usuarios
-      } else if (authData?.session) {
-        console.log("✅ Sesión Supabase Auth creada:", email);
-      }
-    } catch (authErr) {
-      console.error("⚠️ Error creando sesión Supabase:", authErr);
-      // Continuamos si Supabase Auth falla
-    }
-
     // Retornar usuario sin el password
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;

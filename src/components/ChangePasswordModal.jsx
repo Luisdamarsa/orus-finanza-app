@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { DARK, LIGHT } from "../constants/tokens";
 import { getCTAButtonStyle } from "../utils/buttonStyles";
 import { supabase } from "../services/supabaseService";
+import bcrypt from "bcryptjs"; // 🆕 FASE 3F - Para hashear contraseña
 
 /**
  * ChangePasswordModal.jsx
@@ -73,17 +74,37 @@ export default function ChangePasswordModal({ isDark, onClose }) {
     setIsLoading(true);
 
     try {
-      // 🆕 FASE 3F - Verificar que hay sesión activa
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError || !sessionData?.session) {
-        throw new Error("No hay sesión activa. Por favor, cierra sesión y vuelve a ingresar.");
+      // 🆕 FASE 3F - Obtener userId del usuario actual
+      const currentUserId = localStorage.getItem("currentUserId");
+      if (!currentUserId) {
+        throw new Error("Usuario no identificado. Por favor, cierra sesión y vuelve a ingresar.");
       }
 
-      // 🆕 FASE 3F - Cambiar contraseña con Supabase Auth
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      // 🆕 FASE 3F - Obtener usuario actual de BD
+      const { data: userData, error: fetchError } = await supabase
+        .from("usuarios")
+        .select("password")
+        .eq("id", currentUserId)
+        .single();
+
+      if (fetchError || !userData) {
+        throw new Error("No se pudo verificar la contraseña actual");
+      }
+
+      // 🆕 FASE 3F - Validar contraseña actual con bcrypt
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userData.password);
+      if (!isCurrentPasswordValid) {
+        throw new Error("La contraseña actual es incorrecta");
+      }
+
+      // 🆕 FASE 3F - Hashear nueva contraseña
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // 🆕 FASE 3F - Actualizar en tabla usuarios (no en auth.users)
+      const { error: updateError } = await supabase
+        .from("usuarios")
+        .update({ password: hashedPassword })
+        .eq("id", currentUserId);
 
       if (updateError) throw updateError;
 
