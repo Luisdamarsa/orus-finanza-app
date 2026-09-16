@@ -1,57 +1,69 @@
 import { supabase } from './supabaseService';
-import bcrypt from 'bcryptjs';
 
 /**
- * authService.js - Autenticación con email + password
+ * authService.js - Autenticacion con Supabase Auth
  *
- * Valida credenciales contra Supabase usando bcrypt.compare()
+ * FASE 3F FINAL - auth.users es la source of truth
+ * Edge Function maneja creacion/cambios en auth.users
  */
 
 /**
- * Buscar usuario por email y validar password
+ * Login con Supabase Auth
  * @param {string} email - Email del usuario
- * @param {string} password - Contraseña en texto plano
- * @returns {Object|null} Usuario si es válido, null si no
+ * @param {string} password - Contrasena en texto plano
+ * @returns {Object} Usuario con datos personalizados
  */
 export async function loginUser(email, password) {
   if (!email || !password) {
-    throw new Error('Email y contraseña son requeridos');
+    throw new Error('Email y contrasena son requeridos');
   }
 
   try {
-    // Buscar usuario por email
-    const { data: user, error: userError } = await supabase
-      .from('usuarios')
-      .select('id, email, nombre, apellido, phone, password, is_active') // 🆕 Traer is_active
-      .eq('email', email)
-      .single();
+    // Autenticar con Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (userError || !user) {
-      throw new Error('Usuario o contraseña incorrectos');
+    if (authError || !authData?.user) {
+      throw new Error('Usuario o contrasena incorrectos');
     }
 
-    // 🆕 Validar que el usuario esté activo (no haya sido eliminado)
-    if (!user.is_active) {
+    const userId = authData.user.id;
+
+    // Obtener datos personalizados de tabla usuarios
+    const { data: userData, error: userError } = await supabase
+      .from('usuarios')
+      .select('id, email, nombre, apellido, phone, is_active')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !userData) {
+      throw new Error('Usuario no encontrado en sistema');
+    }
+
+    // Validar que el usuario este activo (soft delete)
+    if (!userData.is_active) {
       throw new Error('Esta cuenta ha sido eliminada');
     }
 
-    // Comparar password con bcrypt
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Guardar email en localStorage para ChangePasswordModal
+    localStorage.setItem('currentUserEmail', userData.email);
 
-    if (!isPasswordValid) {
-      throw new Error('Usuario o contraseña incorrectos');
-    }
-
-    // Retornar usuario sin el password
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return {
+      id: userId,
+      email: userData.email,
+      nombre: userData.nombre,
+      apellido: userData.apellido,
+      phone: userData.phone,
+    };
   } catch (error) {
     throw error;
   }
 }
 
 /**
- * Verificar si email ya está registrado
+ * Verificar si email ya esta registrado
  */
 export async function checkEmailExists(email) {
   const { data, error } = await supabase
@@ -64,45 +76,10 @@ export async function checkEmailExists(email) {
 }
 
 /**
- * Crear nuevo usuario con password hasheado
+ * Crear nuevo usuario (usa Edge Function)
  */
 export async function registerUser(userData) {
-  const { email, password, nombre, apellido, phone } = userData;
-
-  if (!email || !password) {
-    throw new Error('Email y contraseña son requeridos');
-  }
-
-  try {
-    // Hashear password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Crear usuario en Supabase
-    const { data, error } = await supabase
-      .from('usuarios')
-      .insert([
-        {
-          email,
-          password: hashedPassword,
-          nombre: nombre || '',
-          apellido: apellido || '',
-          phone: phone || '',
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        throw new Error('Este email ya está registrado');
-      }
-      throw error;
-    }
-
-    const { password: _, ...userWithoutPassword } = data;
-    return userWithoutPassword;
-  } catch (error) {
-    throw error;
-  }
+  // Este metodo ahora usa la Edge Function
+  // Ver authManagementService.js para implementacion
+  throw new Error('Use authManagementService.createUserInAuth() en su lugar');
 }

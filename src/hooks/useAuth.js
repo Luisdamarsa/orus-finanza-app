@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import * as userService from "../services/userService"; // 🆕 FASE 3D - Para crear usuarios en Supabase
 import { supabase } from "../services/supabaseService"; // 🆕 FASE 3F - Para reset password
+import { loginUser as loginUserService } from "../services/authService"; // 🆕 FASE 3F HYBRID - Login con Supabase Auth
 
 /**
  * useAuth.js — Hook de autenticación
@@ -66,60 +66,18 @@ export function useAuth() {
     setError("");
 
     try {
-      // 🆕 FASE 3F - Usar Supabase Auth en lugar de simulación
-      console.log("🔐 Intentando login con:", username);
+      // 🆕 FASE 3F HYBRID - Usar authService que maneja Supabase Auth + tabla usuarios
+      const loginResult = await loginUserService(username, password);
 
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: username,
-        password: password,
-      });
+      setUser(loginResult);
 
-      if (authError) {
-        console.error("❌ Error Supabase Auth:", authError);
-        throw authError;
-      }
+      // Guardar en localStorage para compatibilidad
+      localStorage.setItem("currentUserId", loginResult.id);
+      localStorage.setItem("currentUserEmail", loginResult.email);
 
-      if (!data.user) {
-        console.error("❌ No se retornó user en data");
-        throw new Error("No se pudo autenticar");
-      }
-
-      console.log("✅ Auth exitoso. User:", data.user.email);
-
-      // 🆕 Verificar que la sesión fue creada
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log("✅ Sesión creada:", sessionData?.session ? "SÍ" : "NO");
-
-      // Obtener datos completos del usuario desde tabla usuarios
-      const { data: userData, error: userError } = await supabase
-        .from("usuarios")
-        .select("*")
-        .eq("email", username)
-        .single();
-
-      if (userError) {
-        console.error("❌ Error obteniendo usuario de BD:", userError);
-        throw userError;
-      }
-
-      if (!userData) {
-        console.error("❌ Usuario no encontrado en BD");
-        throw new Error("Usuario no encontrado en BD");
-      }
-
-      console.log("✅ Datos del usuario cargados:", userData.email);
-
-      const { password: _, ...userWithoutPassword } = userData;
-      setUser(userWithoutPassword);
-
-      // Guardar en localStorage
-      localStorage.setItem("currentUserId", userData.id);
-      localStorage.setItem("currentUserEmail", userData.email);
-
-      console.log("✅ LOGIN EXITOSO:", userData.email);
-      return { success: true, user: userWithoutPassword };
+      return { success: true, user: loginResult };
     } catch (err) {
-      console.error("❌ Error en login:", err);
+      console.error("Error en login:", err.message);
       const errorMsg = err.message || "Error al iniciar sesión";
       setError(errorMsg);
       return { success: false, error: errorMsg };
@@ -190,28 +148,9 @@ export function useAuth() {
       //   }
       // });
 
-      // 🆕 FASE 3D - Crear usuario en Supabase
-      const result = await userService.createUser({
-        nombre,
-        apellido,
-        email,
-        phone: phone || "",
-        password,
-        username
-      });
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      // Log in automáticamente
-      setUser(result.user);
-
-      // Guardar en localStorage
-      localStorage.setItem("currentUserId", result.user.id);
-      localStorage.setItem("currentUserEmail", result.user.email);
-
-      return { success: true, user: result.user };
+      // 🆕 PASO 7 - Usar Edge Function en su lugar
+      // Este hook ya NO se usa. SignupPage usa directamente createUserInAuth() de authManagementService
+      throw new Error('Use createUserInAuth() from authManagementService instead');
     } catch (err) {
       const errorMsg = err.message || "Error al registrar";
       setError(errorMsg);

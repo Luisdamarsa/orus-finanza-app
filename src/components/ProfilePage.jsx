@@ -7,9 +7,7 @@ import * as userService from "../services/userService"; // 🆕 FASE 3C
 import HeaderBar from "./HeaderBar";
 import DeleteAccountModal from "./DeleteAccountModal";
 import ChangePasswordModal from "./ChangePasswordModal"; // 🆕 FASE 3F
-
-// 🆕 FASE 3D - Importar soft delete
-import { softDeleteUser } from "../services/userService";
+import { deleteAccountInAuth } from "../services/authManagementService"; // 🆕 FASE 3F - Edge Function
 
 /**
  * Página de Perfil del usuario
@@ -57,6 +55,7 @@ export default function ProfilePage({
   useEffect(() => {
     if (currentUser) {
       // Si tenemos currentUser (FASE 2), usarlo
+      // 🆕 PASO 7 - Usar username como displayName (editable)
       setUser({
         displayName: currentUser.username,
         userId: currentUser.id,
@@ -426,18 +425,24 @@ export default function ProfilePage({
         isOpen={deleteAccountModalOpen}
         onCancel={() => setDeleteAccountModalOpen(false)}
         onConfirm={async () => {
-          // 🆕 FASE 3D - Soft delete: marcar usuario como inactivo
-          const success = await softDeleteUser(currentUser?.id);
-          if (success) {
-            popup.showDeletePopup('cuenta');
-            // Limpiar localStorage y redirigir a login
-            localStorage.removeItem("currentUserId");
-            localStorage.removeItem("currentUserEmail");
-            setTimeout(() => setScreen("login"), 1500);
-          } else {
-            popup.showErrorPopup("Error al eliminar la cuenta");
+          try {
+            // 🆕 FASE 3F - Usar Edge Function para eliminar cuenta (soft delete)
+            const result = await deleteAccountInAuth(currentUser?.email);
+            if (result.success) {
+              popup.showDeletePopup('cuenta');
+              // Limpiar localStorage y redirigir a login
+              localStorage.removeItem("currentUserId");
+              localStorage.removeItem("currentUserEmail");
+              setTimeout(() => setScreen("login"), 1500);
+            } else {
+              popup.showErrorPopup("Error al eliminar la cuenta");
+            }
+          } catch (error) {
+            console.error("Error eliminando cuenta:", error.message);
+            popup.showErrorPopup(error.message || "Error al eliminar la cuenta");
+          } finally {
+            setDeleteAccountModalOpen(false);
           }
-          setDeleteAccountModalOpen(false);
         }}
       />
 

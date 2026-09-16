@@ -298,6 +298,29 @@ function Dashboard() {
     loadSupabaseUsers();
   }, []);
 
+  // 🆕 PASO 7 - Refetch usuarios cuando vuelves a dashboard (después de editar perfil)
+  useEffect(() => {
+    if (screen === "dashboard") {
+      const loadSupabaseUsers = async () => {
+        const users = await getAllUsers();
+
+        if (users.length > 0) {
+          const userOptions = users.map(user => ({
+            id: user.id,
+            nombre: user.nombre || '',
+            apellido: user.apellido || '',
+            username: user.username || user.email?.split('@')[0] || 'Usuario',
+            email: user.email || '',
+            phone: user.phone || ''
+          }));
+          setSupabaseUsers(userOptions);
+        }
+      };
+
+      loadSupabaseUsers();
+    }
+  }, [screen]);
+
   // Crear opciones del dropdown desde usuarios de Supabase
   const MOCK_USER_OPTIONS = supabaseUsers.map(user => ({
     id: user.id,

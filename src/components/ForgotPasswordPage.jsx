@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
 import { usePress } from "../hooks/usePress";
-import { useAuth } from "../hooks/useAuth";
 import { DARK, LIGHT } from "../constants/tokens";
 import { getClayShadow } from "../utils/clayStyles";
 import { getCTAButtonStyle } from "../utils/buttonStyles";
+import {
+  sendPasswordResetCode,
+  verifyResetCodeAndUpdatePassword
+} from "../services/resetPasswordService"; // 🆕 FASE 3F HYBRID
 
 // Lock Icon SVG
 const LockIconSvg = () => (
@@ -32,7 +35,6 @@ const AlertIconSvg = () => (
 
 export default function ForgotPasswordPage({ setScreen }) {
   const { isDark } = useTheme();
-  const { resetPasswordForEmail, verifyOtpAndReset } = useAuth(); // 🆕 FASE 3F
   const tokens = isDark ? DARK : LIGHT;
 
   const [step, setStep] = useState(1); // 1: email, 2: code, 3: password
@@ -63,26 +65,35 @@ export default function ForgotPasswordPage({ setScreen }) {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     if (!email) {
       setError("Ingresa un correo electrónico válido");
+      setIsLoading(false);
       return;
     }
 
     if (!isEmailValid(email)) {
       setError("Ingresa un correo electrónico válido");
+      setIsLoading(false);
       return;
     }
 
-    // 🆕 FASE 3F - Enviar email de reset con Supabase
-    const result = await resetPasswordForEmail(email);
+    try {
+      // 🆕 FASE 3F HYBRID - Generar OTP y guardar en BD
+      const result = await sendPasswordResetCode(email);
 
-    if (result.success) {
-      setStep(2);
-      setResendCountdown(60);
-      setAttempts(0);
-    } else {
-      setError(result.error || "Error al enviar email");
+      if (result.success) {
+        setStep(2);
+        setResendCountdown(60);
+        setAttempts(0);
+      } else {
+        setError(result.error || "Error al enviar código");
+      }
+    } catch (err) {
+      setError(err.message || "Error al enviar código");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,16 +135,23 @@ export default function ForgotPasswordPage({ setScreen }) {
 
   const handleResend = async () => {
     setError("");
+    setIsLoading(true);
 
-    // 🆕 FASE 3F - Reenviar código con Supabase
-    const result = await resetPasswordForEmail(email);
+    try {
+      // 🆕 FASE 3F HYBRID - Generar nuevo OTP
+      const result = await sendPasswordResetCode(email);
 
-    if (result.success) {
-      setCode(["", "", "", "", "", ""]);
-      setAttempts(0);
-      setResendCountdown(60);
-    } else {
-      setError(result.error || "Error al reenviar código");
+      if (result.success) {
+        setCode(["", "", "", "", "", ""]);
+        setAttempts(0);
+        setResendCountdown(60);
+      } else {
+        setError(result.error || "Error al reenviar código");
+      }
+    } catch (err) {
+      setError(err.message || "Error al reenviar código");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,39 +168,50 @@ export default function ForgotPasswordPage({ setScreen }) {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     if (password.length < 8) {
       setError("La contraseña debe tener mínimo 8 caracteres");
+      setIsLoading(false);
       return;
     }
 
     if (!/[A-Z]/.test(password)) {
       setError("La contraseña debe contener al menos 1 mayúscula");
+      setIsLoading(false);
       return;
     }
 
     if (!/[0-9]/.test(password)) {
       setError("La contraseña debe contener al menos 1 número");
+      setIsLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");
+      setIsLoading(false);
       return;
     }
 
-    // 🆕 FASE 3F - Cambiar contraseña con código verificado
-    const fullCode = code.join("");
-    const result = await verifyOtpAndReset(email, fullCode, password);
+    try {
+      // 🆕 FASE 3F HYBRID - Verificar OTP + cambiar contraseña en auth.users
+      const fullCode = code.join("");
+      const result = await verifyResetCodeAndUpdatePassword(email, fullCode, password);
 
-    if (result.success) {
-      // Contraseña cambiada exitosamente - ir a login
-      setTimeout(() => {
-        setScreen("login");
-      }, 800);
-    } else {
-      // Error - mostrar mensaje
-      setError(result.error);
+      if (result.success) {
+        // Contraseña cambiada exitosamente - ir a login
+        console.log("✅ Contraseña actualizada en auth.users");
+        setTimeout(() => {
+          setScreen("login");
+        }, 800);
+      } else {
+        setError(result.error || "Error al cambiar contraseña");
+      }
+    } catch (err) {
+      setError(err.message || "Error al cambiar contraseña");
+    } finally {
+      setIsLoading(false);
     }
   };
 

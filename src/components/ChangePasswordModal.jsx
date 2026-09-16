@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useTheme } from "../hooks/useTheme";
-import { useAuth } from "../hooks/useAuth";
 import { DARK, LIGHT } from "../constants/tokens";
 import { getCTAButtonStyle } from "../utils/buttonStyles";
-import { supabase } from "../services/supabaseService";
-import bcrypt from "bcryptjs"; // 🆕 FASE 3F - Para hashear contraseña
+import { changePasswordInAuth } from "../services/authManagementService"; // 🆕 FASE 3F - Edge Function
 
 /**
  * ChangePasswordModal.jsx
@@ -40,7 +38,6 @@ export default function ChangePasswordModal({ isDark, onClose }) {
     setError("");
     setSuccess(false);
 
-    // Validaciones
     if (!currentPassword) {
       setError("Ingresa tu contraseña actual");
       return;
@@ -74,51 +71,29 @@ export default function ChangePasswordModal({ isDark, onClose }) {
     setIsLoading(true);
 
     try {
-      // 🆕 FASE 3F - Obtener userId del usuario actual
-      const currentUserId = localStorage.getItem("currentUserId");
-      if (!currentUserId) {
-        throw new Error("Usuario no identificado. Por favor, cierra sesión y vuelve a ingresar.");
+      const currentUserEmail = localStorage.getItem("currentUserEmail");
+
+      if (!currentUserEmail) {
+        throw new Error("Usuario no identificado. Por favor, cierra sesion y vuelve a ingresar.");
       }
 
-      // 🆕 FASE 3F - Obtener usuario actual de BD
-      const { data: userData, error: fetchError } = await supabase
-        .from("usuarios")
-        .select("password")
-        .eq("id", currentUserId)
-        .single();
+      // Llamar Edge Function (valida password actual internamente y cambia en auth.users)
+      const result = await changePasswordInAuth(currentUserEmail, newPassword);
 
-      if (fetchError || !userData) {
-        throw new Error("No se pudo verificar la contraseña actual");
+      if (!result.success) {
+        throw new Error(result.error || "Error al cambiar contrasena");
       }
-
-      // 🆕 FASE 3F - Validar contraseña actual con bcrypt
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userData.password);
-      if (!isCurrentPasswordValid) {
-        throw new Error("La contraseña actual es incorrecta");
-      }
-
-      // 🆕 FASE 3F - Hashear nueva contraseña
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-      // 🆕 FASE 3F - Actualizar en tabla usuarios (no en auth.users)
-      const { error: updateError } = await supabase
-        .from("usuarios")
-        .update({ password: hashedPassword })
-        .eq("id", currentUserId);
-
-      if (updateError) throw updateError;
 
       setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
 
-      // Cerrar modal después de 1.5s
       setTimeout(() => {
         onClose();
       }, 1500);
     } catch (err) {
-      const errorMsg = err.message || "Error al cambiar contraseña";
+      const errorMsg = err.message || "Error al cambiar contrasena";
       setError(errorMsg);
     } finally {
       setIsLoading(false);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { usePress } from "../hooks/usePress";
-import { useAuth } from "../hooks/useAuth";
+import { createUserInAuth } from "../services/authManagementService"; // 🆕 PASO 7 - Usar Edge Function directamente
 
 // Back Button SVG
 const BackButtonSvg = () => (
@@ -39,7 +39,6 @@ const COUNTRIES = [
 ];
 
 export default function SignupPage({ setScreen }) {
-  const { register, isLoading, error: authError } = useAuth();
   const pressBack = usePress();
   const pressSignup = usePress();
   const pressGoogle = usePress();
@@ -117,25 +116,26 @@ export default function SignupPage({ setScreen }) {
 
     setRegisterError(""); // Limpiar error anterior
 
-    const result = await register({
-      nombre,
-      apellido,
-      email,
-      phone: phone ? `${selectedCountry.phone} ${phone}` : "",
-      password,
-      username: nombre, // 🆕 Username = solo nombre (no email)
-    });
+    try {
+      // 🆕 FASE 3F - Usar Edge Function para crear usuario
+      const result = await createUserInAuth(
+        email,
+        password,
+        nombre,
+        apellido,
+        phone ? `${selectedCountry.phone} ${phone}` : ""
+      );
 
-    if (result.success) {
-      // 🆕 FASE 3D - Guardar userId en localStorage ANTES de cambiar screen
-      localStorage.setItem("currentUserId", result.user.id);
+      // Guardar userId en localStorage ANTES de cambiar screen
+      localStorage.setItem("currentUserId", result.userId);
+
       // Pequeño delay para asegurar que localStorage se actualiza
       setTimeout(() => {
         setScreen("dashboard");
       }, 100);
-    } else {
-      // 🆕 FASE 3D - Mostrar error de registro
-      setRegisterError(result.error || "Error al crear cuenta");
+    } catch (error) {
+      console.error("Error en signup:", error.message);
+      setRegisterError(error.message || "Error al crear cuenta");
     }
   };
 
@@ -334,10 +334,6 @@ export default function SignupPage({ setScreen }) {
             onChange={(e) => {
               setEmail(e.target.value);
               if (errors.email) setErrors({ ...errors, email: "" });
-              // Limpiar error global de duplicado si el usuario lo cambia
-              if (authError && authError.includes("registrado")) {
-                // No limpiamos aquí, se limpia al hacer submit de nuevo
-              }
             }}
             style={{
               width: "100%",
@@ -345,7 +341,7 @@ export default function SignupPage({ setScreen }) {
               padding: "15px 16px",
               fontSize: 13.5,
               fontFamily: "inherit",
-              border: `1px solid ${(errors.email || (authError && authError.includes("registrado"))) ? "#FF8A8A" : "rgba(255,255,255,0.07)"}`,
+              border: `1px solid ${errors.email ? "#FF8A8A" : "rgba(255,255,255,0.07)"}`,
               borderRadius: 14,
               background: "#1e1b28",
               color: "#F5F3FF",
@@ -355,9 +351,9 @@ export default function SignupPage({ setScreen }) {
           />
         </div>
 
-        {(errors.email || (authError && authError.includes("registrado"))) && (
+        {errors.email && (
           <span style={{ color: "#FF8A8A", fontSize: 11.5, fontWeight: 700, marginTop: -12 }}>
-            {errors.email || authError}
+            {errors.email}
           </span>
         )}
 

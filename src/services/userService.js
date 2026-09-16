@@ -1,10 +1,10 @@
 import { supabase } from './supabaseService';
-import bcryptjs from 'bcryptjs'; // 🆕 Para hashear contraseñas
 
 /**
  * userService.js
  *
  * Gestiona datos del usuario en Supabase
+ * Auth (contraseñas) se maneja en auth.users vía Edge Function
  */
 
 /**
@@ -98,92 +98,6 @@ export async function softDeleteUser(userId) {
     return true;
   } catch (err) {
     return false;
-  }
-}
-
-/**
- * 🆕 FASE 3D - Crear nuevo usuario en Supabase
- * Valida email duplicado y crea el usuario con contraseña hasheada
- */
-export async function createUser(userData) {
-  const { nombre, apellido, email, phone, password, username } = userData;
-
-  if (!nombre || !apellido || !email || !password || !username) {
-    throw new Error('Faltan campos requeridos');
-  }
-
-  try {
-    // 1️⃣ Validar que el email NO existe
-    const { data: existingUser, error: checkError } = await supabase
-      .from('usuarios')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
-
-    if (checkError && checkError.code !== 'PGRST116') {
-      throw new Error('Error al validar email');
-    }
-
-    if (existingUser) {
-      throw new Error('El correo electrónico ya está registrado');
-    }
-
-    // 2️⃣ Hashear contraseña
-    const hashedPassword = await bcryptjs.hash(password, 10);
-
-    // 3️⃣ Crear usuario en Supabase
-    const newId = crypto.randomUUID();
-    const { data, error } = await supabase
-      .from('usuarios')
-      .insert([
-        {
-          id: newId,
-          username,
-          nombre,
-          apellido,
-          email,
-          phone: phone || '',
-          password: hashedPassword, // 🆕 Nombre correcto de columna (no password_hash)
-          created_at: new Date().toISOString(),
-        }
-      ])
-      .select('id, username, nombre, apellido, email, phone');
-
-    if (error) {
-      throw new Error(`Error al crear usuario: ${error.message}`);
-    }
-
-    const user = data?.[0];
-    if (!user) throw new Error('No se retornó el usuario creado');
-
-    // 4️⃣ Crear registro en configuraciones_usuario con defaults
-    const { error: configError } = await supabase
-      .from('configuraciones_usuario')
-      .insert([
-        {
-          user_id: newId,
-          show_incomes: false,
-          microphoneenabled: true,
-          notificationlistenerenabled: false,
-          iosshortcutsenabled: false,
-          isdark: true,
-          idioma: 'es',
-          moneda: 'COP',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      ]);
-
-    if (configError) {
-      // No lanzar error, el usuario ya existe
-    }
-
-    return { success: true, user };
-  } catch (err) {
-    return {
-      success: false,
-      error: err.message || 'Error al registrar usuario'
-    };
   }
 }
 
