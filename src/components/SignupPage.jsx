@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { usePress } from "../hooks/usePress";
 import { createUserInAuth } from "../services/authManagementService"; // 🆕 PASO 7 - Usar Edge Function directamente
+import { signInWithOAuth } from "../services/oauthService"; // 🆕 SESSION 1 - OAuth
 
 // Back Button SVG
 const BackButtonSvg = () => (
@@ -53,6 +54,7 @@ export default function SignupPage({ setScreen }) {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [registerError, setRegisterError] = useState(""); // 🆕 FASE 3D - Error de registro
+  const [isLoading, setIsLoading] = useState(false); // 🆕 OAuth loading state
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const countryDropdownRef = useRef(null);
 
@@ -141,6 +143,20 @@ export default function SignupPage({ setScreen }) {
 
   const handleBack = () => {
     setScreen("login");
+  };
+
+  const handleOAuth = async (provider) => {
+    setRegisterError("");
+    setIsLoading(true);
+
+    try {
+      // Redirige a Google/Apple para autenticar
+      await signInWithOAuth(provider);
+      // Nota: Después del callback, syncOAuthUserToDatabase se ejecuta en App.jsx
+    } catch (err) {
+      setRegisterError(`Error con ${provider}: ${err.message}`);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -652,6 +668,7 @@ export default function SignupPage({ setScreen }) {
         {/* Google */}
         <button
           type="button"
+          onClick={() => handleOAuth("google")}
           {...pressGoogle.handlers}
           disabled={isLoading}
           style={{
@@ -681,6 +698,7 @@ export default function SignupPage({ setScreen }) {
         {/* Apple */}
         <button
           type="button"
+          onClick={() => handleOAuth("apple")}
           {...pressApple.handlers}
           disabled={isLoading}
           style={{

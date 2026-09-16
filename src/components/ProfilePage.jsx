@@ -22,6 +22,10 @@ export default function ProfilePage({
   const { isDark } = useTheme();
   const popup = usePopup();
 
+  // 🆕 Detectar si es OAuth o email+password
+  const authProvider = localStorage.getItem("authProvider");
+  const hasPassword = authProvider === "email";
+
   // Tokens de diseño
   const tokens = {
     accent: "#9B6DFF",
@@ -55,16 +59,16 @@ export default function ProfilePage({
   useEffect(() => {
     if (currentUser) {
       // Si tenemos currentUser (FASE 2), usarlo
-      // 🆕 PASO 7 - Usar username como displayName (editable)
+      // Username = nombre al crear (OAuth), editable después
       setUser({
-        displayName: currentUser.username,
+        displayName: currentUser.username, // Mostrar y editar username
         userId: currentUser.id,
         nombre: currentUser.nombre,
         apellido: currentUser.apellido,
         email: currentUser.email,
         phone: currentUser.phone,
       });
-      setDisplayName(currentUser.username);
+      setDisplayName(currentUser.username); // Mostrar username actual
     } else {
       // Fallback a userStorage (original)
       const userData = userStorage.getUser();
@@ -160,9 +164,10 @@ export default function ProfilePage({
           {/* Botón Cerrar Sesión a la derecha */}
           <button
             onClick={() => {
-              // Limpiar localStorage
+              // Limpiar localStorage para permitir nueva sesión (otra cuenta de Google, etc)
               localStorage.removeItem("currentUserId");
               localStorage.removeItem("currentUserEmail");
+              localStorage.removeItem("authProvider"); // 🆕 Limpiar provider para cambiar de cuenta
               // Ir a login
               setScreen("login");
             }}
@@ -380,7 +385,7 @@ export default function ProfilePage({
             ...pressChangePassword.getPressStyle({ scale: 0.97 }),
           }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Cambiar Contraseña
+          {hasPassword ? "Cambiar Contraseña" : "Establecer Contraseña"}
         </button>
 
         {/* BOTÓN Eliminar Cuenta */}

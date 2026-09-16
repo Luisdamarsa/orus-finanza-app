@@ -4,6 +4,9 @@ import ErrorBoundary from "./components/ErrorBoundary";
 // 🆕 FASE 3F - Importar supabase para recuperar sesión
 import { supabase } from "./services/supabaseService";
 
+// 🆕 SESSION 1 - Importar OAuth service
+import { syncOAuthUserToDatabase } from "./services/oauthService";
+
 // 🆕 Importar PopupProvider
 import { PopupProvider } from "./services/PopupService";
 
@@ -25,6 +28,7 @@ import { useTransactions } from "./hooks/useTransactions";
 import { useTransactionToast } from "./hooks/useTransactionToast";
 import { useUserCategories } from "./hooks/useUserCategories"; // 🆕 FASE 3C - categoryMap
 import ScreenRouter from "./components/ScreenRouter";
+import LoadingDashboard from "./components/LoadingDashboard"; // 🆕 Skeleton loading
 import { DashboardContext } from "./contexts/DashboardContext";
 import * as catalog from "./services/categoryCatalogService";
 // 🆕 FASE 3B - Importar budgetService para presupuestos
@@ -117,6 +121,9 @@ function Dashboard() {
     return localStorage.getItem("currentUserId") || null;
   });
 
+  // 🆕 Loading state para Dashboard después de OAuth
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false);
+
   // 🆕 Rastrear pantalla anterior para navegación correcta (ej. Permisos → volver a Automatizaciones, no a Configuración)
   // Solo registra pantallas "principales", no pantallas hijas/modales (permissions, privacy-perms, terms, etc.)
   const [previousScreen, setPreviousScreen] = useState(null);
@@ -163,12 +170,77 @@ function Dashboard() {
     recoverSession();
   }, []);
 
-  // ✅ FASE LOGIN - Validar si hay usuario logueado
-  // Si no hay userId en localStorage, forzar pantalla de login
+  // 🆕 SESSION 1 - Sincronizar usuarios OAuth después del callback
+  // Escucha cambios en auth.users y sincroniza con tabla usuarios (SOLO para OAuth)
   useEffect(() => {
-    if (!currentUserId && screen !== "login" && screen !== "signup" && screen !== "forgot-password" && screen !== "about-login") {
-      setScreen("login");
-    }
+    const syncOAuthUser = async (session) => {
+      try {
+        // 🆕 VERIFICAR: Solo sincronizar si es OAuth (google, apple, etc)
+        const provider = session?.user?.app_metadata?.provider;
+        const isOAuth = provider && provider !== "email";
+
+        if (!isOAuth) {
+          console.log("[App] Login con email+password, no sincronizar OAuth");
+          // Guardar userId incluso para email+password
+          if (session?.user?.id) {
+            localStorage.setItem("currentUserId", session.user.id);
+            localStorage.setItem("authProvider", "email"); // 🆕 Guardar que es email+password
+            setCurrentUserId(session.user.id);
+          }
+          return;
+        }
+
+        // Si es OAuth, sincronizar a tabla usuarios
+        if (session?.user?.id) {
+          await syncOAuthUserToDatabase();
+          localStorage.setItem("currentUserId", session.user.id);
+          localStorage.setItem("authProvider", provider); // 🆕 Guardar provider (google, apple, etc)
+          setCurrentUserId(session.user.id);
+
+          // 🆕 IMPORTANTE: Redirigir a Dashboard después de OAuth exitoso
+          // setTimeout asegura que React procese el cambio antes
+          setTimeout(() => {
+            setIsDashboardLoading(true); // Activar skeleton loading
+            setScreen("dashboard");
+            console.log("[App] Redirigiendo a Dashboard después de OAuth");
+
+            // Desactivar loading después de 800ms (o cuando datos lleguen)
+            setTimeout(() => setIsDashboardLoading(false), 800);
+          }, 100);
+        }
+      } catch (err) {
+        console.error("[App] Error sincronizando OAuth:", err.message);
+      }
+    };
+
+    // Listener para cambios de sesión
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+          await syncOAuthUser(session);
+        }
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [setCurrentUserId, setScreen]);
+
+  // ✅ FASE LOGIN - Validar si hay usuario logueado
+  // Si no hay sesión activa, forzar pantalla de login
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Si hay sesión en Supabase, debería estar en dashboard
+      // Si NO hay sesión, debería estar en login/signup/forgot-password
+      if (!session && !currentUserId) {
+        if (screen !== "login" && screen !== "signup" && screen !== "forgot-password" && screen !== "about-login") {
+          setScreen("login");
+        }
+      }
+    };
+
+    checkSession();
   }, [currentUserId, screen, setScreen]);
 
   // 🆕 Limpiar localStorage de currentUserId al iniciar si está en login
@@ -785,7 +857,12 @@ function Dashboard() {
       {/* 🆕 FASE 3C - CategoryHistoryProvider envuelve todo para acceso global a categorías con historial */}
       <CategoryHistoryProvider userId={currentUserId}>
         <DashboardContext.Provider value={dashboard}>
-          <ScreenRouter {...routerProps} />
+          {/* 🆕 Mostrar skeleton loading mientras se carga Dashboard después de OAuth */}
+          {isDashboardLoading && screen === "dashboard" ? (
+            <LoadingDashboard isDark={isDark} />
+          ) : (
+            <ScreenRouter {...routerProps} />
+          )}
         </DashboardContext.Provider>
       </CategoryHistoryProvider>
     </>

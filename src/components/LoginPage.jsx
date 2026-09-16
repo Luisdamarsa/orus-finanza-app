@@ -4,6 +4,7 @@ import { useTheme } from "../hooks/useTheme";
 import { DARK, LIGHT } from "../constants/tokens";
 import { getClayShadow } from "../utils/clayStyles";
 import * as authService from "../services/authService";
+import { signInWithOAuth } from "../services/oauthService";
 
 // Google Logo SVG - official 4-color
 const GoogleLogoSvg = () => (
@@ -66,7 +67,18 @@ export default function LoginPage({ setScreen }) {
     setScreen("signup");
   };
 
-  const handleOAuth = (provider) => {
+  const handleOAuth = async (provider) => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      // Redirige a Google/Apple para autenticar
+      await signInWithOAuth(provider);
+      // Nota: Después del callback, syncOAuthUserToDatabase se ejecuta en App.jsx
+    } catch (err) {
+      setError(`Error con ${provider}: ${err.message}`);
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {

@@ -14,6 +14,11 @@ import { changePasswordInAuth } from "../services/authManagementService"; // �
  */
 export default function ChangePasswordModal({ isDark, onClose }) {
   const tokens = isDark ? DARK : LIGHT;
+
+  // 🆕 Detectar si es OAuth (Google/Apple) o email+password
+  const authProvider = localStorage.getItem("authProvider");
+  const hasPassword = authProvider === "email"; // true si tiene contraseña previa
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,7 +43,8 @@ export default function ChangePasswordModal({ isDark, onClose }) {
     setError("");
     setSuccess(false);
 
-    if (!currentPassword) {
+    // 🆕 Solo pedir contraseña actual si tiene password previa (email+password)
+    if (hasPassword && !currentPassword) {
       setError("Ingresa tu contraseña actual");
       return;
     }
@@ -136,19 +142,22 @@ export default function ChangePasswordModal({ isDark, onClose }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 12,
+            marginBottom: hasPassword ? 12 : 0, // Menos margen si no hay título
           }}
         >
-          <h2
-            style={{
-              fontSize: 16,
-              fontWeight: 700,
-              color: t.text,
-              margin: 0,
-            }}
-          >
-            Cambiar Contraseña
-          </h2>
+          {/* Título solo si tiene contraseña previa */}
+          {hasPassword && (
+            <h2
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                color: t.text,
+                margin: 0,
+              }}
+            >
+              Cambiar Contraseña
+            </h2>
+          )}
           <button
             onClick={onClose}
             style={{
@@ -207,62 +216,64 @@ export default function ChangePasswordModal({ isDark, onClose }) {
 
         {/* Formulario */}
         <form onSubmit={handleChangePassword} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {/* Contraseña Actual */}
-          <div>
-            <label
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: t.sub,
-                marginBottom: 5,
-                display: "block",
-              }}
-            >
-              ACTUAL
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showCurrentPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={currentPassword}
-                onChange={(e) => {
-                  setCurrentPassword(e.target.value);
-                  setError("");
-                }}
-                disabled={isLoading || success}
+          {/* Contraseña Actual - SOLO si tiene password previa (email+password) */}
+          {hasPassword && (
+            <div>
+              <label
                 style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "8px 14px 8px 36px",
-                  fontSize: 13,
-                  border: `1px solid ${error ? t.danger : "rgba(255,255,255,0.07)"}`,
-                  borderRadius: 10,
-                  background: t.surface,
-                  color: t.text,
-                  outline: "none",
-                  transition: "all 0.3s",
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                style={{
-                  position: "absolute",
-                  left: 12,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  color: t.sub,
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: 700,
-                  cursor: "pointer",
+                  color: t.sub,
+                  marginBottom: 5,
+                  display: "block",
                 }}
               >
-                🔒
-              </button>
+                ACTUAL
+              </label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={currentPassword}
+                  onChange={(e) => {
+                    setCurrentPassword(e.target.value);
+                    setError("");
+                  }}
+                  disabled={isLoading || success}
+                  style={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "8px 14px 8px 36px",
+                    fontSize: 13,
+                    border: `1px solid ${error ? t.danger : "rgba(255,255,255,0.07)"}`,
+                    borderRadius: 10,
+                    background: t.surface,
+                    color: t.text,
+                    outline: "none",
+                    transition: "all 0.3s",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  style={{
+                    position: "absolute",
+                    left: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: t.sub,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  🔒
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Nueva Contraseña */}
           <div>
