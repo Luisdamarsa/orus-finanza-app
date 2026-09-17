@@ -192,24 +192,37 @@ function Dashboard() {
 
         // Si es OAuth, sincronizar a tabla usuarios
         if (session?.user?.id) {
-          await syncOAuthUserToDatabase();
+          const syncResult = await syncOAuthUserToDatabase();
           localStorage.setItem("currentUserId", session.user.id);
           localStorage.setItem("authProvider", provider); // 🆕 Guardar provider (google, apple, etc)
           setCurrentUserId(session.user.id);
 
-          // 🆕 IMPORTANTE: Redirigir a Dashboard después de OAuth exitoso
+          // 🆕 IMPORTANTE: Redirigir a Dashboard o AccountReactivatedPage después de OAuth exitoso
           // setTimeout asegura que React procese el cambio antes
           setTimeout(() => {
-            setIsDashboardLoading(true); // Activar skeleton loading
-            setScreen("dashboard");
-            console.log("[App] Redirigiendo a Dashboard después de OAuth");
+            // Si fue una reactivación, mostrar pantalla especial primero
+            if (syncResult?.wasReactivated) {
+              console.log("[App] Cuenta reactivada, mostrando AccountReactivatedPage");
+              setScreen("account-reactivated");
+            } else {
+              // Si es nuevo login, ir directo a Dashboard
+              setIsDashboardLoading(true); // Activar skeleton loading
+              setScreen("dashboard");
+              console.log("[App] Redirigiendo a Dashboard después de OAuth");
 
-            // Desactivar loading después de 800ms (o cuando datos lleguen)
-            setTimeout(() => setIsDashboardLoading(false), 800);
+              // Desactivar loading después de 800ms (o cuando datos lleguen)
+              setTimeout(() => setIsDashboardLoading(false), 800);
+            }
           }, 100);
         }
       } catch (err) {
         console.error("[App] Error sincronizando OAuth:", err.message);
+        // 🆕 Limpiar localStorage como fallback si falla la sincronización
+        localStorage.removeItem("currentUserId");
+        localStorage.removeItem("currentUserEmail");
+        localStorage.removeItem("authProvider");
+        setCurrentUserId(null);
+        setScreen("login");
       }
     };
 

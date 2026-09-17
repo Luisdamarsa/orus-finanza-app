@@ -41,7 +41,7 @@ export async function signInWithOAuth(provider) {
  * Después de OAuth callback, sincronizar usuario en tabla usuarios
  * Llamar esto en useEffect cuando la sesión se actualiza
  *
- * @returns {Object} Usuario creado/actualizado en tabla usuarios
+ * @returns {Object} { user, wasReactivated } - wasReactivated = true si se reactivó una cuenta eliminada
  */
 export async function syncOAuthUserToDatabase() {
   try {
@@ -71,9 +71,21 @@ export async function syncOAuthUserToDatabase() {
       throw checkError;
     }
 
-    // 🆕 Si existe pero está inactivo, rechazar login
+    // 🆕 Si existe pero está inactivo, REACTIVAR automáticamente (solo para OAuth)
     if (existingUser && !existingUser.is_active) {
-      throw new Error('Esta cuenta ha sido eliminada');
+      console.error(`[oauthService] Cuenta inactiva detectada, reactivando...`);
+
+      const { error: updateError } = await supabase
+        .from('usuarios')
+        .update({ is_active: true })
+        .eq('id', authUser.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      console.error(`[oauthService] ✅ Cuenta reactivada automáticamente`);
+      return { user: { ...existingUser, is_active: true }, wasReactivated: true };
     }
 
     // Si no existe, crear registro en usuarios
@@ -115,11 +127,11 @@ export async function syncOAuthUserToDatabase() {
       }
 
       console.error(`[oauthService] ✅ Usuario creado en tabla usuarios`);
-      return newUser;
+      return { user: newUser, wasReactivated: false };
     }
 
     console.error(`[oauthService] ✅ Usuario ya existe en tabla usuarios`);
-    return existingUser;
+    return { user: existingUser, wasReactivated: false };
   } catch (error) {
     console.error(`[oauthService] Error en syncOAuthUserToDatabase:`, error.message);
     throw error;

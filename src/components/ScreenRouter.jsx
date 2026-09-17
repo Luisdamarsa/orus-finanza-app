@@ -23,6 +23,7 @@ import LoginPage from "./LoginPage";
 import SignupPage from "./SignupPage";
 import OnboardingPage from "./OnboardingPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
+import AccountReactivatedPage from "./AccountReactivatedPage"; // 🆕 Para OAuth reactivation
 
 /**
  * ScreenRouter.jsx — enruta la pantalla activa (RS-7).
@@ -287,6 +288,20 @@ export default function ScreenRouter({
     );
   }
 
+  // 🆕 Pantalla de reactivación de cuenta (OAuth)
+  if (screen === "account-reactivated") {
+    return (
+      <ScreenShell bg="#000000">
+        <AccountReactivatedPage
+          setScreen={setScreen}
+          currentUser={currentUser}
+          transactions={transactions}
+          customBudgets={customBudgets}
+          selectedPeriod={selectedPeriod}
+        />
+      </ScreenShell>
+    );
+  }
 
   return <DashboardScreen />;
 }
