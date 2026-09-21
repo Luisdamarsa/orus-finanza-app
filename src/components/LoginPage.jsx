@@ -85,19 +85,21 @@ export default function LoginPage({ setScreen }) {
     setScreen("forgot-password");
   };
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+
   return (
     <div
       style={{
-        position: "absolute",
-        inset: 0,
+        width: "100%",
+        minHeight: "100vh",
         background: "#000000",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "flex-start",
-        padding: "20px",
+        padding: isMobile ? "12px" : "20px",
         boxSizing: "border-box",
-        overflow: "auto",
+        overflow: "visible",
         fontFamily: "Manrope, system-ui, sans-serif",
       }}
     >
@@ -132,11 +134,11 @@ export default function LoginPage({ setScreen }) {
         }}
       >
         {/* Logo Container */}
-        <div style={{ marginTop: 20, marginBottom: 60 }}>
-          {/* Donut Logo with 5 pillars - 56% larger (30% + 20%) */}
+        <div style={{ marginTop: isMobile ? 8 : 20, marginBottom: isMobile ? 20 : 60 }}>
+          {/* Donut Logo with 5 pillars - responsive size */}
           <svg
-            width="187"
-            height="187"
+            width={isMobile ? 120 : 187}
+            height={isMobile ? 120 : 187}
             viewBox="0 0 120 120"
             style={{
               display: "block",
@@ -228,11 +230,11 @@ export default function LoginPage({ setScreen }) {
         {/* Tagline */}
         <div
           style={{
-            fontSize: 16,
+            fontSize: isMobile ? 13 : 16,
             fontWeight: 700,
             color: "white",
             textAlign: "center",
-            marginBottom: 48,
+            marginBottom: isMobile ? 16 : 48,
             maxWidth: 300,
           }}
         >
@@ -247,7 +249,7 @@ export default function LoginPage({ setScreen }) {
             maxWidth: 360,
             display: "flex",
             flexDirection: "column",
-            gap: 20,
+            gap: isMobile ? 12 : 20,
           }}
         >
           {/* Email Field */}
@@ -363,7 +365,7 @@ export default function LoginPage({ setScreen }) {
           )}
 
           {/* Buttons */}
-          <div style={{ display: "flex", gap: 12, marginTop: 28 }}>
+          <div style={{ display: "flex", gap: 12, marginTop: isMobile ? 12 : 28 }}>
             {/* Login Button - exact spec: vivid purple gradient with clay effect */}
             <button
               type="submit"
@@ -431,7 +433,7 @@ export default function LoginPage({ setScreen }) {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 12,
+          gap: isMobile ? 6 : 12,
           alignItems: "center",
           flex: "0 0 auto",
           width: "100%",
