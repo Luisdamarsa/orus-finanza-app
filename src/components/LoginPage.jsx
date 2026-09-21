@@ -94,7 +94,7 @@ export default function LoginPage({ setScreen }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
         padding: "20px",
         boxSizing: "border-box",
         overflow: "auto",
@@ -417,6 +417,14 @@ export default function LoginPage({ setScreen }) {
 
         </form>
       </div>
+
+      {/* Spacer - empuja Bottom hacia abajo en desktop, pero permite scroll en mobile */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+        }}
+      />
 
       {/* Bottom Section - OAuth + Footer */}
       <div
